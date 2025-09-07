@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "CommonJS",
+    
     "target": "ES2022",
     "lib": ["ES2022"],
     "declaration": true,
@@ -16,6 +16,7 @@
     "noFallthroughCasesInSwitch": false,
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": false,
+    "module": "ESNext",              // ✅ Compatible with bundler
     "moduleResolution": "bundler",
     "ignoreDeprecations": "5.0",
     "baseUrl": ".",
