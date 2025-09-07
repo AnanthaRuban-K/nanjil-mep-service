@@ -1,0 +1,206 @@
+{
+  "version": "6.0",
+  "nxVersion": "21.4.1",
+  "pathMappings": {
+    "@nanjil-mep/shared": [
+      "libs/shared/src/index.ts"
+    ]
+  },
+  "nxJsonPlugins": [
+    {
+      "name": "@nx/next/plugin",
+      "options": {
+        "startTargetName": "start",
+        "buildTargetName": "build",
+        "devTargetName": "dev",
+        "serveStaticTargetName": "serve-static",
+        "buildDepsTargetName": "build-deps",
+        "watchDepsTargetName": "watch-deps"
+      }
+    }
+  ],
+  "fileMap": {
+    "nonProjectFiles": [
+      {
+        "file": ".prettierrc",
+        "hash": "16267754514737964994"
+      },
+      {
+        "file": ".vscode/extensions.json",
+        "hash": "4134969992917317260"
+      },
+      {
+        "file": ".vscode/launch.json",
+        "hash": "3091359258626460534"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "17916001417971287321"
+      },
+      {
+        "file": "package.json",
+        "hash": "13748313090561100602"
+      },
+      {
+        "file": "nx.json",
+        "hash": "13700341982787347550"
+      },
+      {
+        "file": ".editorconfig",
+        "hash": "5443105041930014821"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "5796847179613607413"
+      },
+      {
+        "file": ".prettierignore",
+        "hash": "14688272390704683536"
+      },
+      {
+        "file": "README.md",
+        "hash": "1732109540096836010"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "10709861207219699602"
+      }
+    ],
+    "projectFileMap": {
+      "backend": [
+        {
+          "file": "apps/backend/package.json",
+          "hash": "12482680021332785902",
+          "deps": [
+            "npm:@types/node",
+            "npm:@types/cors",
+            "npm:tsx",
+            "npm:typescript",
+            "npm:drizzle-kit",
+            "npm:eslint",
+            "npm:hono",
+            "npm:@hono/node-server",
+            "npm:drizzle-orm",
+            "npm:postgres",
+            "npm:zod",
+            "npm:@clerk/backend",
+            "npm:cors",
+            "npm:dotenv"
+          ]
+        },
+        {
+          "file": "apps/backend/project.json",
+          "hash": "8348820127570471917"
+        },
+        {
+          "file": "apps/backend/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/backend/src/main.ts",
+          "hash": "10220203174035213316",
+          "deps": [
+            "npm:@hono/node-server",
+            "npm:hono"
+          ]
+        },
+        {
+          "file": "apps/backend/tsconfig.app.json",
+          "hash": "663763413802756907"
+        },
+        {
+          "file": "apps/backend/tsconfig.json",
+          "hash": "13155576910838619236"
+        }
+      ],
+      "frontend": [
+        {
+          "file": "apps/frontend/.swcrc",
+          "hash": "2742566327615098680"
+        },
+        {
+          "file": "apps/frontend/index.d.ts",
+          "hash": "5498222895072842432"
+        },
+        {
+          "file": "apps/frontend/next-env.d.ts",
+          "hash": "1320675027584673186"
+        },
+        {
+          "file": "apps/frontend/next.config.js",
+          "hash": "5443563404894739361",
+          "deps": [
+            "npm:@nx/next"
+          ]
+        },
+        {
+          "file": "apps/frontend/package.json",
+          "hash": "13780505155053275667",
+          "deps": [
+            "npm:@types/node",
+            "npm:@types/react",
+            "npm:@types/react-dom",
+            "npm:autoprefixer",
+            "npm:eslint",
+            "npm:postcss",
+            "npm:tailwindcss",
+            "npm:typescript",
+            "npm:next",
+            "npm:react",
+            "npm:react-dom",
+            "npm:zustand",
+            "npm:react-hook-form",
+            "npm:@hookform/resolvers",
+            "npm:zod",
+            "npm:axios",
+            "npm:@tanstack/react-query",
+            "npm:@clerk/nextjs",
+            "npm:lucide-react",
+            "npm:clsx",
+            "npm:tailwind-merge"
+          ]
+        },
+        {
+          "file": "apps/frontend/postcss.config.js",
+          "hash": "2759402739052110475"
+        },
+        {
+          "file": "apps/frontend/project.json",
+          "hash": "8416125061948997680"
+        },
+        {
+          "file": "apps/frontend/public/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/frontend/public/favicon.ico",
+          "hash": "9303420814833116677"
+        },
+        {
+          "file": "apps/frontend/src/app/api/hello/route.ts",
+          "hash": "495073956729887886"
+        },
+        {
+          "file": "apps/frontend/src/app/global.css",
+          "hash": "291024361394925992"
+        },
+        {
+          "file": "apps/frontend/src/app/layout.tsx",
+          "hash": "13415515203133792280"
+        },
+        {
+          "file": "apps/frontend/src/app/page.tsx",
+          "hash": "13264280020250538240"
+        },
+        {
+          "file": "apps/frontend/tailwind.config.js",
+          "hash": "5937918000814531646"
+        },
+        {
+          "file": "apps/frontend/tsconfig.json",
+          "hash": "16300060426112243553"
+        }
+      ]
+    }
+  }
+}
