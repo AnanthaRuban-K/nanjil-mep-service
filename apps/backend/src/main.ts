@@ -1,31 +1,96 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { logger } from 'hono/logger'
+import { bookingRoutes } from './routes/bookingRoutes'
+import { adminRoutes } from './routes/adminRoutes'
 
 const app = new Hono()
 
-app.use('*', cors())
+// Middleware
+app.use('*', logger())
+app.use('*', cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://nanjilmepservice.com']
+    : ['http://localhost:3100'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+}))
 
-app.get('/', (c) => {
-  return c.json({ 
-    message: 'Nanjil MEP Service API',
-    status: 'running',
-    port: 3101
-  })
-})
-
+// Health check
 app.get('/health', (c) => {
   return c.json({
     status: 'ok',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || 'development',
+    message: 'Nanjil MEP Service API - Simplified Version'
   })
 })
 
-const port = parseInt(process.env.PORT || '3101')
+// Routes
+app.route('/api/bookings', bookingRoutes)
+app.route('/api/admin', adminRoutes)
+
+// Root endpoint
+app.get('/', (c) => {
+  return c.json({ 
+    message: 'Nanjil MEP Service API - Simplified',
+    version: '2.0.0',
+    status: 'running',
+    features: [
+      'Simple booking creation',
+      'Basic admin management', 
+      'Cash payment (no tracking)',
+      'Tamil/English support',
+      'Mobile-first design'
+    ]
+  })
+})
+
+// 404 handler
+app.notFound((c) => {
+  return c.json({ 
+    error: 'Endpoint not found',
+    availableEndpoints: [
+      'GET /',
+      'GET /health', 
+      'POST /api/bookings',
+      'GET /api/bookings/:id',
+      'PUT /api/bookings/:id/cancel',
+      'POST /api/bookings/:id/feedback',
+      'GET /api/admin/dashboard',
+      'GET /api/admin/bookings',
+      'PUT /api/admin/bookings/:id/status'
+    ]
+  }, 404)
+})
+
+// Error handler
+app.onError((err, c) => {
+  console.error('Server error:', err)
+  return c.json({ 
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  }, 500)
+})
+
+const port = parseInt(process.env.PORT || '3001')
 
 serve({
   fetch: app.fetch,
   port,
 }, (info) => {
-  console.log(`🚀 Backend running at http://localhost:${info.port}`)
+  console.log(`🚀 Nanjil MEP API running at http://localhost:${info.port}`)
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`)
+  console.log(`🔧 Features: Simplified booking system`)
 })
+
+// REMOVED COMPLEX ROUTES:
+// - Team assignment routes
+// - Inventory management routes
+// - Performance analytics routes
+// - Payment tracking routes
+// - Location tracking routes
+// - File upload routes
+// - Notification routes
