@@ -8,12 +8,14 @@
     "dev:backend": "cd apps/backend && npm run dev",
     "build": "nx run-many --target=build --projects=frontend,backend",
     "build:frontend": "cd apps/frontend && npm run build",
-    "build:backend": "cd apps/backend && npm run build",
+    
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "cd apps/frontend && npm run start",
-    "start:backend": "cd apps/backend && npm run start",
+    
     "lint": "nx run-many --target=lint --projects=frontend,backend",
-    "install:all": "npm install && cd apps/frontend && npm install && cd ../backend && npm install"
+    "install:all": "npm install && cd apps/frontend && npm install && cd ../backend && npm install",
+    "build:backend": "nx build backend",
+    "start:backend": "nx start backend"
   },
   "private": true,
   "devDependencies": {
