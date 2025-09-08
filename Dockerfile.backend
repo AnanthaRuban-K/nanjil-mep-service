@@ -26,21 +26,25 @@ RUN nx build backend
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
-RUN addgroup --system --gid 1001 backend
-RUN adduser --system --uid 1001 backend
+# Create non-root user
+RUN addgroup --system --gid 1001 backend \
+  && adduser --system --uid 1001 backend
 
 # Copy built application
-COPY --from=builder /app/dist/apps/backend ./
+COPY --from=builder /app/dist/apps/backend ./ 
 COPY --from=builder /app/apps/backend/drizzle ./drizzle
 COPY --from=builder /app/node_modules ./node_modules
+
+# Copy environment file into container
+COPY apps/backend/.env.production .env
 
 USER backend
 
 EXPOSE 3101
 
-ENV PORT 3101
+ENV PORT=3101
 
 # Start the application
 CMD ["node", "main.js"]
