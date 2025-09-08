@@ -23,7 +23,7 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 backend
 RUN adduser --system --uid 1001 backend
 
-# Copy the built backend files to the correct location
+# Copy built files directly to working directory
 COPY --from=builder /app/dist/apps/backend ./
 COPY --from=builder /app/node_modules ./node_modules
 
@@ -33,5 +33,5 @@ USER backend
 EXPOSE 3101
 ENV PORT=3101
 
-# The main.js is in src/ subdirectory based on your build output
+# Since main.js is in src/ subdirectory of the build output
 CMD ["node", "src/main.js"]
