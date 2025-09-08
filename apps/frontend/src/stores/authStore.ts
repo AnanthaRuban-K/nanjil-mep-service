@@ -1,6 +1,6 @@
+// apps/frontend/src/stores/authStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
 
 interface User {
   id: string
@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
       isAdmin: false,
 
       setUser: (user: User | null) => {
-        set({ user })
+        set({ user, isAdmin: user?.role === 'admin' })
       },
 
       setLanguage: (language: 'ta' | 'en') => {
@@ -51,16 +51,9 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       partialize: (state) => ({
-        language: state.language
+        language: state.language,
+        user: state.user
       })
     }
   )
 )
-
-// REMOVED COMPLEX STORES:
-// - productStore (no inventory management)
-// - teamStore (no team assignment)
-// - locationStore (no GPS tracking)
-// - performanceStore (no analytics)
-// - notificationStore (simplified)
-// - cacheStore (simplified API calls)

@@ -20,7 +20,7 @@ interface Booking {
 
 interface AdminState {
   // Dashboard data
-  allBookings: Booking[]
+  allBookings: any[]
   metrics: AdminMetrics | null
   
   // Loading states
@@ -51,10 +51,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
       const { bookings } = await response.json()
       
-      set({ allBookings: bookings })
+      set({ allBookings: bookings || [] })
     } catch (error) {
       console.error('Fetch admin bookings error:', error)
-      throw error
+      set({ allBookings: [] })
     } finally {
       set({ isLoading: false })
     }
@@ -62,8 +62,6 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   updateBookingStatus: async (bookingId: string, status: string) => {
     try {
-      set({ isLoading: true })
-      
       const response = await fetch(`/api/admin/bookings/${bookingId}/status`, {
         method: 'PUT',
         headers: {
@@ -79,8 +77,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       // Update local state
       set((state) => ({
         allBookings: state.allBookings.map(booking =>
-          booking.bookingNumber === bookingId || booking.id === Number(bookingId)
-            ? { ...booking, status: status as any }
+          booking.bookingNumber === bookingId || booking.id === bookingId
+            ? { ...booking, status }
             : booking
         )
       }))
@@ -90,8 +88,6 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     } catch (error) {
       console.error('Update booking status error:', error)
       throw error
-    } finally {
-      set({ isLoading: false })
     }
   },
 
@@ -105,10 +101,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
       const { metrics } = await response.json()
       
-      set({ metrics })
+      set({ metrics: metrics || null })
     } catch (error) {
       console.error('Fetch metrics error:', error)
-      // Set default metrics on error
       set({
         metrics: {
           todayBookings: 0,

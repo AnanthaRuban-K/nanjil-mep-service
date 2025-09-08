@@ -5,7 +5,30 @@
       "type": "app",
       "data": {
         "root": "apps/frontend",
+        "name": "frontend",
+        "tags": [
+          "npm:private",
+          "type:app",
+          "scope:frontend"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "frontend",
+            "isInPackageManagerWorkspaces": false
+          }
+        },
         "targets": {
+          "dev": {
+            "executor": "@nx/next:dev",
+            "options": {
+              "port": 3100,
+              "dev": true
+            },
+            "configurations": {},
+            "parallelism": true,
+            "cache": false
+          },
           "build": {
             "executor": "@nx/next:build",
             "outputs": [
@@ -21,16 +44,15 @@
               },
               "production": {}
             },
-            "parallelism": true
-          },
-          "dev": {
-            "executor": "@nx/next:dev",
-            "options": {
-              "port": 3100,
-              "dev": true
-            },
-            "configurations": {},
-            "parallelism": true
+            "parallelism": true,
+            "cache": true,
+            "dependsOn": [
+              "^build"
+            ],
+            "inputs": [
+              "production",
+              "^production"
+            ]
           },
           "start": {
             "executor": "@nx/next:start",
@@ -40,40 +62,6 @@
             "dependsOn": [
               "build"
             ],
-            "configurations": {},
-            "parallelism": true
-          },
-          "serve-static": {
-            "continuous": true,
-            "options": {
-              "cwd": "apps/frontend",
-              "command": "next start"
-            },
-            "dependsOn": [
-              "build"
-            ],
-            "executor": "nx:run-commands",
-            "configurations": {},
-            "parallelism": true
-          },
-          "build-deps": {
-            "dependsOn": [
-              "^build"
-            ],
-            "configurations": {},
-            "options": {},
-            "parallelism": true,
-            "executor": "nx:noop"
-          },
-          "watch-deps": {
-            "continuous": true,
-            "dependsOn": [
-              "build-deps"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-              "command": "npx nx watch --projects frontend --includeDependentProjects -- npx nx build-deps frontend"
-            },
             "configurations": {},
             "parallelism": true
           },
@@ -88,20 +76,13 @@
               ]
             },
             "configurations": {},
-            "parallelism": true
-          }
-        },
-        "name": "frontend",
-        "tags": [
-          "npm:private",
-          "type:app",
-          "scope:frontend"
-        ],
-        "metadata": {
-          "targetGroups": {},
-          "js": {
-            "packageName": "frontend",
-            "isInPackageManagerWorkspaces": false
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "{workspaceRoot}/.eslintrc.json",
+              "{workspaceRoot}/.eslintignore"
+            ]
           }
         },
         "$schema": "../../node_modules/nx/schemas/project-schema.json",
@@ -122,13 +103,81 @@
           "scope:backend"
         ],
         "metadata": {
-          "targetGroups": {},
+          "targetGroups": {
+            "NPM Scripts": [
+              "type-check",
+              "db:generate",
+              "db:migrate",
+              "db:studio",
+              "db:seed"
+            ]
+          },
           "js": {
             "packageName": "backend",
             "isInPackageManagerWorkspaces": false
           }
         },
         "targets": {
+          "type-check": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "type-check"
+            },
+            "metadata": {
+              "scriptContent": "tsc --noEmit",
+              "runCommand": "npm run type-check"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "db:generate": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "db:generate"
+            },
+            "metadata": {
+              "scriptContent": "drizzle-kit generate:pg",
+              "runCommand": "npm run db:generate"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "db:migrate": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "db:migrate"
+            },
+            "metadata": {
+              "scriptContent": "tsx src/db/migrate.ts",
+              "runCommand": "npm run db:migrate"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "db:studio": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "db:studio"
+            },
+            "metadata": {
+              "scriptContent": "drizzle-kit studio",
+              "runCommand": "npm run db:studio"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "db:seed": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "db:seed"
+            },
+            "metadata": {
+              "scriptContent": "tsx src/db/seed.ts",
+              "runCommand": "npm run db:seed"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
           "dev": {
             "executor": "nx:run-commands",
             "options": {
@@ -139,7 +188,8 @@
               }
             },
             "configurations": {},
-            "parallelism": true
+            "parallelism": true,
+            "cache": false
           },
           "build": {
             "executor": "@nx/js:tsc",
@@ -153,7 +203,15 @@
               "assets": []
             },
             "configurations": {},
-            "parallelism": true
+            "parallelism": true,
+            "cache": true,
+            "dependsOn": [
+              "^build"
+            ],
+            "inputs": [
+              "production",
+              "^production"
+            ]
           },
           "start": {
             "executor": "nx:run-commands",
@@ -181,7 +239,13 @@
               ]
             },
             "configurations": {},
-            "parallelism": true
+            "parallelism": true,
+            "cache": true,
+            "inputs": [
+              "default",
+              "{workspaceRoot}/.eslintrc.json",
+              "{workspaceRoot}/.eslintignore"
+            ]
           }
         },
         "$schema": "../../node_modules/nx/schemas/project-schema.json",
@@ -7284,6 +7348,33 @@
         "hash": "sha512-4gEjHJFT9e+2W/77h/DS5SGUgwDaOwprX8L/gl5+3ixnzkVJJsZWDSelmN3Oilw3LNDZjZV0yqH1hLG3k6nghg=="
       }
     },
+    "npm:concurrently": {
+      "type": "npm",
+      "name": "npm:concurrently",
+      "data": {
+        "version": "9.2.1",
+        "packageName": "concurrently",
+        "hash": "sha512-fsfrO0MxV64Znoy8/l1vVIjjHa29SZyyqPgQBwhiDcaW8wJc2W3XWVOGx4M3oJBnv/zdUZIIp1gDeS98GzP8Ng=="
+      }
+    },
+    "npm:supports-color@8.1.1": {
+      "type": "npm",
+      "name": "npm:supports-color@8.1.1",
+      "data": {
+        "version": "8.1.1",
+        "packageName": "supports-color",
+        "hash": "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q=="
+      }
+    },
+    "npm:supports-color": {
+      "type": "npm",
+      "name": "npm:supports-color",
+      "data": {
+        "version": "7.2.0",
+        "packageName": "supports-color",
+        "hash": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="
+      }
+    },
     "npm:connect-history-api-fallback": {
       "type": "npm",
       "name": "npm:connect-history-api-fallback",
@@ -7489,24 +7580,6 @@
         "version": "27.5.1",
         "packageName": "jest-worker",
         "hash": "sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg=="
-      }
-    },
-    "npm:supports-color@8.1.1": {
-      "type": "npm",
-      "name": "npm:supports-color@8.1.1",
-      "data": {
-        "version": "8.1.1",
-        "packageName": "supports-color",
-        "hash": "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q=="
-      }
-    },
-    "npm:supports-color": {
-      "type": "npm",
-      "name": "npm:supports-color",
-      "data": {
-        "version": "7.2.0",
-        "packageName": "supports-color",
-        "hash": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="
       }
     },
     "npm:css-select": {
@@ -14480,11 +14553,6 @@
     "frontend": [
       {
         "source": "frontend",
-        "target": "npm:@nx/next",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
         "target": "npm:@types/node",
         "type": "static"
       },
@@ -14525,6 +14593,36 @@
       },
       {
         "source": "frontend",
+        "target": "npm:@clerk/nextjs",
+        "type": "static"
+      },
+      {
+        "source": "frontend",
+        "target": "npm:@hookform/resolvers",
+        "type": "static"
+      },
+      {
+        "source": "frontend",
+        "target": "npm:@tanstack/react-query",
+        "type": "static"
+      },
+      {
+        "source": "frontend",
+        "target": "npm:axios",
+        "type": "static"
+      },
+      {
+        "source": "frontend",
+        "target": "npm:clsx",
+        "type": "static"
+      },
+      {
+        "source": "frontend",
+        "target": "npm:lucide-react",
+        "type": "static"
+      },
+      {
+        "source": "frontend",
         "target": "npm:next",
         "type": "static"
       },
@@ -14540,17 +14638,12 @@
       },
       {
         "source": "frontend",
-        "target": "npm:zustand",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
         "target": "npm:react-hook-form",
         "type": "static"
       },
       {
         "source": "frontend",
-        "target": "npm:@hookform/resolvers",
+        "target": "npm:tailwind-merge",
         "type": "static"
       },
       {
@@ -14560,36 +14653,21 @@
       },
       {
         "source": "frontend",
-        "target": "npm:axios",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
-        "target": "npm:@tanstack/react-query",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
-        "target": "npm:@clerk/nextjs",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
-        "target": "npm:lucide-react",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
-        "target": "npm:clsx",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
-        "target": "npm:tailwind-merge",
+        "target": "npm:zustand",
         "type": "static"
       }
     ],
     "backend": [
+      {
+        "source": "backend",
+        "target": "npm:drizzle-kit",
+        "type": "static"
+      },
+      {
+        "source": "backend",
+        "target": "npm:dotenv",
+        "type": "static"
+      },
       {
         "source": "backend",
         "target": "npm:@types/node",
@@ -14612,7 +14690,7 @@
       },
       {
         "source": "backend",
-        "target": "npm:drizzle-kit",
+        "target": "npm:tsc-alias",
         "type": "static"
       },
       {
@@ -14653,11 +14731,6 @@
       {
         "source": "backend",
         "target": "npm:cors",
-        "type": "static"
-      },
-      {
-        "source": "backend",
-        "target": "npm:dotenv",
         "type": "static"
       }
     ],
@@ -22976,6 +23049,45 @@
         "type": "static"
       }
     ],
+    "npm:concurrently": [
+      {
+        "source": "npm:concurrently",
+        "target": "npm:chalk",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:shell-quote",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:supports-color@8.1.1",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:tree-kill",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:yargs",
+        "type": "static"
+      }
+    ],
+    "npm:supports-color@8.1.1": [
+      {
+        "source": "npm:supports-color@8.1.1",
+        "target": "npm:has-flag",
+        "type": "static"
+      }
+    ],
     "npm:content-disposition": [
       {
         "source": "npm:content-disposition",
@@ -23295,13 +23407,6 @@
       {
         "source": "npm:jest-worker@29.7.0",
         "target": "npm:supports-color@8.1.1",
-        "type": "static"
-      }
-    ],
-    "npm:supports-color@8.1.1": [
-      {
-        "source": "npm:supports-color@8.1.1",
-        "target": "npm:has-flag",
         "type": "static"
       }
     ],
@@ -32512,5 +32617,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1757181184287
+  "computedAt": 1757269034122
 }
