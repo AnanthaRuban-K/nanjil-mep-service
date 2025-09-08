@@ -1,13 +1,11 @@
 FROM node:18-alpine AS base
 RUN apk add --no-cache libc6-compat
 
-# Dependencies
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-# Build
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -15,7 +13,6 @@ COPY . .
 RUN npm install -g nx
 RUN nx build backend
 
-# Production
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
@@ -23,8 +20,8 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 backend
 RUN adduser --system --uid 1001 backend
 
-# Copy built files directly to working directory
-COPY --from=builder /app/dist/apps/backend ./
+# Keep the exact build structure that nx creates
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
 RUN chown -R backend:backend /app
@@ -33,5 +30,5 @@ USER backend
 EXPOSE 3101
 ENV PORT=3101
 
-# Since main.js is in src/ subdirectory of the build output
-CMD ["node", "src/main.js"]
+# Use the exact path where nx build puts the file
+CMD ["node", "dist/apps/backend/src/main.js"]
