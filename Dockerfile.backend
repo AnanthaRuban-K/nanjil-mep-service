@@ -30,4 +30,5 @@ USER backend
 EXPOSE 3101
 ENV PORT=3101
 
-CMD ["node", "dist/apps/backend/src/main.js"]
+CMD ["node", "dist/src/main.js"]
+
