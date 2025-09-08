@@ -216,7 +216,7 @@
           "start": {
             "executor": "nx:run-commands",
             "options": {
-              "command": "node dist/main.js",
+              "command": "node src/main.js",
               "cwd": "dist/apps/backend",
               "env": {
                 "PORT": "3101"
@@ -32617,5 +32617,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1757321702577
+  "computedAt": 1757323080158
 }

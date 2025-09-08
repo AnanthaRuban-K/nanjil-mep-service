@@ -25,16 +25,16 @@
       }
     },
     "start": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node dist/main.js",
-        "cwd": "dist/apps/backend",
-        "env": {
-          "PORT": "3101"
-        }
-      },
-      "dependsOn": ["build"]
+    "executor": "nx:run-commands",
+    "options": {
+      "command": "node src/main.js",
+      "cwd": "dist/apps/backend",
+      "env": {
+        "PORT": "3101"
+      }
     },
+    "dependsOn": ["build"]
+  },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],

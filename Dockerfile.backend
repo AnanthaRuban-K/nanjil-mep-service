@@ -1,32 +1,30 @@
-# Stage 1: Base
 FROM node:18-alpine AS base
 RUN apk add --no-cache libc6-compat
 
-# Stage 2: Dependencies  
+# Dependencies
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-COPY apps/backend/package.json ./apps/backend/
 RUN npm ci
 
-# Stage 3: Build
+# Build
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm install -g nx tsx
+RUN npm install -g nx
 RUN nx build backend
 
-# Stage 4: Production image
+# Production
 FROM base AS runner
 WORKDIR /app
-
 ENV NODE_ENV=production
+
 RUN addgroup --system --gid 1001 backend
 RUN adduser --system --uid 1001 backend
 
-# Copy the built files to correct location
-COPY --from=builder /app/dist/apps/backend ./dist
+# Copy the built backend files to the correct location
+COPY --from=builder /app/dist/apps/backend ./
 COPY --from=builder /app/node_modules ./node_modules
 
 RUN chown -R backend:backend /app
@@ -35,5 +33,5 @@ USER backend
 EXPOSE 3101
 ENV PORT=3101
 
-# Use the correct path where main.js actually exists
-CMD ["node", "dist/src/main.js"]
+# The main.js is in src/ subdirectory based on your build output
+CMD ["node", "src/main.js"]
