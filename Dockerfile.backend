@@ -28,23 +28,18 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Create non-root user
-RUN addgroup --system --gid 1001 backend \
-  && adduser --system --uid 1001 backend
+RUN addgroup --system --gid 1001 backend
+RUN adduser --system --uid 1001 backend
 
-# Copy built application
-COPY --from=builder /app/dist/apps/backend ./ 
+# Copy built backend app only
+COPY --from=builder /app/dist/apps/backend ./dist
 COPY --from=builder /app/apps/backend/drizzle ./drizzle
 COPY --from=builder /app/node_modules ./node_modules
-
-# Copy environment file into container
-COPY apps/backend/.env.production .env
 
 USER backend
 
 EXPOSE 3101
-
 ENV PORT=3101
 
-# Start the application
-CMD ["node", "main.js"]
+# Start the backend correctly
+CMD ["node", "dist/main.js"]
