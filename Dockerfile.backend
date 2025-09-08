@@ -1,35 +1,46 @@
 FROM node:18-alpine AS base
-RUN apk add --no-cache libc6-compat
 
+# Install dependencies only when needed
 FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY package.json package-lock.json* nx.json workspace.json tsconfig.base.json ./
-COPY apps ./apps
-COPY libs ./libs
+
+# Copy package files
+COPY package.json package-lock.json* ./
+COPY apps/backend/package.json ./apps/backend/
 RUN npm ci
 
+# Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app ./
-RUN npm install -g nx
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Install Nx CLI and tsx
+RUN npm install -g nx tsx
+
+# Build the backend
 RUN nx build backend
 
+# Production image
 FROM base AS runner
 WORKDIR /app
-ENV NODE_ENV=production
+
+ENV NODE_ENV production
 
 RUN addgroup --system --gid 1001 backend
 RUN adduser --system --uid 1001 backend
 
-COPY --from=builder /app/dist ./dist
+# Copy built application
+COPY --from=builder /app/dist/apps/backend ./
+COPY --from=builder /app/apps/backend/drizzle ./drizzle
 COPY --from=builder /app/node_modules ./node_modules
 
-RUN chown -R backend:backend /app
 USER backend
 
 EXPOSE 3101
-ENV PORT=3101
 
-CMD ["node", "dist/apps/backend/src/main.js"]
+ENV PORT 3101
 
-
+# Start the application
+CMD ["node", "main.js"]

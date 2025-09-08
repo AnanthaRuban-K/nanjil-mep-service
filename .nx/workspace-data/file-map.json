@@ -10,40 +10,64 @@
   "fileMap": {
     "nonProjectFiles": [
       {
+        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
+        "hash": "7931736663588028422"
+      },
+      {
+        "file": "coolify.yml",
+        "hash": "10189223219846369094"
+      },
+      {
+        "file": "README.md",
+        "hash": "1092509514459091072"
+      },
+      {
         "file": ".editorconfig",
         "hash": "5443105041930014821"
-      },
-      {
-        "file": "package-lock.json",
-        "hash": "3228574797105233363"
-      },
-      {
-        "file": ".env.production",
-        "hash": "6868898688190112911"
-      },
-      {
-        "file": ".gitignore",
-        "hash": "794121244803854593"
       },
       {
         "file": "LICENSE",
         "hash": "9555439355558940311"
       },
       {
+        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
+        "hash": "1445852493764896065"
+      },
+      {
         "file": "DEPLOYMENT.md",
         "hash": "5997703399884897577"
       },
       {
-        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
-        "hash": "7931736663588028422"
+        "file": ".prettierrc",
+        "hash": "16267754514737964994"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "3228574797105233363"
       },
       {
         "file": "Dockerfile.frontend",
         "hash": "7004066885937108249"
       },
       {
-        "file": "README.md",
-        "hash": "1092509514459091072"
+        "file": "package.json",
+        "hash": "13923324428112739205"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "794121244803854593"
+      },
+      {
+        "file": "scripts/deploy.sh",
+        "hash": "17046331438570067664"
+      },
+      {
+        "file": ".github/pull_request_template.md",
+        "hash": "2788755260168459697"
+      },
+      {
+        "file": "Dockerfile.backend",
+        "hash": "13783131767315147993"
       },
       {
         "file": "scripts/health-check.sh",
@@ -54,24 +78,12 @@
         "hash": "5796847179613607413"
       },
       {
-        "file": "Dockerfile.backend",
-        "hash": "9379288516821447073"
-      },
-      {
-        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
-        "hash": "1445852493764896065"
-      },
-      {
-        "file": ".github/pull_request_template.md",
-        "hash": "2788755260168459697"
-      },
-      {
         "file": ".prettierignore",
         "hash": "14688272390704683536"
       },
       {
-        "file": "package.json",
-        "hash": "13923324428112739205"
+        "file": ".env.production",
+        "hash": "6868898688190112911"
       },
       {
         "file": "nx.json",
@@ -80,18 +92,6 @@
       {
         "file": "docker-compose.yml",
         "hash": "14986573797577654766"
-      },
-      {
-        "file": "scripts/deploy.sh",
-        "hash": "17046331438570067664"
-      },
-      {
-        "file": ".prettierrc",
-        "hash": "16267754514737964994"
-      },
-      {
-        "file": "coolify.yml",
-        "hash": "10189223219846369094"
       }
     ],
     "projectFileMap": {
@@ -126,7 +126,7 @@
         },
         {
           "file": "apps/backend/package.json",
-          "hash": "5691791316353785461",
+          "hash": "13378616494650780631",
           "deps": [
             "npm:@types/node",
             "npm:@types/cors",
@@ -147,7 +147,7 @@
         },
         {
           "file": "apps/backend/project.json",
-          "hash": "18312968311351826601"
+          "hash": "8348820127570471917"
         },
         {
           "file": "apps/backend/src/assets/.gitkeep",
