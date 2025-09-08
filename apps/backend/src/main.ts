@@ -75,7 +75,7 @@ app.onError((err, c) => {
   }, 500)
 })
 
-const port = parseInt(process.env.PORT || '3001')
+const port = parseInt(process.env.PORT || '3101')
 
 serve({
   fetch: app.fetch,

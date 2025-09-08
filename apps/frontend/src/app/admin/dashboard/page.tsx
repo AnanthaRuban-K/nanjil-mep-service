@@ -53,7 +53,7 @@ export default function ProductionAdminDashboard() {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
 
   // API base URL
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3101"
 
   // Fetch dashboard metrics
   const fetchDashboardStats = useCallback(async () => {

@@ -127,7 +127,7 @@ export const useRealtimeBookings = () => {
     // In production, replace with your WebSocket server URL
     const wsUrl = process.env.NODE_ENV === 'production' 
       ? 'wss://your-api-domain.com/ws' 
-      : 'ws://localhost:3001/ws'
+      : 'ws://localhost:3101/ws'
 
     // For demo purposes, we'll simulate WebSocket with mock data
     // Replace this with actual WebSocket connection in production
