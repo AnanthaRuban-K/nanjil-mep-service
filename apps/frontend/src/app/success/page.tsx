@@ -1,21 +1,22 @@
-'use client'
-import React, { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { CheckCircle, Phone, MessageCircle, Home, Copy } from 'lucide-react'
+"use client"
 
-export default function SuccessPage() {
+import React, { useEffect, useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { CheckCircle, Phone, MessageCircle, Home, Copy } from "lucide-react"
+
+function SuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [bookingId, setBookingId] = useState<string>('')
+  const [bookingId, setBookingId] = useState<string>("")
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    const id = searchParams.get('bookingId')
+    const id = searchParams.get("bookingId")
     if (id) {
       setBookingId(id)
     } else {
       // If no booking ID, redirect to home
-      setTimeout(() => router.push('/'), 3000)
+      setTimeout(() => router.push("/"), 3000)
     }
   }, [searchParams, router])
 
@@ -27,16 +28,18 @@ export default function SuccessPage() {
 
   const handleWhatsApp = () => {
     const message = `Hi! I just booked a service. My booking ID is: ${bookingId}`
-    const whatsappUrl = `https://wa.me/1800NANJIL?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, '_blank')
+    const whatsappUrl = `https://wa.me/1800NANJIL?text=${encodeURIComponent(
+      message
+    )}`
+    window.open(whatsappUrl, "_blank")
   }
 
   const handleCall = () => {
-    window.location.href = 'tel:1800-NANJIL'
+    window.location.href = "tel:1800-NANJIL"
   }
 
   const handleHome = () => {
-    router.push('/')
+    router.push("/")
   }
 
   return (
@@ -47,9 +50,7 @@ export default function SuccessPage() {
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            பதிவு முடிந்தது!
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">பதிவு முடிந்தது!</h1>
           <p className="text-xl text-gray-600">Booking Confirmed!</p>
         </div>
 
@@ -69,9 +70,7 @@ export default function SuccessPage() {
                 <Copy className="w-5 h-5" />
               </button>
             </div>
-            {copied && (
-              <p className="text-green-600 text-sm mt-1">Copied!</p>
-            )}
+            {copied && <p className="text-green-600 text-sm mt-1">Copied!</p>}
           </div>
         )}
 
@@ -123,5 +122,13 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
   )
 }
