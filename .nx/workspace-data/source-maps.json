@@ -20,30 +20,6 @@
       "apps/backend/package.json",
       "nx/core/package-json"
     ],
-    "metadata.targetGroups.NPM Scripts": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "metadata.targetGroups.NPM Scripts.0": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "metadata.targetGroups.NPM Scripts.1": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "metadata.targetGroups.NPM Scripts.2": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "metadata.targetGroups.NPM Scripts.3": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "metadata.targetGroups.NPM Scripts.4": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
     "metadata.js": [
       "apps/backend/package.json",
       "nx/core/package-json"
@@ -57,146 +33,6 @@
       "nx/core/package-json"
     ],
     "targets": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.executor": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.options": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.metadata": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.options.script": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.metadata.scriptContent": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.metadata.runCommand": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:generate": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:generate.executor": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:generate.options": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:generate.metadata": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:generate.options.script": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:generate.metadata.scriptContent": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:generate.metadata.runCommand": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:migrate": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:migrate.executor": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:migrate.options": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:migrate.metadata": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:migrate.options.script": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:migrate.metadata.scriptContent": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:migrate.metadata.runCommand": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:studio": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:studio.executor": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:studio.options": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:studio.metadata": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:studio.options.script": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:studio.metadata.scriptContent": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:studio.metadata.runCommand": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:seed": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:seed.executor": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:seed.options": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:seed.metadata": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:seed.options.script": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:seed.metadata.scriptContent": [
-      "apps/backend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.db:seed.metadata.runCommand": [
       "apps/backend/package.json",
       "nx/core/package-json"
     ],
@@ -240,10 +76,6 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.dev.options.env": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
     "targets.build": [
       "apps/backend/project.json",
       "nx/core/project-json"
@@ -269,10 +101,6 @@
       "nx/core/project-json"
     ],
     "targets.build.options.tsConfig": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.build.options.format": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
@@ -304,10 +132,6 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.start.options.env": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
     "targets.lint": [
       "apps/backend/project.json",
       "nx/core/project-json"
@@ -325,6 +149,102 @@
       "nx/core/project-json"
     ],
     "targets.lint.options.lintFilePatterns": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.type-check": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.type-check.executor": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.type-check.options": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.type-check.options.command": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:generate": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:generate.executor": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:generate.options": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:generate.options.command": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:generate.options.cwd": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:migrate": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:migrate.executor": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:migrate.options": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:migrate.options.command": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:migrate.options.cwd": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:studio": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:studio.executor": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:studio.options": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:studio.options.command": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:studio.options.cwd": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:seed": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:seed.executor": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:seed.options": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:seed.options.command": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.db:seed.options.cwd": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],

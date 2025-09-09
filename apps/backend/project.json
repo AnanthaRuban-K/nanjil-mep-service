@@ -8,39 +8,66 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "tsx watch src/main.ts",
-        "cwd": "apps/backend",
-        "env": {
-          "PORT": "3101"
-        }
+        "cwd": "apps/backend"
       }
     },
     "build": {
-    "executor": "@nx/js:tsc",
-    "outputs": ["{options.outputPath}"],
-    "options": {
-      "outputPath": "dist/apps/backend",
-      "main": "apps/backend/src/main.ts",
-      "tsConfig": "apps/backend/tsconfig.json",
-      "format": ["cjs"],
-      "assets": []
-    }
-  },
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/backend",
+        "main": "apps/backend/src/main.ts",
+        "tsConfig": "apps/backend/tsconfig.json",
+        "assets": []
+      }
+    },
     "start": {
-  "executor": "nx:run-commands",
-  "options": {
-    "command": "node src/main.js",
-    "cwd": "dist/apps/backend",
-    "env": {
-      "PORT": "3101"
-    }
-  },
-  "dependsOn": ["build"]
-},
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node dist/main.js",
+        "cwd": "dist/apps/backend"
+      },
+      "dependsOn": ["build"]
+    },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/backend/**/*.ts"]
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --project apps/backend/tsconfig.json --noEmit"
+      }
+    },
+    "db:generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "drizzle-kit generate:pg",
+        "cwd": "apps/backend"
+      }
+    },
+    "db:migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx src/db/migrate.ts",
+        "cwd": "apps/backend"
+      }
+    },
+    "db:studio": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "drizzle-kit studio",
+        "cwd": "apps/backend"
+      }
+    },
+    "db:seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx src/db/seed.ts",
+        "cwd": "apps/backend"
       }
     }
   },

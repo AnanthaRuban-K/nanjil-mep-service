@@ -103,89 +103,18 @@
           "scope:backend"
         ],
         "metadata": {
-          "targetGroups": {
-            "NPM Scripts": [
-              "type-check",
-              "db:generate",
-              "db:migrate",
-              "db:studio",
-              "db:seed"
-            ]
-          },
+          "targetGroups": {},
           "js": {
             "packageName": "backend",
             "isInPackageManagerWorkspaces": false
           }
         },
         "targets": {
-          "type-check": {
-            "executor": "nx:run-script",
-            "options": {
-              "script": "type-check"
-            },
-            "metadata": {
-              "scriptContent": "tsc --noEmit",
-              "runCommand": "npm run type-check"
-            },
-            "configurations": {},
-            "parallelism": true
-          },
-          "db:generate": {
-            "executor": "nx:run-script",
-            "options": {
-              "script": "db:generate"
-            },
-            "metadata": {
-              "scriptContent": "drizzle-kit generate:pg",
-              "runCommand": "npm run db:generate"
-            },
-            "configurations": {},
-            "parallelism": true
-          },
-          "db:migrate": {
-            "executor": "nx:run-script",
-            "options": {
-              "script": "db:migrate"
-            },
-            "metadata": {
-              "scriptContent": "tsx src/db/migrate.ts",
-              "runCommand": "npm run db:migrate"
-            },
-            "configurations": {},
-            "parallelism": true
-          },
-          "db:studio": {
-            "executor": "nx:run-script",
-            "options": {
-              "script": "db:studio"
-            },
-            "metadata": {
-              "scriptContent": "drizzle-kit studio",
-              "runCommand": "npm run db:studio"
-            },
-            "configurations": {},
-            "parallelism": true
-          },
-          "db:seed": {
-            "executor": "nx:run-script",
-            "options": {
-              "script": "db:seed"
-            },
-            "metadata": {
-              "scriptContent": "tsx src/db/seed.ts",
-              "runCommand": "npm run db:seed"
-            },
-            "configurations": {},
-            "parallelism": true
-          },
           "dev": {
             "executor": "nx:run-commands",
             "options": {
               "command": "tsx watch src/main.ts",
-              "cwd": "apps/backend",
-              "env": {
-                "PORT": "3101"
-              }
+              "cwd": "apps/backend"
             },
             "configurations": {},
             "parallelism": true,
@@ -200,9 +129,6 @@
               "outputPath": "dist/apps/backend",
               "main": "apps/backend/src/main.ts",
               "tsConfig": "apps/backend/tsconfig.json",
-              "format": [
-                "cjs"
-              ],
               "assets": []
             },
             "configurations": {},
@@ -219,11 +145,8 @@
           "start": {
             "executor": "nx:run-commands",
             "options": {
-              "command": "node src/main.js",
-              "cwd": "dist/apps/backend",
-              "env": {
-                "PORT": "3101"
-              }
+              "command": "node dist/main.js",
+              "cwd": "dist/apps/backend"
             },
             "dependsOn": [
               "build"
@@ -249,6 +172,50 @@
               "{workspaceRoot}/.eslintrc.json",
               "{workspaceRoot}/.eslintignore"
             ]
+          },
+          "type-check": {
+            "executor": "nx:run-commands",
+            "options": {
+              "command": "tsc --project apps/backend/tsconfig.json --noEmit"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "db:generate": {
+            "executor": "nx:run-commands",
+            "options": {
+              "command": "drizzle-kit generate:pg",
+              "cwd": "apps/backend"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "db:migrate": {
+            "executor": "nx:run-commands",
+            "options": {
+              "command": "tsx src/db/migrate.ts",
+              "cwd": "apps/backend"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "db:studio": {
+            "executor": "nx:run-commands",
+            "options": {
+              "command": "drizzle-kit studio",
+              "cwd": "apps/backend"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "db:seed": {
+            "executor": "nx:run-commands",
+            "options": {
+              "command": "tsx src/db/seed.ts",
+              "cwd": "apps/backend"
+            },
+            "configurations": {},
+            "parallelism": true
           }
         },
         "$schema": "../../node_modules/nx/schemas/project-schema.json",
@@ -32620,5 +32587,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1757419585068
+  "computedAt": 1757432146073
 }

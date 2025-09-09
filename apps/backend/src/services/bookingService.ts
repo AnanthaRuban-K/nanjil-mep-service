@@ -1,5 +1,5 @@
 // apps/backend/src/services/bookingService.ts - SIMPLIFIED VERSION
-import { db } from '../db'
+import { db } from '../db/index.js'
 import { bookings, type NewBooking } from '../db/schema'
 import { eq, desc, and,gte,lt } from 'drizzle-orm'
 
