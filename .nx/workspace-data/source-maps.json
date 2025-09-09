@@ -272,6 +272,10 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
+    "targets.build.options.format": [
+      "apps/backend/project.json",
+      "nx/core/project-json"
+    ],
     "targets.build.options.assets": [
       "apps/backend/project.json",
       "nx/core/project-json"

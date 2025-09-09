@@ -200,6 +200,9 @@
               "outputPath": "dist/apps/backend",
               "main": "apps/backend/src/main.ts",
               "tsConfig": "apps/backend/tsconfig.json",
+              "format": [
+                "cjs"
+              ],
               "assets": []
             },
             "configurations": {},
@@ -216,7 +219,7 @@
           "start": {
             "executor": "nx:run-commands",
             "options": {
-              "command": "node dist/main.js",
+              "command": "node src/main.js",
               "cwd": "dist/apps/backend",
               "env": {
                 "PORT": "3101"
@@ -14578,7 +14581,7 @@
       },
       {
         "source": "frontend",
-        "target": "npm:postcss",
+        "target": "npm:postcss@8.5.6",
         "type": "static"
       },
       {
@@ -32617,5 +32620,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1757334085235
+  "computedAt": 1757416628585
 }

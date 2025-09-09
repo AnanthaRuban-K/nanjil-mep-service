@@ -15,7 +15,7 @@
     "lint": "nx run-many --target=lint --projects=frontend,backend",
     "install:all": "npm install && cd apps/frontend && npm install && cd ../backend && npm install",
     "build:backend": "nx build backend",
-    "start:backend": "node dist/apps/backend/main.js"
+    "start:backend": "node dist/apps/backend/src/main.js"
   },
   "private": true,
   "devDependencies": {
