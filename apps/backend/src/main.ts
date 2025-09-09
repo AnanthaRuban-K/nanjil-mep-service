@@ -75,13 +75,13 @@ app.onError((err, c) => {
   }, 500)
 })
 
-const port = parseInt(process.env.PORT || '3101')
+const port = Number(process.env.PORT) || 3101
 
 serve({
   fetch: app.fetch,
   port,
 }, (info) => {
-  console.log(`🚀 Nanjil MEP API running at http://localhost:${info.port}`)
+  console.log(`🚀 Nanjil MEP API running at http://localhost:${port}`)
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`)
   console.log(`🔧 Features: Simplified booking system`)
 })
