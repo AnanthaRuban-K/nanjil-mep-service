@@ -1,4 +1,4 @@
-// apps/frontend/src/app/describe/page.tsx - SIMPLIFIED PROBLEM DESCRIPTION
+// apps/frontend/src/app/describe/page.tsx - FIXED VERSION
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -56,146 +56,125 @@ export default function DescribePage() {
       ]
     } else if (selectedService === 'plumbing') {
       return [
-        'கழிவறை ப்ளஷ் ஆகவில்லை - Toilet not flushing',
+        'கழிவறை புளஷ் ஆகவில்லை - Toilet not flushing',
         'குழாயில் தண்ணீர் கசிவு - Pipe water leaking',
         'டேப்பில் தண்ணீர் வரவில்லை - No water from tap',
         'வாட்டர் ஹீட்டர் வேலை செய்யவில்லை - Water heater not working',
-        'சின்க் அடைத்து போயிருக்கு - Sink is blocked',
+        'சிங்க் அடைத்து போயிருக்கு - Sink is blocked',
         'பாத்ரூமில் தண்ணீர் தேங்குது - Water pooling in bathroom'
       ]
     }
     return []
   }
 
-  const serviceIcon = selectedService === 'electrical' ? Zap : Wrench
-  const serviceColor = selectedService === 'electrical' ? 'yellow' : 'blue'
-  const serviceName = selectedService === 'electrical' ? 'மின்சாரம் (Electrical)' : 'குழாய் (Plumbing)'
+  const serviceIcon = selectedService === 'electrical' ? <Zap className="w-6 h-6" /> : <Wrench className="w-6 h-6" />
+  const serviceNameTa = selectedService === 'electrical' ? 'மின்சாரம்' : 'குழாய்'
+  const serviceNameEn = selectedService === 'electrical' ? 'Electrical' : 'Plumbing'
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
-            <button
+            <button 
               onClick={handleBack}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100"
             >
               <ArrowLeft className="w-6 h-6 text-gray-600" />
             </button>
-            <div>
-              <h1 className="text-xl font-bold text-gray-800">பிரச்சனை என்ன?</h1>
-              <p className="text-sm text-gray-600">What's the Problem?</p>
+            <div className="flex items-center space-x-3">
+              <div className={`p-2 rounded-lg ${
+                selectedService === 'electrical' ? 'bg-yellow-500' : 'bg-blue-500'
+              }`}>
+                {serviceIcon}
+                <span className="text-white">{serviceIcon}</span>
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-gray-800">{serviceNameTa} சேவை</h1>
+                <p className="text-sm text-gray-600">{serviceNameEn} Service</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Service Info */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
-          <div className="flex items-center space-x-4">
-            <div className={`bg-${serviceColor}-100 p-3 rounded-full`}>
-              {React.createElement(serviceIcon, { 
-                className: `w-6 h-6 text-${serviceColor}-600` 
-              })}
-            </div>
-            <div className="flex-1">
-              <h2 className="text-lg font-semibold text-gray-800">
-                தேர்ந்தெடுத்த சேவை: {serviceName}
-              </h2>
-              {isEmergency && (
-                <span className="inline-block bg-red-100 text-red-800 text-sm font-medium px-3 py-1 rounded-full mt-1">
-                  🚨 அவசரம் (Emergency)
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Problem Description */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-gray-800 mb-2">
             பிரச்சனையை விவரிக்கவும்
-          </h3>
-          <p className="text-gray-600 mb-4 text-sm">
-            Describe the problem in detail (minimum 10 characters)
-          </p>
-          
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="உங்கள் பிரச்சனையை விரிவாக எழுதுங்கள்... 
-Write your problem in detail..."
-            className="w-full h-32 p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-lg"
-            style={{ fontFamily: 'Noto Sans Tamil, sans-serif' }}
-          />
-          
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-sm text-gray-500">
-              {description.length} characters (minimum 10 required)
-            </span>
-            <span className={`text-sm ${description.length >= 10 ? 'text-green-600' : 'text-red-500'}`}>
-              {description.length >= 10 ? '✓ Ready' : '✗ Too short'}
-            </span>
-          </div>
-        </div>
+          </h2>
+          <p className="text-gray-600 mb-6">Describe Your Problem</p>
 
-        {/* Quick Issue Selection */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            பொதுவான பிரச்சனைகள்
-          </h3>
-          <p className="text-gray-600 mb-4 text-sm">
-            Common Issues - Click to select quickly
-          </p>
-          
-          <div className="grid gap-3">
-            {getQuickIssues().map((issue, index) => (
-              <button
-                key={index}
-                onClick={() => handleQuickSelect(issue)}
-                className={`text-left p-4 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
-                  description === issue
-                    ? `border-${serviceColor}-500 bg-${serviceColor}-50`
-                    : 'border-gray-200 hover:border-gray-300 bg-white'
-                }`}
-              >
-                <div className="flex items-start space-x-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    description === issue ? `bg-${serviceColor}-500` : 'bg-gray-400'
-                  }`}></div>
-                  <span className="text-gray-800 font-medium">{issue}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+          {/* Quick Issues */}
+          {getQuickIssues().length > 0 && (
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-800 mb-3">
+                பொதுவான பிரச்சனைகள் • Common Issues
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {getQuickIssues().map((issue, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleQuickSelect(issue)}
+                    className="text-left p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                  >
+                    <span className="text-sm text-gray-800">{issue}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-        {/* Next Button */}
-        <div className="text-center">
+          {/* Description Input */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              விரிவான விவரம் • Detailed Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="உங்கள் பிரச்சனையை விரிவாக எழுதுங்கள் / Describe your problem in detail..."
+              className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows={4}
+              maxLength={500}
+            />
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-sm text-gray-500">
+                குறைந்தது 10 எழுத்துகள் • Minimum 10 characters
+              </span>
+              <span className="text-sm text-gray-500">
+                {description.length}/500
+              </span>
+            </div>
+          </div>
+
+          {/* Emergency Badge */}
+          {isEmergency && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                <span className="text-red-800 font-semibold">
+                  அவசர சேவை • Emergency Service
+                </span>
+              </div>
+              <p className="text-red-600 text-sm mt-1">
+                கூடுதல் கட்டணம் பொருந்தும் • Additional charges apply
+              </p>
+            </div>
+          )}
+
+          {/* Next Button */}
           <button
             onClick={handleNext}
             disabled={description.trim().length < 10}
-            className={`font-bold py-4 px-8 rounded-2xl shadow-lg transition-all duration-300 min-w-[200px] ${
-              description.trim().length >= 10
-                ? 'bg-green-500 hover:bg-green-600 text-white hover:shadow-xl transform hover:-translate-y-1'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            அடுத்தது: உங்கள் விபரங்கள் →
-            <div className="text-sm font-normal">Next: Your Details</div>
+            அடுத்த படி • Next Step
           </button>
         </div>
       </div>
     </div>
   )
 }
-
-// REMOVED COMPLEX FEATURES:
-// - Voice input/recording
-// - Photo upload functionality  
-// - Auto-translation between Tamil/English
-// - AI-powered problem categorization
-// - Location-specific issue templates
-// - Integration with inventory to suggest parts needed

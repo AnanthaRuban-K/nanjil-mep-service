@@ -1,7 +1,7 @@
-// apps/backend/src/db/schema.ts - SIMPLIFIED VERSION
+// apps/backend/src/db/schema.ts - FIXED VERSION
 import { pgTable, serial, varchar, text, timestamp, jsonb, decimal, integer } from 'drizzle-orm/pg-core'
 
-// SIMPLIFIED BOOKINGS TABLE - Remove complex features
+// SIMPLIFIED BOOKINGS TABLE
 export const bookings = pgTable('bookings', {
   id: serial('id').primaryKey(),
   bookingNumber: varchar('booking_number', { length: 20 }).notNull().unique(),
@@ -45,14 +45,14 @@ export const services = pgTable('services', {
   isActive: varchar('is_active', { length: 10 }).notNull().default('true')
 })
 
-// CUSTOMERS TABLE - Simple user info
+// CUSTOMERS TABLE - Simple user info (FIXED)
 export const customers = pgTable('customers', {
   id: serial('id').primaryKey(),
   clerkUserId: varchar('clerk_user_id', { length: 100 }).unique(),
   name: varchar('name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 15 }).notNull(),
   address: text('address'),
-  language: varchar('language', { length: 5 }).default('ta'), // 'ta' | 'en'
+  language: varchar('language', { length: 5 }).notNull().default('ta'), // Fixed: added .notNull()
   createdAt: timestamp('created_at').defaultNow()
 })
 
@@ -63,7 +63,7 @@ export const admins = pgTable('admins', {
   name: varchar('name', { length: 100 }).notNull(),
   email: varchar('email', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 15 }),
-  role: varchar('role', { length: 20 }).default('admin'),
+  role: varchar('role', { length: 20 }).notNull().default('admin'),
   isActive: varchar('is_active', { length: 10 }).notNull().default('true'),
   createdAt: timestamp('created_at').defaultNow()
 })
@@ -74,11 +74,3 @@ export type NewBooking = typeof bookings.$inferInsert
 export type Service = typeof services.$inferSelect
 export type Customer = typeof customers.$inferSelect
 export type Admin = typeof admins.$inferSelect
-
-// REMOVED COMPLEX TABLES:
-// - teams (no team assignment)
-// - products (no inventory)
-// - service_areas (simplified location)
-// - booking_events (no complex tracking)
-// - inventory_items (no inventory management)
-// - performance_metrics (no analytics)

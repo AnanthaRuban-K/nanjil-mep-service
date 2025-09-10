@@ -14640,12 +14640,12 @@
       },
       {
         "source": "backend",
-        "target": "npm:@types/node",
+        "target": "npm:@types/cors",
         "type": "static"
       },
       {
         "source": "backend",
-        "target": "npm:@types/cors",
+        "target": "npm:@types/node",
         "type": "static"
       },
       {
@@ -14655,42 +14655,12 @@
       },
       {
         "source": "backend",
-        "target": "npm:typescript",
-        "type": "static"
-      },
-      {
-        "source": "backend",
         "target": "npm:tsc-alias",
         "type": "static"
       },
       {
         "source": "backend",
-        "target": "npm:eslint",
-        "type": "static"
-      },
-      {
-        "source": "backend",
-        "target": "npm:hono",
-        "type": "static"
-      },
-      {
-        "source": "backend",
-        "target": "npm:@hono/node-server",
-        "type": "static"
-      },
-      {
-        "source": "backend",
-        "target": "npm:drizzle-orm",
-        "type": "static"
-      },
-      {
-        "source": "backend",
-        "target": "npm:postgres",
-        "type": "static"
-      },
-      {
-        "source": "backend",
-        "target": "npm:zod",
+        "target": "npm:typescript",
         "type": "static"
       },
       {
@@ -14700,7 +14670,27 @@
       },
       {
         "source": "backend",
+        "target": "npm:@hono/node-server",
+        "type": "static"
+      },
+      {
+        "source": "backend",
         "target": "npm:cors",
+        "type": "static"
+      },
+      {
+        "source": "backend",
+        "target": "npm:drizzle-orm",
+        "type": "static"
+      },
+      {
+        "source": "backend",
+        "target": "npm:hono",
+        "type": "static"
+      },
+      {
+        "source": "backend",
+        "target": "npm:postgres",
         "type": "static"
       }
     ],
@@ -32587,5 +32577,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1757432146073
+  "computedAt": 1757503351061
 }

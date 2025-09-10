@@ -1,7 +1,6 @@
-// apps/backend/src/services/bookingService.ts - SIMPLIFIED VERSION
 import { db } from '../db/index.js'
-import { bookings, type NewBooking } from '../db/schema'
-import { eq, desc, and,gte,lt } from 'drizzle-orm'
+import { bookings, type NewBooking } from '../db/schema.js'
+import { eq, desc, and, gte, lt } from 'drizzle-orm'
 
 export class BookingService {
   async createBooking(data: {
@@ -73,138 +72,118 @@ export class BookingService {
     }
   }
 
-  // SIMPLIFIED status updates
   async updateBookingStatus(bookingId: string, status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled') {
     try {
       const isNumeric = !isNaN(Number(bookingId))
-      const completedAt = status === 'completed' ? new Date() : null
+      const completedAt = status === 'completed' ? new Date() : undefined
+      
+      const updateData: any = {
+        status,
+        updatedAt: new Date(),
+        ...(completedAt && { completedAt })
+      }
       
       if (isNumeric) {
-        await db
-          .update(bookings)
-          .set({ 
-            status, 
-            updatedAt: new Date(),
-            completedAt
-          })
-          .where(eq(bookings.id, Number(bookingId)))
+        await db.update(bookings).set(updateData).where(eq(bookings.id, Number(bookingId)))
       } else {
-        await db
-          .update(bookings)
-          .set({ 
-            status, 
-            updatedAt: new Date(),
-            completedAt
-          })
-          .where(eq(bookings.bookingNumber, bookingId))
+        await db.update(bookings).set(updateData).where(eq(bookings.bookingNumber, bookingId))
       }
+      
+      return true
     } catch (error) {
       console.error('updateBookingStatus error:', error)
       throw new Error(`Failed to update booking status`)
     }
   }
 
-  // SIMPLIFIED rating system
+  async cancelBooking(bookingId: string, reason?: string) {
+    try {
+      return this.updateBookingStatus(bookingId, 'cancelled')
+    } catch (error) {
+      console.error('cancelBooking error:', error)
+      throw new Error(`Failed to cancel booking`)
+    }
+  }
+
   async rateBooking(bookingId: string, rating: number, review: string) {
     try {
       const isNumeric = !isNaN(Number(bookingId))
+      const updateData = { rating, review, updatedAt: new Date() }
       
       if (isNumeric) {
-        await db
-          .update(bookings)
-          .set({ rating, review, updatedAt: new Date() })
-          .where(eq(bookings.id, Number(bookingId)))
+        await db.update(bookings).set(updateData).where(eq(bookings.id, Number(bookingId)))
       } else {
-        await db
-          .update(bookings)
-          .set({ rating, review, updatedAt: new Date() })
-          .where(eq(bookings.bookingNumber, bookingId))
+        await db.update(bookings).set(updateData).where(eq(bookings.bookingNumber, bookingId))
       }
+      
+      return true
     } catch (error) {
       console.error('rateBooking error:', error)
       throw new Error(`Failed to rate booking`)
     }
   }
 
-  async cancelBooking(bookingId: string, reason?: string) {
-    try {
-      await this.updateBookingStatus(bookingId, 'cancelled')
-      console.log(`Booking ${bookingId} cancelled. Reason: ${reason || 'No reason provided'}`)
-    } catch (error) {
-      throw new Error(`Failed to cancel booking`)
-    }
-  }
-
-  // SIMPLIFIED admin dashboard metrics
   async getDashboardMetrics() {
     try {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      
-      const tomorrow = new Date(today)
-      tomorrow.setDate(tomorrow.getDate() + 1)
-
-      // Get today's bookings
-      const todayBookings = await db
-  .select()
-  .from(bookings)
-  .where(
-    and(
-      gte(bookings.createdAt, today),
-      lt(bookings.createdAt, tomorrow)
-    )
-  )
-
-      // Get all bookings for status counts
       const allBookings = await db.select().from(bookings)
       
-      const metrics = {
-        todayBookings: todayBookings.length,
-        completedJobs: allBookings.filter(b => b.status === 'completed').length,
-        pendingJobs: allBookings.filter(b => b.status === 'pending').length,
-        emergencyJobs: allBookings.filter(b => b.priority === 'emergency' && b.status !== 'completed').length,
-        totalBookings: allBookings.length
+      const today = new Date()
+      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+      const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
+      
+      const todayBookings = allBookings.filter(b => {
+        const bookingDate = new Date(b.createdAt || '')
+        return bookingDate >= startOfDay && bookingDate < endOfDay
+      })
+      
+      return {
+        today: {
+          bookings: todayBookings.length,
+          completed: todayBookings.filter(b => b.status === 'completed').length,
+          pending: todayBookings.filter(b => b.status === 'pending').length,
+          inProgress: todayBookings.filter(b => b.status === 'in_progress').length,
+          revenue: todayBookings
+            .filter(b => b.status === 'completed')
+            .reduce((sum, b) => sum + parseFloat(b.totalCost || '0'), 0)
+        },
+        overall: {
+          totalBookings: allBookings.length,
+          completedJobs: allBookings.filter(b => b.status === 'completed').length,
+          pendingJobs: allBookings.filter(b => b.status === 'pending').length,
+          emergencyJobs: allBookings.filter(b => b.priority === 'emergency').length,
+          totalRevenue: allBookings
+            .filter(b => b.status === 'completed')
+            .reduce((sum, b) => sum + parseFloat(b.totalCost || '0'), 0)
+        }
       }
-
-      return metrics
     } catch (error) {
       console.error('getDashboardMetrics error:', error)
-      return {
-        todayBookings: 0,
-        completedJobs: 0,
-        pendingJobs: 0,
-        emergencyJobs: 0,
-        totalBookings: 0
-      }
+      throw new Error(`Failed to get dashboard metrics`)
     }
   }
 
   private generateBookingNumber(): string {
-    const timestamp = Date.now().toString()
-    const random = Math.floor(Math.random() * 999).toString().padStart(3, '0')
-    return `NMS${timestamp.slice(-6)}${random}`
+    const date = new Date()
+    const year = date.getFullYear().toString().slice(-2)
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const day = date.getDate().toString().padStart(2, '0')
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+    
+    return `NMS${year}${month}${day}${random}`
   }
 
-  // SIMPLIFIED cost calculation
-  private calculateBasicCost(serviceType: string, priority: string): number {
-    const serviceFees = {
+  private calculateBasicCost(serviceType: 'electrical' | 'plumbing', priority: 'normal' | 'urgent' | 'emergency'): number {
+    const baseCosts = {
       electrical: 300,
       plumbing: 350
     }
     
-    const baseCost = serviceFees[serviceType as keyof typeof serviceFees] || 300
-    const emergencyMultiplier = priority === 'emergency' ? 1.5 : priority === 'urgent' ? 1.2 : 1
-    const travelCharge = 50
+    const priorityMultipliers = {
+      normal: 1,
+      urgent: 1.2,
+      emergency: 1.5
+    }
     
-    return Math.round((baseCost * emergencyMultiplier) + travelCharge)
+    return Math.round(baseCosts[serviceType] * priorityMultipliers[priority])
   }
 }
-
-// REMOVED COMPLEX METHODS:
-// - assignTeam()
-// - updateLocation()
-// - uploadPhotos()
-// - calculateDistance()
-// - sendNotifications()
-// - getPerformanceMetrics()
-// - manageInventory()

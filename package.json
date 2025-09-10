@@ -6,16 +6,17 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "cd apps/frontend && npm run dev",
     "dev:backend": "cd apps/backend && npm run dev",
-    "build": "nx run-many --target=build --projects=frontend,backend",
+    "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "cd apps/frontend && npm run build",
-    
+    "build:backend": "nx build backend",
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "cd apps/frontend && npm run start",
-    
+    "start:backend": "node dist/apps/backend/main.js",
     "lint": "nx run-many --target=lint --projects=frontend,backend",
     "install:all": "npm install && cd apps/frontend && npm install && cd ../backend && npm install",
-    "build:backend": "nx build backend",
-    "start:backend": "node dist/apps/backend/src/main.js"
+    "db:generate": "cd apps/backend && npm run db:generate",
+    "db:migrate": "cd apps/backend && npm run db:migrate",
+    "db:seed": "cd apps/backend && npm run db:seed"
   },
   "private": true,
   "devDependencies": {
