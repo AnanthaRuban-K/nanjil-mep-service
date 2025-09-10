@@ -1,5 +1,5 @@
-import { db } from '../db/index.js'
-import { bookings, type NewBooking } from '../db/schema.js'
+import { db } from '../db'
+import { bookings, type NewBooking } from '../db/schema'
 import { eq, desc, and, gte, lt } from 'drizzle-orm'
 
 export class BookingService {
