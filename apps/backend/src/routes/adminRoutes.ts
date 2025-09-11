@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { BookingService } from '../services/bookingService'
+import { BookingService } from '../services/bookingService.js'
 
 const adminRoutes = new Hono()
 const bookingService = new BookingService()

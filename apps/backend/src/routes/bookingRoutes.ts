@@ -1,6 +1,6 @@
 // apps/backend/src/routes/bookingRoutes.ts - SIMPLIFIED BOOKING ROUTES
 import { Hono } from 'hono'
-import { BookingService } from '../services/bookingService'
+import { BookingService } from '../services/bookingService.js'
 
 const bookingRoutes = new Hono()
 const bookingService = new BookingService()

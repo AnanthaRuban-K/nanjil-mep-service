@@ -1,13 +1,9 @@
-// ===== Fix apps/backend/src/main.ts imports =====
-// Remove .js extensions from all imports
-
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-// Fix these imports - remove .js extensions:
-import { bookingRoutes } from './routes/bookingRoutes'  // ← Remove .js
-import { adminRoutes } from './routes/adminRoutes'      // ← Remove .js
+import { bookingRoutes } from './routes/bookingRoutes.js'
+import { adminRoutes } from './routes/adminRoutes.js'
 
 const app = new Hono()
 
@@ -83,7 +79,7 @@ const port = Number(process.env.PORT) || 3101
 
 serve({
   fetch: app.fetch,
-  hostname: "0.0.0.0",  // Important: bind to all interfaces
+  hostname: "0.0.0.0",
   port,
 }, (info) => {
   console.log(`🚀 Nanjil MEP API running at http://0.0.0.0:${port}`)
