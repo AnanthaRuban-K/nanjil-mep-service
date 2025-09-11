@@ -1,9 +1,13 @@
+// ===== Fix apps/backend/src/main.ts imports =====
+// Remove .js extensions from all imports
+
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { bookingRoutes } from './routes/bookingRoutes'
-import { adminRoutes } from './routes/adminRoutes'
+// Fix these imports - remove .js extensions:
+import { bookingRoutes } from './routes/bookingRoutes'  // ← Remove .js
+import { adminRoutes } from './routes/adminRoutes'      // ← Remove .js
 
 const app = new Hono()
 
@@ -79,18 +83,10 @@ const port = Number(process.env.PORT) || 3101
 
 serve({
   fetch: app.fetch,
+  hostname: "0.0.0.0",  // Important: bind to all interfaces
   port,
 }, (info) => {
-  console.log(`🚀 Nanjil MEP API running at http://localhost:${port}`)
+  console.log(`🚀 Nanjil MEP API running at http://0.0.0.0:${port}`)
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`)
   console.log(`🔧 Features: Simplified booking system`)
 })
-
-// REMOVED COMPLEX ROUTES:
-// - Team assignment routes
-// - Inventory management routes
-// - Performance analytics routes
-// - Payment tracking routes
-// - Location tracking routes
-// - File upload routes
-// - Notification routes
