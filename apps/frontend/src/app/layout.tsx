@@ -1,28 +1,22 @@
 // apps/frontend/src/app/layout.tsx
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './global.css'
-import { AuthProvider } from '../providers/AuthProvider'
+import { Inter } from 'next/font/google';
+import './global.css';
+import { ReactNode } from 'react';
+import { ClientProviders } from './ClientProviders';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'நாஞ்சில் MEP சேவை',
   description: 'நாஞ்சில் மின்சாரம் மற்றும் பிளம்பிங் சேவைகள்',
-}
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
-  )
+  );
 }

@@ -1,8 +1,9 @@
 import { db } from '../db/index.js'
 import { bookings, type NewBooking } from '../db/schema.js'
 import { eq, desc, and, gte, lt } from 'drizzle-orm'
-
+import { NotificationService } from './notificationService.js'
 export class BookingService {
+  private notificationService = new NotificationService()
   async createBooking(data: {
     serviceType: 'electrical' | 'plumbing'
     priority: 'normal' | 'urgent' | 'emergency'
@@ -29,7 +30,27 @@ export class BookingService {
         status: 'pending'
       }
       
+      
       const [booking] = await db.insert(bookings).values(newBooking).returning()
+      
+      
+      // 🔔 CREATE NOTIFICATION FOR ADMIN
+      const serviceNameTa = data.serviceType === 'electrical' ? 'மின்சாரம்' : 'குழாய்'
+      const serviceNameEn = data.serviceType === 'electrical' ? 'Electrical' : 'Plumbing'
+      
+      await this.notificationService.createNotification({
+        type: data.priority === 'emergency' ? 'emergency_booking' : 'new_booking',
+        title: data.priority === 'emergency' 
+          ? `🚨 அவசர சேவை கோரிக்கை / Emergency Service Request`
+          : `📋 புதிய சேவை கோரிக்கை / New Service Request`,
+        message: `${data.contactInfo.name} requested ${serviceNameEn} service (${serviceNameTa}). Priority: ${data.priority}`,
+        bookingId: booking.id,
+        bookingNumber: booking.bookingNumber,
+        priority: data.priority
+      })
+      
+    
+
       return booking
       
     } catch (error) {
@@ -37,6 +58,8 @@ export class BookingService {
       throw new Error(`Failed to create booking: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
+
+  
 
   async getBookingById(id: number) {
     try {
@@ -72,7 +95,7 @@ export class BookingService {
     }
   }
 
-  async updateBookingStatus(bookingId: string, status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled') {
+  async updateBookingStatus(bookingId: string, status: string) {
     try {
       const isNumeric = !isNaN(Number(bookingId))
       const completedAt = status === 'completed' ? new Date() : undefined
@@ -87,6 +110,22 @@ export class BookingService {
         await db.update(bookings).set(updateData).where(eq(bookings.id, Number(bookingId)))
       } else {
         await db.update(bookings).set(updateData).where(eq(bookings.bookingNumber, bookingId))
+      }
+
+      // 🔔 CREATE STATUS UPDATE NOTIFICATION
+      const booking = isNumeric 
+        ? await this.getBookingById(Number(bookingId))
+        : await this.getBookingByNumber(bookingId)
+
+      if (booking) {
+        await this.notificationService.createNotification({
+          type: 'booking_updated',
+          title: `📝 Booking Status Updated`,
+          message: `Booking ${booking.bookingNumber} status changed to ${status}`,
+          bookingId: booking.id,
+          bookingNumber: booking.bookingNumber,
+          priority: 'normal'
+        })
       }
       
       return true

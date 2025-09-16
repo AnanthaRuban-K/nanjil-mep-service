@@ -4,7 +4,7 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { bookingRoutes } from './routes/bookingRoutes.js'
 import { adminRoutes } from './routes/adminRoutes.js'
-
+import { notificationRoutes } from './routes/notificationRoutes.js'
 const app = new Hono()
 
 // Middleware
@@ -31,7 +31,7 @@ app.get('/health', (c) => {
 // Routes
 app.route('/api/bookings', bookingRoutes)
 app.route('/api/admin', adminRoutes)
-
+app.route('/api/notifications', notificationRoutes)
 // Root endpoint
 app.get('/', (c) => {
   return c.json({ 

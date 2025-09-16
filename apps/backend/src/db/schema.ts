@@ -1,5 +1,5 @@
 // apps/backend/src/db/schema.ts - FIXED VERSION
-import { pgTable, serial, varchar, text, timestamp, jsonb, decimal, integer } from 'drizzle-orm/pg-core'
+import { pgTable, serial, varchar, text, timestamp, jsonb, decimal, integer, boolean } from 'drizzle-orm/pg-core'
 
 // SIMPLIFIED BOOKINGS TABLE
 export const bookings = pgTable('bookings', {
@@ -68,9 +68,25 @@ export const admins = pgTable('admins', {
   createdAt: timestamp('created_at').defaultNow()
 })
 
+
+export const notifications = pgTable('notifications', {
+  id: serial('id').primaryKey(),
+  type: varchar('type', { length: 50 }).notNull(), // 'new_booking', 'booking_updated', etc.
+  title: varchar('title', { length: 200 }).notNull(),
+  message: text('message').notNull(),
+  bookingId: integer('booking_id').references(() => bookings.id),
+  bookingNumber: varchar('booking_number', { length: 20 }),
+  priority: varchar('priority', { length: 20 }).notNull().default('normal'),
+  isRead: boolean('is_read').notNull().default(false),
+  readAt: timestamp('read_at'),
+  createdAt: timestamp('created_at').defaultNow()
+})
 // Type exports
 export type Booking = typeof bookings.$inferSelect
 export type NewBooking = typeof bookings.$inferInsert
 export type Service = typeof services.$inferSelect
 export type Customer = typeof customers.$inferSelect
 export type Admin = typeof admins.$inferSelect
+
+export type Notification = typeof notifications.$inferSelect
+export type NewNotification = typeof notifications.$inferInsert

@@ -6,50 +6,6 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": "nx.json",
-        "hash": "1587157688121701354"
-      },
-      {
-        "file": "package-lock.json",
-        "hash": "3228574797105233363"
-      },
-      {
-        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
-        "hash": "1445852493764896065"
-      },
-      {
-        "file": "scripts/deploy.sh",
-        "hash": "17046331438570067664"
-      },
-      {
-        "file": ".prettierrc",
-        "hash": "16267754514737964994"
-      },
-      {
-        "file": "DEPLOYMENT.md",
-        "hash": "5997703399884897577"
-      },
-      {
-        "file": "LICENSE",
-        "hash": "9555439355558940311"
-      },
-      {
-        "file": "coolify.yml",
-        "hash": "10189223219846369094"
-      },
-      {
-        "file": "Dockerfile.frontend",
-        "hash": "7004066885937108249"
-      },
-      {
-        "file": "Dockerfile.backend",
-        "hash": "824879728931815620"
-      },
-      {
-        "file": ".env.production",
-        "hash": "12720711678033927721"
-      },
-      {
         "file": "package.json",
         "hash": "12447692727973457202"
       },
@@ -58,36 +14,80 @@
         "hash": "14688272390704683536"
       },
       {
-        "file": ".editorconfig",
-        "hash": "5443105041930014821"
+        "file": "package-lock.json",
+        "hash": "3228574797105233363"
+      },
+      {
+        "file": "scripts/health-check.sh",
+        "hash": "7965516863560647107"
+      },
+      {
+        "file": ".env.production",
+        "hash": "12720711678033927721"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "16267754514737964994"
       },
       {
         "file": "tsconfig.base.json",
         "hash": "17226025119457913132"
       },
       {
-        "file": ".github/pull_request_template.md",
-        "hash": "2788755260168459697"
+        "file": ".gitignore",
+        "hash": "794121244803854593"
       },
       {
-        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
-        "hash": "7931736663588028422"
+        "file": "Dockerfile.backend",
+        "hash": "824879728931815620"
+      },
+      {
+        "file": "scripts/deploy.sh",
+        "hash": "17046331438570067664"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "9555439355558940311"
       },
       {
         "file": "docker-compose.yml",
         "hash": "2777483950022711085"
       },
       {
-        "file": ".gitignore",
-        "hash": "794121244803854593"
+        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
+        "hash": "7931736663588028422"
+      },
+      {
+        "file": ".github/pull_request_template.md",
+        "hash": "2788755260168459697"
+      },
+      {
+        "file": "nx.json",
+        "hash": "1587157688121701354"
+      },
+      {
+        "file": "Dockerfile.frontend",
+        "hash": "7004066885937108249"
+      },
+      {
+        "file": ".editorconfig",
+        "hash": "5443105041930014821"
+      },
+      {
+        "file": "coolify.yml",
+        "hash": "10189223219846369094"
+      },
+      {
+        "file": "DEPLOYMENT.md",
+        "hash": "5997703399884897577"
       },
       {
         "file": "README.md",
         "hash": "1092509514459091072"
       },
       {
-        "file": "scripts/health-check.sh",
-        "hash": "7965516863560647107"
+        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
+        "hash": "1445852493764896065"
       }
     ],
     "projectFileMap": {
@@ -160,6 +160,28 @@
           "hash": "9303420814833116677"
         },
         {
+          "file": "apps/frontend/src/app/(auth)/sign-in/[[...sign-in]]/page.tsx",
+          "hash": "9003019107255983438",
+          "deps": [
+            "npm:@clerk/nextjs"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/app/(auth)/sign-up/[[...sign-up]]/page.tsx",
+          "hash": "2790271332969061586",
+          "deps": [
+            "npm:@clerk/nextjs"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/app/ClientProviders.tsx",
+          "hash": "17880365826864359189",
+          "deps": [
+            "npm:react",
+            "npm:@tanstack/react-query"
+          ]
+        },
+        {
           "file": "apps/frontend/src/app/admin/bookings/page.tsx",
           "hash": "73427646392221137",
           "deps": [
@@ -171,7 +193,7 @@
         },
         {
           "file": "apps/frontend/src/app/admin/dashboard/page.tsx",
-          "hash": "18354903356326924515",
+          "hash": "5017778970626418335",
           "deps": [
             "npm:react",
             "npm:lucide-react"
@@ -179,7 +201,7 @@
         },
         {
           "file": "apps/frontend/src/app/admin/layout.tsx",
-          "hash": "18339037285479868602",
+          "hash": "11703386503085187046",
           "deps": [
             "npm:@clerk/nextjs",
             "npm:next"
@@ -187,12 +209,9 @@
         },
         {
           "file": "apps/frontend/src/app/admin/login/page.tsx",
-          "hash": "14692664779306403451",
+          "hash": "8265851294041485264",
           "deps": [
-            "npm:react",
-            "npm:next",
-            "npm:@clerk/nextjs",
-            "npm:lucide-react"
+            "npm:@clerk/nextjs"
           ]
         },
         {
@@ -206,6 +225,15 @@
             "npm:react",
             "npm:next",
             "npm:lucide-react"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/app/check-role/page.tsx",
+          "hash": "11723393948503395606",
+          "deps": [
+            "npm:react",
+            "npm:@clerk/nextjs",
+            "npm:next"
           ]
         },
         {
@@ -235,9 +263,10 @@
         },
         {
           "file": "apps/frontend/src/app/layout.tsx",
-          "hash": "745006278421535516",
+          "hash": "9039760077688330758",
           "deps": [
-            "npm:next"
+            "npm:next",
+            "npm:react"
           ]
         },
         {
@@ -247,6 +276,14 @@
             "npm:react",
             "npm:next",
             "npm:lucide-react"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/app/providers.tsx",
+          "hash": "17694917587434022210",
+          "deps": [
+            "npm:@tanstack/react-query",
+            "npm:react"
           ]
         },
         {
@@ -286,6 +323,31 @@
           ]
         },
         {
+          "file": "apps/frontend/src/components/AdminHeader.tsx",
+          "hash": "7248431268062829444",
+          "deps": [
+            "npm:react",
+            "npm:next",
+            "npm:@clerk/nextjs",
+            "npm:lucide-react"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/components/NotificationBell.tsx",
+          "hash": "6137928379156157018",
+          "deps": [
+            "npm:react",
+            "npm:lucide-react"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/hooks/useAdmin.ts",
+          "hash": "2526916745063910861",
+          "deps": [
+            "npm:@tanstack/react-query"
+          ]
+        },
+        {
           "file": "apps/frontend/src/hooks/useAuth.ts",
           "hash": "4368274284916453441",
           "deps": [
@@ -293,10 +355,21 @@
           ]
         },
         {
-          "file": "apps/frontend/src/hooks/useHydrationSafe.ts",
-          "hash": "7275884839513890963",
+          "file": "apps/frontend/src/lib/api/admin.ts",
+          "hash": "3845383279938752071"
+        },
+        {
+          "file": "apps/frontend/src/lib/api/client.ts",
+          "hash": "8935147928553331379",
           "deps": [
-            "npm:react"
+            "npm:axios"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/middleware.ts",
+          "hash": "5530251876720615770",
+          "deps": [
+            "npm:@clerk/nextjs"
           ]
         },
         {
@@ -327,6 +400,17 @@
           "deps": [
             "npm:zustand"
           ]
+        },
+        {
+          "file": "apps/frontend/src/stores/notificationStore.ts",
+          "hash": "10573611636968996369",
+          "deps": [
+            "npm:zustand"
+          ]
+        },
+        {
+          "file": "apps/frontend/src/types/admin.ts",
+          "hash": "5022254158502067148"
         },
         {
           "file": "apps/frontend/src/types/booking.ts",
@@ -363,12 +447,20 @@
           "hash": "15734339131075624993"
         },
         {
+          "file": "apps/backend/drizzle/0001_dusty_tarantula.sql",
+          "hash": "18274708904846501478"
+        },
+        {
           "file": "apps/backend/drizzle/meta/0000_snapshot.json",
           "hash": "5027739866261729687"
         },
         {
+          "file": "apps/backend/drizzle/meta/0001_snapshot.json",
+          "hash": "10198118673032742855"
+        },
+        {
           "file": "apps/backend/drizzle/meta/_journal.json",
-          "hash": "13172010528983412507"
+          "hash": "16140722151579095401"
         },
         {
           "file": "apps/backend/package.json",
@@ -415,7 +507,7 @@
         },
         {
           "file": "apps/backend/src/db/schema.ts",
-          "hash": "4500639995209215323",
+          "hash": "9654694568415600229",
           "deps": [
             "npm:drizzle-orm"
           ]
@@ -426,7 +518,7 @@
         },
         {
           "file": "apps/backend/src/main.ts",
-          "hash": "4477850899723665592",
+          "hash": "17965596658972023965",
           "deps": [
             "npm:@hono/node-server",
             "npm:hono"
@@ -447,8 +539,22 @@
           ]
         },
         {
+          "file": "apps/backend/src/routes/notificationRoutes.ts",
+          "hash": "7117380686838233675",
+          "deps": [
+            "npm:hono"
+          ]
+        },
+        {
           "file": "apps/backend/src/services/bookingService.ts",
-          "hash": "4507823235613189663",
+          "hash": "4198697560907931127",
+          "deps": [
+            "npm:drizzle-orm"
+          ]
+        },
+        {
+          "file": "apps/backend/src/services/notificationService.ts",
+          "hash": "1569316912369317415",
           "deps": [
             "npm:drizzle-orm"
           ]

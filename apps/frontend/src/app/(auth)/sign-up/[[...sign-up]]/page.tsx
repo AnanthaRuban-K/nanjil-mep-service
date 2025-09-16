@@ -1,19 +1,18 @@
 "use client";
 
-import { SignIn } from "@clerk/nextjs";
+import { SignUp } from "@clerk/nextjs";
 
-export default function AdminSignInPage() {
+export default function SignUpPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <SignIn
-        path="/admin/login"
+      <SignUp
+        path="/sign-up"
         routing="path"
-        signUpUrl="/sign-up"
-       afterSignInUrl="/check-role"
+        signInUrl="/sign-in"
         appearance={{
           elements: {
             formButtonPrimary:
-              "bg-blue-600 hover:bg-blue-700 text-white font-medium",
+              "bg-green-600 hover:bg-green-700 text-white font-medium",
             card: "shadow-xl rounded-xl",
           },
         }}

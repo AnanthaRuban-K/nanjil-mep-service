@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { Users, CheckCircle, XCircle, Calendar, AlertTriangle, Phone, MapPin, Eye, RefreshCw } from "lucide-react"
+import AdminHeader from '@/components/AdminHeader'
 
 // Match your backend interface
 export interface Booking {
@@ -51,6 +52,12 @@ export default function ProductionAdminDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Prevent hydration issues
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // API base URL
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3101"
@@ -130,6 +137,8 @@ export default function ProductionAdminDashboard() {
 
   // Initial data fetch
   useEffect(() => {
+    if (!isMounted) return // Only run after client mount
+    
     const loadData = async () => {
       setLoading(true)
       await Promise.all([
@@ -140,10 +149,12 @@ export default function ProductionAdminDashboard() {
     }
     
     loadData()
-  }, [fetchBookings, fetchDashboardStats])
+  }, [isMounted, fetchBookings, fetchDashboardStats])
 
   // Set up real-time updates every 30 seconds
   useEffect(() => {
+    if (!isMounted) return // Only run after client mount
+    
     const interval = setInterval(async () => {
       await Promise.all([
         fetchBookings(),
@@ -154,7 +165,7 @@ export default function ProductionAdminDashboard() {
     }, 30000) // 30 seconds
 
     return () => clearInterval(interval)
-  }, [fetchBookings, fetchDashboardStats])
+  }, [isMounted, fetchBookings, fetchDashboardStats])
 
   // Manual refresh
   const handleRefresh = async () => {
@@ -200,35 +211,50 @@ export default function ProductionAdminDashboard() {
     return colors[priority as keyof typeof colors] || 'bg-gray-100 text-gray-800'
   }
 
-  if (loading && bookings.length === 0) {
+  // Show loading during SSR and initial mount
+  if (!isMounted || (loading && bookings.length === 0)) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-lg">Loading admin dashboard...</p>
+      <div className="min-h-screen bg-gray-50">
+        <AdminHeader 
+          title="நாஞ்சில் MEP Admin Dashboard"
+          subtitle="Production Environment - Real Data"
+        />
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <RefreshCw className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+            <p className="text-lg">Loading admin dashboard...</p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Admin Header with Logout Button */}
+      <AdminHeader 
+        title="நாஞ்சில் MEP Admin Dashboard"
+        subtitle="Production Environment - Real Data"
+      />
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Dashboard Controls */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">நாஞ்சில் MEP Admin Dashboard</h1>
-            <p className="text-gray-600">Production Environment - Real Data</p>
             <p className="text-sm text-gray-500">API: {API_BASE}</p>
+            <p className="text-sm text-gray-500">
+              Real-time updates every 30 seconds
+            </p>
           </div>
           <div className="flex items-center space-x-4">
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
+              <span>புதுப்பிக்க / Refresh</span>
             </button>
             {lastUpdate && (
               <p className="text-sm text-gray-500">
@@ -240,51 +266,86 @@ export default function ProductionAdminDashboard() {
 
         {/* Error Display */}
         {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {error}
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center space-x-2">
+            <AlertTriangle className="h-5 w-5" />
+            <span>{error}</span>
           </div>
         )}
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <Users className="w-8 h-8 text-blue-500 mb-2" />
-            <p className="text-sm text-gray-500">Total Bookings</p>
-            <p className="text-2xl font-bold">{stats.overall?.totalBookings ?? 0}</p>
-
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="bg-blue-100 rounded-lg p-3">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Total Bookings</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.overall?.totalBookings ?? 0}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
-            <Calendar className="w-8 h-8 text-green-500 mb-2" />
-            <p className="text-sm text-gray-500">Today's Bookings</p>
-            <p className="text-2xl font-bold">{stats.today?.bookings ?? 0}</p>
-
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="bg-green-100 rounded-lg p-3">
+                <Calendar className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Today's Bookings</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.today?.bookings ?? 0}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
-            <CheckCircle className="w-8 h-8 text-green-500 mb-2" />
-            <p className="text-sm text-gray-500">Completed</p>
-            <p className="text-2xl font-bold">{stats.overall?.completedJobs ?? 0}</p>
-
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="bg-emerald-100 rounded-lg p-3">
+                <CheckCircle className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Completed</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.overall?.completedJobs ?? 0}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
-            <XCircle className="w-8 h-8 text-yellow-500 mb-2" />
-            <p className="text-sm text-gray-500">Pending</p>
-            <p className="text-2xl font-bold">{stats.overall?.pendingJobs ?? 0}</p>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="bg-yellow-100 rounded-lg p-3">
+                <XCircle className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Pending</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.overall?.pendingJobs ?? 0}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
-            <AlertTriangle className="w-8 h-8 text-red-500 mb-2" />
-            <p className="text-sm text-gray-500">Emergency</p>
-            <p className="text-2xl font-bold">{stats.overall?.emergencyJobs ?? 0}</p>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="bg-red-100 rounded-lg p-3">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Emergency</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.overall?.emergencyJobs ?? 0}</p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Recent Bookings */}
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Recent Bookings ({bookings.length})</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Recent Bookings ({bookings.length})
+              </h2>
+              <div className="text-sm text-gray-500">
+                சமீபத்திய முன்பதிவுகள்
+              </div>
+            </div>
           </div>
           
           {loading ? (
@@ -337,7 +398,8 @@ export default function ProductionAdminDashboard() {
                     <div className="ml-4 flex items-center space-x-2">
                       <button
                         onClick={() => setSelectedBooking(booking)}
-                        className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                        className="p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50"
+                        title="View Details"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
@@ -375,7 +437,7 @@ export default function ProductionAdminDashboard() {
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Current Status: {selectedBooking.status}
+                    Current Status: <span className="font-semibold">{selectedBooking.status}</span>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -383,36 +445,36 @@ export default function ProductionAdminDashboard() {
                         updateBookingStatus(selectedBooking.id, 'confirmed')
                         setSelectedBooking({ ...selectedBooking, status: 'confirmed' })
                       }}
-                      className="px-3 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                      className="px-3 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                     >
-                      Confirm
+                      உறுதிப்படுத்து / Confirm
                     </button>
                     <button
                       onClick={() => {
                         updateBookingStatus(selectedBooking.id, 'in_progress')
                         setSelectedBooking({ ...selectedBooking, status: 'in_progress' })
                       }}
-                      className="px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                      className="px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
                     >
-                      Start Work
+                      வேலை தொடங்கு / Start Work
                     </button>
                     <button
                       onClick={() => {
                         updateBookingStatus(selectedBooking.id, 'completed')
                         setSelectedBooking({ ...selectedBooking, status: 'completed' })
                       }}
-                      className="px-3 py-2 bg-purple-600 text-white rounded text-sm hover:bg-purple-700"
+                      className="px-3 py-2 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 transition-colors"
                     >
-                      Complete
+                      முடிக்க / Complete
                     </button>
                     <button
                       onClick={() => {
                         updateBookingStatus(selectedBooking.id, 'cancelled')
                         setSelectedBooking({ ...selectedBooking, status: 'cancelled' })
                       }}
-                      className="px-3 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                      className="px-3 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors"
                     >
-                      Cancel
+                      ரத்து செய் / Cancel
                     </button>
                   </div>
                 </div>
@@ -420,9 +482,9 @@ export default function ProductionAdminDashboard() {
                 <div className="flex justify-end">
                   <button
                     onClick={() => setSelectedBooking(null)}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
                   >
-                    Close
+                    மூடு / Close
                   </button>
                 </div>
               </div>
