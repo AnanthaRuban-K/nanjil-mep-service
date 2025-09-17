@@ -12,13 +12,29 @@
           "scope:frontend"
         ],
         "metadata": {
-          "targetGroups": {},
+          "targetGroups": {
+            "NPM Scripts": [
+              "type-check"
+            ]
+          },
           "js": {
-            "packageName": "frontend",
-            "isInPackageManagerWorkspaces": false
+            "packageName": "nanjil-mep-frontend",
+            "isInPackageManagerWorkspaces": true
           }
         },
         "targets": {
+          "type-check": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "type-check"
+            },
+            "metadata": {
+              "scriptContent": "tsc --noEmit",
+              "runCommand": "npm run type-check"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
           "dev": {
             "executor": "@nx/next:dev",
             "options": {
@@ -106,7 +122,7 @@
           "targetGroups": {},
           "js": {
             "packageName": "backend",
-            "isInPackageManagerWorkspaces": false
+            "isInPackageManagerWorkspaces": true
           }
         },
         "targets": {
@@ -14583,11 +14599,6 @@
       },
       {
         "source": "frontend",
-        "target": "npm:clsx",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
         "target": "npm:lucide-react",
         "type": "static"
       },
@@ -14609,11 +14620,6 @@
       {
         "source": "frontend",
         "target": "npm:react-hook-form",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
-        "target": "npm:tailwind-merge",
         "type": "static"
       },
       {
@@ -32572,5 +32578,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1758093923182
+  "computedAt": 1758097352773
 }

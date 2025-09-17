@@ -6,60 +6,24 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": "DEPLOYMENT.md",
-        "hash": "5997703399884897577"
-      },
-      {
-        "file": "tsconfig.base.json",
-        "hash": "17226025119457913132"
-      },
-      {
-        "file": "nx.json",
-        "hash": "1587157688121701354"
-      },
-      {
-        "file": "scripts/deploy.sh",
-        "hash": "17046331438570067664"
-      },
-      {
-        "file": "scripts/health-check.sh",
-        "hash": "7965516863560647107"
+        "file": ".editorconfig",
+        "hash": "5443105041930014821"
       },
       {
         "file": ".env.production",
         "hash": "12720711678033927721"
       },
       {
-        "file": "Dockerfile.backend",
-        "hash": "824879728931815620"
-      },
-      {
         "file": ".github/ISSUE_TEMPLATE/bug_report.md",
         "hash": "7931736663588028422"
       },
       {
-        "file": ".prettierrc",
-        "hash": "16267754514737964994"
-      },
-      {
-        "file": "package-lock.json",
-        "hash": "3228574797105233363"
-      },
-      {
-        "file": "Dockerfile.frontend",
-        "hash": "7004066885937108249"
-      },
-      {
-        "file": "package.json",
-        "hash": "12447692727973457202"
+        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
+        "hash": "1445852493764896065"
       },
       {
         "file": ".github/pull_request_template.md",
         "hash": "2788755260168459697"
-      },
-      {
-        "file": "LICENSE",
-        "hash": "9555439355558940311"
       },
       {
         "file": ".gitignore",
@@ -70,170 +34,63 @@
         "hash": "14688272390704683536"
       },
       {
-        "file": "coolify.yml",
-        "hash": "10189223219846369094"
+        "file": ".prettierrc",
+        "hash": "16267754514737964994"
+      },
+      {
+        "file": "DEPLOYMENT.md",
+        "hash": "5997703399884897577"
+      },
+      {
+        "file": "Dockerfile.backend",
+        "hash": "824879728931815620"
+      },
+      {
+        "file": "Dockerfile.frontend",
+        "hash": "7004066885937108249"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "9555439355558940311"
       },
       {
         "file": "README.md",
         "hash": "1092509514459091072"
       },
       {
-        "file": ".editorconfig",
-        "hash": "5443105041930014821"
+        "file": "coolify.yml",
+        "hash": "10189223219846369094"
       },
       {
         "file": "docker-compose.yml",
         "hash": "2777483950022711085"
       },
       {
-        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
-        "hash": "1445852493764896065"
+        "file": "nx.json",
+        "hash": "1587157688121701354"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "3228574797105233363"
+      },
+      {
+        "file": "package.json",
+        "hash": "5963281494708883158"
+      },
+      {
+        "file": "scripts/deploy.sh",
+        "hash": "17046331438570067664"
+      },
+      {
+        "file": "scripts/health-check.sh",
+        "hash": "7965516863560647107"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "17226025119457913132"
       }
     ],
     "projectFileMap": {
-      "backend": [
-        {
-          "file": "apps/backend/.env.example",
-          "hash": "8128479519117925389"
-        },
-        {
-          "file": "apps/backend/.env.production",
-          "hash": "2991149691374953195"
-        },
-        {
-          "file": "apps/backend/drizzle.config.ts",
-          "hash": "13259851270299068563",
-          "deps": [
-            "npm:drizzle-kit",
-            "npm:dotenv"
-          ]
-        },
-        {
-          "file": "apps/backend/drizzle/0000_bright_may_parker.sql",
-          "hash": "15734339131075624993"
-        },
-        {
-          "file": "apps/backend/drizzle/0001_dusty_tarantula.sql",
-          "hash": "18274708904846501478"
-        },
-        {
-          "file": "apps/backend/drizzle/meta/0000_snapshot.json",
-          "hash": "5027739866261729687"
-        },
-        {
-          "file": "apps/backend/drizzle/meta/0001_snapshot.json",
-          "hash": "10198118673032742855"
-        },
-        {
-          "file": "apps/backend/drizzle/meta/_journal.json",
-          "hash": "16140722151579095401"
-        },
-        {
-          "file": "apps/backend/package.json",
-          "hash": "10932925272273268960",
-          "deps": [
-            "npm:@types/cors",
-            "npm:@types/node",
-            "npm:drizzle-kit",
-            "npm:tsx",
-            "npm:typescript",
-            "npm:@clerk/backend",
-            "npm:@hono/node-server",
-            "npm:cors",
-            "npm:dotenv",
-            "npm:drizzle-orm",
-            "npm:hono",
-            "npm:postgres"
-          ]
-        },
-        {
-          "file": "apps/backend/project.json",
-          "hash": "11787871645909831243"
-        },
-        {
-          "file": "apps/backend/src/assets/.gitkeep",
-          "hash": "3244421341483603138"
-        },
-        {
-          "file": "apps/backend/src/db/index.ts",
-          "hash": "3423169235418647229",
-          "deps": [
-            "npm:drizzle-orm",
-            "npm:postgres",
-            "npm:dotenv"
-          ]
-        },
-        {
-          "file": "apps/backend/src/db/migrate.ts",
-          "hash": "14213442423597176025",
-          "deps": [
-            "npm:drizzle-orm",
-            "npm:dotenv"
-          ]
-        },
-        {
-          "file": "apps/backend/src/db/schema.ts",
-          "hash": "9654694568415600229",
-          "deps": [
-            "npm:drizzle-orm"
-          ]
-        },
-        {
-          "file": "apps/backend/src/db/seed.ts",
-          "hash": "1727741895662417714"
-        },
-        {
-          "file": "apps/backend/src/main.ts",
-          "hash": "17965596658972023965",
-          "deps": [
-            "npm:@hono/node-server",
-            "npm:hono"
-          ]
-        },
-        {
-          "file": "apps/backend/src/routes/adminRoutes.ts",
-          "hash": "12670742249985874112",
-          "deps": [
-            "npm:hono"
-          ]
-        },
-        {
-          "file": "apps/backend/src/routes/bookingRoutes.ts",
-          "hash": "16263569120301567391",
-          "deps": [
-            "npm:hono"
-          ]
-        },
-        {
-          "file": "apps/backend/src/routes/notificationRoutes.ts",
-          "hash": "7117380686838233675",
-          "deps": [
-            "npm:hono"
-          ]
-        },
-        {
-          "file": "apps/backend/src/services/bookingService.ts",
-          "hash": "4198697560907931127",
-          "deps": [
-            "npm:drizzle-orm"
-          ]
-        },
-        {
-          "file": "apps/backend/src/services/notificationService.ts",
-          "hash": "1569316912369317415",
-          "deps": [
-            "npm:drizzle-orm"
-          ]
-        },
-        {
-          "file": "apps/backend/tsconfig.app.json",
-          "hash": "663763413802756907"
-        },
-        {
-          "file": "apps/backend/tsconfig.json",
-          "hash": "571520361327566589"
-        }
-      ],
       "frontend": [
         {
           "file": "apps/frontend/.env.production",
@@ -261,7 +118,7 @@
         },
         {
           "file": "apps/frontend/package.json",
-          "hash": "1531276263189749761",
+          "hash": "15582317557335174834",
           "deps": [
             "npm:@types/node",
             "npm:@types/react",
@@ -275,13 +132,11 @@
             "npm:@hookform/resolvers",
             "npm:@tanstack/react-query",
             "npm:axios",
-            "npm:clsx",
             "npm:lucide-react",
             "npm:next",
             "npm:react",
             "npm:react-dom",
             "npm:react-hook-form",
-            "npm:tailwind-merge",
             "npm:zod",
             "npm:zustand"
           ]
@@ -398,7 +253,7 @@
         },
         {
           "file": "apps/frontend/src/app/error.tsx",
-          "hash": "9716272967751812963",
+          "hash": "17764889267659480027",
           "deps": [
             "npm:react"
           ]
@@ -417,7 +272,7 @@
         },
         {
           "file": "apps/frontend/src/app/not-found.tsx",
-          "hash": "18269016261245239056"
+          "hash": "9208013352369533353"
         },
         {
           "file": "apps/frontend/src/app/page.tsx",
@@ -573,6 +428,149 @@
         {
           "file": "apps/frontend/tsconfig.json",
           "hash": "16300060426112243553"
+        }
+      ],
+      "backend": [
+        {
+          "file": "apps/backend/.env.example",
+          "hash": "8128479519117925389"
+        },
+        {
+          "file": "apps/backend/.env.production",
+          "hash": "2991149691374953195"
+        },
+        {
+          "file": "apps/backend/drizzle.config.ts",
+          "hash": "13259851270299068563",
+          "deps": [
+            "npm:drizzle-kit",
+            "npm:dotenv"
+          ]
+        },
+        {
+          "file": "apps/backend/drizzle/0000_bright_may_parker.sql",
+          "hash": "15734339131075624993"
+        },
+        {
+          "file": "apps/backend/drizzle/0001_dusty_tarantula.sql",
+          "hash": "18274708904846501478"
+        },
+        {
+          "file": "apps/backend/drizzle/meta/0000_snapshot.json",
+          "hash": "5027739866261729687"
+        },
+        {
+          "file": "apps/backend/drizzle/meta/0001_snapshot.json",
+          "hash": "10198118673032742855"
+        },
+        {
+          "file": "apps/backend/drizzle/meta/_journal.json",
+          "hash": "16140722151579095401"
+        },
+        {
+          "file": "apps/backend/package.json",
+          "hash": "10932925272273268960",
+          "deps": [
+            "npm:@types/cors",
+            "npm:@types/node",
+            "npm:drizzle-kit",
+            "npm:tsx",
+            "npm:typescript",
+            "npm:@clerk/backend",
+            "npm:@hono/node-server",
+            "npm:cors",
+            "npm:dotenv",
+            "npm:drizzle-orm",
+            "npm:hono",
+            "npm:postgres"
+          ]
+        },
+        {
+          "file": "apps/backend/project.json",
+          "hash": "11787871645909831243"
+        },
+        {
+          "file": "apps/backend/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/backend/src/db/index.ts",
+          "hash": "3423169235418647229",
+          "deps": [
+            "npm:drizzle-orm",
+            "npm:postgres",
+            "npm:dotenv"
+          ]
+        },
+        {
+          "file": "apps/backend/src/db/migrate.ts",
+          "hash": "14213442423597176025",
+          "deps": [
+            "npm:drizzle-orm",
+            "npm:dotenv"
+          ]
+        },
+        {
+          "file": "apps/backend/src/db/schema.ts",
+          "hash": "9654694568415600229",
+          "deps": [
+            "npm:drizzle-orm"
+          ]
+        },
+        {
+          "file": "apps/backend/src/db/seed.ts",
+          "hash": "1727741895662417714"
+        },
+        {
+          "file": "apps/backend/src/main.ts",
+          "hash": "17965596658972023965",
+          "deps": [
+            "npm:@hono/node-server",
+            "npm:hono"
+          ]
+        },
+        {
+          "file": "apps/backend/src/routes/adminRoutes.ts",
+          "hash": "12670742249985874112",
+          "deps": [
+            "npm:hono"
+          ]
+        },
+        {
+          "file": "apps/backend/src/routes/bookingRoutes.ts",
+          "hash": "16263569120301567391",
+          "deps": [
+            "npm:hono"
+          ]
+        },
+        {
+          "file": "apps/backend/src/routes/notificationRoutes.ts",
+          "hash": "7117380686838233675",
+          "deps": [
+            "npm:hono"
+          ]
+        },
+        {
+          "file": "apps/backend/src/services/bookingService.ts",
+          "hash": "4198697560907931127",
+          "deps": [
+            "npm:drizzle-orm"
+          ]
+        },
+        {
+          "file": "apps/backend/src/services/notificationService.ts",
+          "hash": "1569316912369317415",
+          "deps": [
+            "npm:drizzle-orm"
+          ]
+        },
+        {
+          "file": "apps/backend/tsconfig.app.json",
+          "hash": "663763413802756907"
+        },
+        {
+          "file": "apps/backend/tsconfig.json",
+          "hash": "571520361327566589"
         }
       ]
     }
