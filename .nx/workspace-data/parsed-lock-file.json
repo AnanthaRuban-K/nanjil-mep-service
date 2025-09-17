@@ -16356,11 +16356,6 @@
     },
     {
       "source": "npm:@clerk/nextjs",
-      "target": "npm:next",
-      "type": "static"
-    },
-    {
-      "source": "npm:@clerk/nextjs",
       "target": "npm:react",
       "type": "static"
     },

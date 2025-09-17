@@ -16966,11 +16966,6 @@
     "npm:@clerk/nextjs": [
       {
         "source": "npm:@clerk/nextjs",
-        "target": "npm:next",
-        "type": "static"
-      },
-      {
-        "source": "npm:@clerk/nextjs",
         "target": "npm:react",
         "type": "static"
       },
@@ -32562,5 +32557,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1758128486548
+  "computedAt": 1758128834726
 }
