@@ -1,18 +1,30 @@
+// apps/frontend/next.config.js - ADD THIS TO DISABLE DEVTOOLS
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use standalone instead of export to support server actions
-  output: 'standalone',
-  
-  // Remove experimental options that cause warnings
-  experimental: {},
-  
-  // Essential settings
-  images: {
-    unoptimized: true
+  experimental: {
+    // Disable Next.js DevTools to avoid the bundler error
+    nextDevTools: false,
   },
-  
-  // Remove rewrites since they don't work with static export anyway
-  // API calls will use full URLs instead
-}
+  // Suppress hydration warnings in development
+  reactStrictMode: true,
+  // Optimize images
+  images: {
+    domains: ['localhost'],
+  },
+  // Reduce bundle analysis noise
+  webpack: (config, { dev, isServer }) => {
+    if (dev && !isServer) {
+      // Reduce webpack noise in development
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          default: false,
+          vendors: false,
+        },
+      };
+    }
+    return config;
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

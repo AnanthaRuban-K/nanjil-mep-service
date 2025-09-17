@@ -2173,9 +2173,9 @@
       "type": "npm",
       "name": "npm:@eslint-community/eslint-utils",
       "data": {
-        "version": "4.8.0",
+        "version": "4.9.0",
         "packageName": "@eslint-community/eslint-utils",
-        "hash": "sha512-MJQFqrZgcW0UNYLGOuQpey/oTN59vyWwplvCGZztn1cKz9agZPPYpJB7h2OMmuu7VLqkvEjN8feFZJmxNF9D+Q=="
+        "hash": "sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g=="
       }
     },
     "npm:eslint-visitor-keys@3.4.3": {
@@ -3843,22 +3843,22 @@
         "hash": "sha512-Wglpdk03BSfXkHoQa3b/oulrotAkwrlLDRSOb9D0bN86FdRyE9lppSp33aHNPgBa0JKCoB+drFLZkQoRRYae5A=="
       }
     },
-    "npm:vite@6.3.5": {
+    "npm:vite@6.3.6": {
       "type": "npm",
-      "name": "npm:vite@6.3.5",
+      "name": "npm:vite@6.3.6",
       "data": {
-        "version": "6.3.5",
+        "version": "6.3.6",
         "packageName": "vite",
-        "hash": "sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ=="
+        "hash": "sha512-0msEVHJEScQbhkbVTb/4iHZdJ6SXp/AvxL2sjwYQFfBqleHtnCqv1J3sa9zbWz/6kW1m9Tfzn92vW+kZ1WV6QA=="
       }
     },
-    "npm:vite@7.1.4": {
+    "npm:vite@7.1.5": {
       "type": "npm",
-      "name": "npm:vite@7.1.4",
+      "name": "npm:vite@7.1.5",
       "data": {
-        "version": "7.1.4",
+        "version": "7.1.5",
         "packageName": "vite",
-        "hash": "sha512-X5QFK4SGynAeeIt+A7ZWnApdUyHYm+pzv/8/A57LqSGcI88U6R6ipOs3uCesdc6yl7nl+zNO0t8LmqAdXcQihw=="
+        "hash": "sha512-4cKBO9wR75r0BeIWWWId9XK9Lj6La5X846Zw9dFfzMRw38IlTk2iCcUt6hsyiDRcPidc55ZParFYDXi0nXOeLQ=="
       }
     },
     "npm:yaml@2.8.1": {
@@ -13567,9 +13567,9 @@
       "type": "npm",
       "name": "npm:tinyglobby",
       "data": {
-        "version": "0.2.14",
+        "version": "0.2.15",
         "packageName": "tinyglobby",
-        "hash": "sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ=="
+        "hash": "sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ=="
       }
     },
     "npm:tinypool": {
@@ -18831,7 +18831,7 @@
     },
     {
       "source": "npm:@nx/vite@21.4.1",
-      "target": "npm:vite@6.3.5",
+      "target": "npm:vite@6.3.6",
       "type": "static"
     },
     {
@@ -19030,77 +19030,77 @@
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:@types/node",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:jiti",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:less",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:sass",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:sass-embedded",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:terser",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:tsx",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:yaml@2.8.1",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:esbuild@0.25.9",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:fdir",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:picomatch",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:postcss@8.5.6",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:rollup",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:tinyglobby",
       "type": "static"
     },
     {
-      "source": "npm:vite@6.3.5",
+      "source": "npm:vite@6.3.6",
       "target": "npm:fsevents",
       "type": "static"
     },
@@ -29851,7 +29851,7 @@
     },
     {
       "source": "npm:tinyglobby",
-      "target": "npm:picomatch",
+      "target": "npm:picomatch@4.0.3",
       "type": "static"
     },
     {
@@ -30411,7 +30411,7 @@
     },
     {
       "source": "npm:vite-node",
-      "target": "npm:vite@7.1.4",
+      "target": "npm:vite@7.1.5",
       "type": "static"
     },
     {
@@ -30560,77 +30560,77 @@
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:@types/node",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:jiti",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:less",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:sass",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:sass-embedded",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:terser",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:tsx",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:yaml@2.8.1",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:esbuild@0.25.9",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:fdir",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:picomatch@4.0.3",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:postcss@8.5.6",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:rollup",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:tinyglobby",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:fsevents",
       "type": "static"
     },
@@ -30741,7 +30741,7 @@
     },
     {
       "source": "npm:vitest",
-      "target": "npm:vite@7.1.4",
+      "target": "npm:vite@7.1.5",
       "type": "static"
     },
     {
@@ -30756,7 +30756,7 @@
     },
     {
       "source": "npm:@vitest/mocker@3.2.4",
-      "target": "npm:vite@7.1.4",
+      "target": "npm:vite@7.1.5",
       "type": "static"
     },
     {
@@ -30925,77 +30925,77 @@
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:@types/node",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:jiti",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:less",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:sass",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:sass-embedded",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:terser",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:tsx",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:yaml@2.8.1",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:esbuild@0.25.9",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:fdir",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:picomatch@4.0.3",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:postcss@8.5.6",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:rollup",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:tinyglobby",
       "type": "static"
     },
     {
-      "source": "npm:vite@7.1.4",
+      "source": "npm:vite@7.1.5",
       "target": "npm:fsevents",
       "type": "static"
     },
