@@ -1,4 +1,3 @@
-// apps/frontend/src/app/layout.tsx
 import { Inter } from 'next/font/google';
 import './global.css';
 import { ReactNode } from 'react';
@@ -11,12 +10,16 @@ export const metadata = {
   description: 'நாஞ்சில் மின்சாரம் மற்றும் பிளம்பிங் சேவைகள்',
 };
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    
+    <html lang="en">
       <body className={inter.className}>
         <ClientProviders>{children}</ClientProviders>
       </body>
-  
+    </html>
   );
 }

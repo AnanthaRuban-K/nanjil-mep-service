@@ -1,41 +1,28 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    
-  },
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3101',
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-  },
+  // Disable static optimization to avoid Html import issues
+  output: 'export',
+  trailingSlash: true,
   images: {
-    domains: ['images.clerk.dev'],
+    unoptimized: true
   },
+  
+  // Disable static generation that's causing the issue
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
+  
+  // API rewrites
   async rewrites() {
     return [
       {
         source: '/api/:path*',
         destination: process.env.NODE_ENV === 'production' 
-          ? `${process.env.NEXT_PUBLIC_API_URL || 'https://api.nanjilmepservice.com'}/api/:path*`
+          ? `${process.env.NEXT_PUBLIC_API_URL || ''}/api/:path*`
           : 'http://localhost:3101/api/:path*',
       }
     ]
-  },
-  // Optimize for production deployment
-  output: 'standalone',
-  
-  // Handle images properly
-  images: {
-    unoptimized: true,
-    domains: [],
-  },
-  
-  // Ensure proper trailing slash handling
-  trailingSlash: false,
-  
-  // Optimize bundle
-  swcMinify: true,
-  
-  // Handle static exports properly
-  distDir: '.next',
+  }
 }
 
 module.exports = nextConfig
