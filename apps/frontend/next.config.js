@@ -1,30 +1,14 @@
-// apps/frontend/next.config.js - ADD THIS TO DISABLE DEVTOOLS
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    // Disable Next.js DevTools to avoid the bundler error
-    nextDevTools: false,
-  },
-  // Suppress hydration warnings in development
   reactStrictMode: true,
-  // Optimize images
+  swcMinify: true,
   images: {
-    domains: ['localhost'],
+    unoptimized: true
   },
-  // Reduce bundle analysis noise
-  webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      // Reduce webpack noise in development
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          default: false,
-          vendors: false,
-        },
-      };
-    }
-    return config;
-  },
-};
+  // Remove the invalid experimental.nextDevTools
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  }
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

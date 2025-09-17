@@ -14583,11 +14583,6 @@
       },
       {
         "source": "frontend",
-        "target": "npm:clsx",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
         "target": "npm:lucide-react",
         "type": "static"
       },
@@ -14609,11 +14604,6 @@
       {
         "source": "frontend",
         "target": "npm:react-hook-form",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
-        "target": "npm:tailwind-merge",
         "type": "static"
       },
       {
@@ -32572,5 +32562,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1758111426635
+  "computedAt": 1758112054320
 }
