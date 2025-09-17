@@ -11,7 +11,7 @@ const app = new Hono()
 app.use('*', logger())
 app.use('*', cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://nanjilmepservice.com']
+    ? ['http://nanjilmepservice.com']
     : ['http://localhost:3100'],
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

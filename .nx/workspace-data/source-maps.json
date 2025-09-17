@@ -306,14 +306,6 @@
       "apps/frontend/package.json",
       "nx/core/package-json"
     ],
-    "metadata.targetGroups.NPM Scripts": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
-    "metadata.targetGroups.NPM Scripts.0": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
     "metadata.js": [
       "apps/frontend/package.json",
       "nx/core/package-json"
@@ -327,34 +319,6 @@
       "nx/core/package-json"
     ],
     "targets": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.executor": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.options": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.metadata": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.options.script": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.metadata.scriptContent": [
-      "apps/frontend/package.json",
-      "nx/core/package-json"
-    ],
-    "targets.type-check.metadata.runCommand": [
       "apps/frontend/package.json",
       "nx/core/package-json"
     ],

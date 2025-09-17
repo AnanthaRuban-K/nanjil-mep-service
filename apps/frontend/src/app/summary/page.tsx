@@ -1,3 +1,6 @@
+// Update your summary page to use the correct API URL
+// apps/frontend/src/app/summary/page.tsx
+
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -7,6 +10,9 @@ export default function SummaryPage() {
   const router = useRouter()
   const [bookingData, setBookingData] = useState<any>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // ADD THIS: Get the correct API base URL
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3101'
 
   useEffect(() => {
     // Collect all booking data from sessionStorage
@@ -45,7 +51,8 @@ export default function SummaryPage() {
     setIsSubmitting(true)
     
     try {
-      const response = await fetch('/api/bookings', {
+      // FIX: Use the correct API URL
+      const response = await fetch(`${API_BASE}/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -106,6 +113,16 @@ export default function SummaryPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Debug info - remove in production */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-sm">
+          <strong>Debug Info:</strong>
+          <br />API Base: {API_BASE}
+          <br />Current URL: {typeof window !== 'undefined' ? window.location.origin : 'N/A'}
+        </div>
+
+        {/* Rest of your existing JSX remains the same */}
+        {/* ... existing booking summary JSX ... */}
+        
         {/* Booking Summary */}
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-6">
@@ -178,7 +195,7 @@ export default function SummaryPage() {
 
             {/* Problem Description */}
             <div className="p-4 bg-gray-50 rounded-xl">
-              <div className="text-sm text-gray-600 mb-2">📝 பிரச்சனை (Problem Description)</div>
+              <div className="text-sm text-gray-600 mb-2">🔍 பிரச்சனை (Problem Description)</div>
               <div className="font-semibold text-gray-800">{bookingData.description}</div>
             </div>
 
