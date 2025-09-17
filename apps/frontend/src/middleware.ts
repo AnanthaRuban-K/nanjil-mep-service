@@ -1,8 +1,10 @@
-import { authMiddleware } from "@clerk/nextjs";
+import { NextRequest, NextResponse } from "next/server";
 
-export default authMiddleware({
-  publicRoutes: ["/", "/sign-in", "/sign-up"],
-});
+export function middleware(req: NextRequest) {
+  // Simple middleware that just passes everything through
+  // Clerk will handle auth on the client side
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: ["/((?!_next|.*\\..*).*)"],

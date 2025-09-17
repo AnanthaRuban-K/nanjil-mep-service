@@ -1,26 +1,15 @@
-import { currentUser, SignOutButton } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await currentUser();
-
-  if (!user) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Link
-          href="/admin/login"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-        >
-          Go to Login
-        </Link>
-      </div>
-    );
-  }
-
+  // Remove auth check from layout completely
+  // Handle auth in individual pages instead
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="flex justify-between items-center bg-white shadow px-6 py-4">
