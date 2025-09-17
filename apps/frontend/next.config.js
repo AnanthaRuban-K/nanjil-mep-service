@@ -1,6 +1,6 @@
 const nextConfig = {
   experimental: {
-    appDir: true,
+    
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3101',
@@ -13,12 +13,29 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3101'}/api/:path*`,
-      },
+        destination: process.env.NODE_ENV === 'production' 
+          ? `${process.env.NEXT_PUBLIC_API_URL || 'https://api.nanjilmepservice.com'}/api/:path*`
+          : 'http://localhost:3101/api/:path*',
+      }
     ]
   },
-  // Enable standalone output for Docker
+  // Optimize for production deployment
   output: 'standalone',
+  
+  // Handle images properly
+  images: {
+    unoptimized: true,
+    domains: [],
+  },
+  
+  // Ensure proper trailing slash handling
+  trailingSlash: false,
+  
+  // Optimize bundle
+  swcMinify: true,
+  
+  // Handle static exports properly
+  distDir: '.next',
 }
 
 module.exports = nextConfig
