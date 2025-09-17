@@ -15,10 +15,10 @@ export const dynamic = 'force-dynamic'
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+ 
       <body className={inter.className}>
         <ClientProviders>{children}</ClientProviders>
       </body>
-    </html>
+  
   );
 }
