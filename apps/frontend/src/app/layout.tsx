@@ -10,9 +10,8 @@ export const metadata = {
   description: 'நாஞ்சில் மின்சாரம் மற்றும் பிளம்பிங் சேவைகள்',
 };
 
-// Force dynamic rendering to avoid static generation issues
+// Keep dynamic rendering to avoid Html import issues
 export const dynamic = 'force-dynamic'
-export const revalidate = 0
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

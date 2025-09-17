@@ -1,12 +1,12 @@
-// src/lib/api/client.ts
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://api.nanjilmepservice.com', 
+  // Use environment variable or default to your backend URL
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://api.nanjilmepservice.com/',
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds
+  timeout: 10000,
 });
 
 // Request interceptor for logging
@@ -32,12 +32,10 @@ api.interceptors.response.use(
     
     // Handle common error cases
     if (error.response?.status === 401) {
-      // Handle unauthorized - redirect to login if needed
       console.warn('🔒 Unauthorized request');
     }
     
     if (error.response?.status >= 500) {
-      // Handle server errors
       console.error('🔥 Server error occurred');
     }
     
