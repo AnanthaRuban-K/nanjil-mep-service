@@ -27,15 +27,16 @@ function SuccessContent() {
   }
 
   const handleWhatsApp = () => {
-    const message = `Hi! I just booked a service. My booking ID is: ${bookingId}`
-    const whatsappUrl = `https://wa.me/1800NANJIL?text=${encodeURIComponent(
-      message
-    )}`
+    // Fixed WhatsApp number format - use actual phone number
+    const phoneNumber = "919384851596" // Indian number format: 91 + 10-digit number
+    const message = `Hi! I just booked a service with Nanjil MEP. My booking ID is: ${bookingId}`
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
   }
 
   const handleCall = () => {
-    window.location.href = "tel:1800-NANJIL"
+    // Fixed phone number format
+    window.location.href = "tel:+919384851596"
   }
 
   const handleHome = () => {

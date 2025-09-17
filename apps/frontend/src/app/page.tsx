@@ -2,7 +2,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Zap, Wrench, Phone, MapPin, Star, Clock, Shield } from 'lucide-react'
-
+import Image from 'next/image'
 export default function HomePage() {
   const router = useRouter()
 
@@ -11,7 +11,7 @@ export default function HomePage() {
   }
 
   const handleEmergencyCall = () => {
-    window.location.href = 'tel:1800-NANJIL'
+    window.location.href = 'tel:9384851596-NANJIL'
   }
 
   return (
@@ -21,21 +21,28 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">நாஞ்சில் MEP சேவை</h1>
-                <p className="text-sm text-gray-600">Nanjil MEP Service</p>
-              </div>
-            </div>
+  <Image
+    src="/nanjil-logo.jpg"
+    alt="Nanjil MEP Logo"
+    width={100}
+    height={100}
+    className="object-contain"
+  />
+  <div>
+    <h1 className="text-xl font-bold text-gray-800">நாஞ்சில் MEP சேவை</h1>
+    <p className="text-sm text-gray-600">Nanjil MEP Service</p>
+  </div>
+</div>
             <button
-              onClick={handleEmergencyCall}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium animate-pulse"
-            >
-              <Phone className="w-4 h-4 inline mr-2" />
-              அவசரம்
-            </button>
+  onClick={handleEmergencyCall}
+  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium animate-pulse"
+>
+  <Phone className="w-4 h-4 inline mr-2" />
+  <div className="inline-flex flex-col items-start">
+    <span className="text-sm font-bold">அவசரம்</span>
+    <span className="text-xs opacity-90">9384851596</span>
+  </div>
+</button>
           </div>
         </div>
       </div>
@@ -150,7 +157,8 @@ export default function HomePage() {
             className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl inline-flex items-center space-x-2"
           >
             <Phone className="w-5 h-5" />
-            <span>1800-NANJIL</span>
+            <span>9384851596
+-NANJIL</span>
           </button>
         </div>
 

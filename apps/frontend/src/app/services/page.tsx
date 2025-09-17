@@ -178,7 +178,7 @@ export default function ServicesPage() {
               onClick={() => window.location.href = 'tel:1800-NANJIL'}
               className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl inline-flex items-center space-x-2 transition-colors"
             >
-              <span>📞 1800-NANJIL</span>
+              <span>📞 9384851596-NANJIL</span>
             </button>
           </div>
         </div>
