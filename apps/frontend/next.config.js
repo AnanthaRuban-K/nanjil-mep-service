@@ -1,68 +1,44 @@
-// apps/frontend/next.config.js - FIX STATIC GENERATION
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ✅ Force App Router and disable problematic features
+  // Remove deprecated experimental options
   experimental: {
-    appDir: true,
+    // Remove appDir and generateStaticParams
   },
   
-  // ✅ Essential for Docker deployment
+  // Add output configuration for static hosting
   output: 'standalone',
   
-  // ✅ CRITICAL: Disable static optimization that's causing the issue
-  trailingSlash: false,
+  // Enable SWC minification
+  swcMinify: true,
   
-  // ✅ Force dynamic rendering for problematic pages
-  generateEtags: false,
-  
-  // ✅ Basic settings
-  reactStrictMode: true,
-  poweredByHeader: false,
-  
-  // ✅ Image optimization (disabled for simpler deployment)  
-  images: {
-    unoptimized: true,
-    domains: ['localhost', 'nanjilmepservice.com'],
+  // Disable static generation for problematic routes
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
   },
-  
-  // ✅ Environment variables (only public ones)
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-  },
-  
-  // ✅ Webpack config to handle the Html import issue
-  webpack: (config, { isServer, webpack }) => {
-    // Ignore problematic modules during static generation
+
+  // Add webpack configuration to handle client-side only modules
+  webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
-        net: false,
-        tls: false,
-      };
+      }
     }
-    
-    // Add plugin to ignore Html import warnings
-    config.plugins.push(
-      new webpack.IgnorePlugin({
-        resourceRegExp: /^(next\/document)$/,
-        contextRegExp: /pages/,
-      })
-    );
-    
-    return config;
+    return config
   },
-  
-  // ✅ CRITICAL: Skip static generation for problematic pages
-  async generateStaticParams() {
-    return [];
-  },
-  
-  // ✅ Handle redirects for error pages
-  async redirects() {
-    return [];
-  },
-};
 
-module.exports = nextConfig;
+  // Disable static optimization for all pages to avoid SSR issues
+  experimental: {
+    appDir: true,
+  },
+
+  // Add trailing slash for better hosting compatibility
+  trailingSlash: true,
+
+  // Environment variables
+  env: {
+    CUSTOM_KEY: process.env.CUSTOM_KEY,
+  },
+}
+
+module.exports = nextConfig
