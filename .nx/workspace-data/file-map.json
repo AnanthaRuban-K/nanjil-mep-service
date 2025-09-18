@@ -6,84 +6,84 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": ".prettierrc",
-        "hash": "16267754514737964994"
-      },
-      {
-        "file": ".env.production",
-        "hash": "12720711678033927721"
-      },
-      {
-        "file": "scripts/health-check.sh",
-        "hash": "7965516863560647107"
-      },
-      {
-        "file": "scripts/deploy.sh",
-        "hash": "17046331438570067664"
-      },
-      {
-        "file": ".github/pull_request_template.md",
-        "hash": "2788755260168459697"
-      },
-      {
-        "file": "DEPLOYMENT.md",
-        "hash": "5997703399884897577"
-      },
-      {
-        "file": "package.json",
-        "hash": "6420985062845107298"
-      },
-      {
         "file": ".github/ISSUE_TEMPLATE/feature_request.md",
         "hash": "1445852493764896065"
-      },
-      {
-        "file": "Dockerfile.frontend",
-        "hash": "7004066885937108249"
-      },
-      {
-        "file": "coolify.yml",
-        "hash": "10189223219846369094"
       },
       {
         "file": ".gitignore",
         "hash": "794121244803854593"
       },
       {
-        "file": "tsconfig.base.json",
-        "hash": "17226025119457913132"
-      },
-      {
-        "file": "Dockerfile.backend",
-        "hash": "824879728931815620"
-      },
-      {
-        "file": "docker-compose.yml",
-        "hash": "2777483950022711085"
+        "file": "coolify.yml",
+        "hash": "10189223219846369094"
       },
       {
         "file": "package-lock.json",
         "hash": "15300960300773010901"
       },
       {
-        "file": "nx.json",
-        "hash": "1587157688121701354"
+        "file": "scripts/deploy.sh",
+        "hash": "17046331438570067664"
       },
       {
         "file": "README.md",
         "hash": "1092509514459091072"
       },
       {
+        "file": ".prettierrc",
+        "hash": "16267754514737964994"
+      },
+      {
+        "file": "scripts/health-check.sh",
+        "hash": "7965516863560647107"
+      },
+      {
         "file": ".prettierignore",
         "hash": "14688272390704683536"
+      },
+      {
+        "file": ".env.production",
+        "hash": "12720711678033927721"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "17226025119457913132"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "9555439355558940311"
+      },
+      {
+        "file": "Dockerfile.backend",
+        "hash": "824879728931815620"
       },
       {
         "file": ".editorconfig",
         "hash": "5443105041930014821"
       },
       {
-        "file": "LICENSE",
-        "hash": "9555439355558940311"
+        "file": "docker-compose.yml",
+        "hash": "2777483950022711085"
+      },
+      {
+        "file": "nx.json",
+        "hash": "1587157688121701354"
+      },
+      {
+        "file": "DEPLOYMENT.md",
+        "hash": "5997703399884897577"
+      },
+      {
+        "file": "Dockerfile.frontend",
+        "hash": "7004066885937108249"
+      },
+      {
+        "file": ".github/pull_request_template.md",
+        "hash": "2788755260168459697"
+      },
+      {
+        "file": "package.json",
+        "hash": "6420985062845107298"
       },
       {
         "file": ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -114,7 +114,7 @@
         },
         {
           "file": "apps/frontend/package.json",
-          "hash": "16745059471081450734",
+          "hash": "9296983301356703080",
           "deps": [
             "npm:@types/node",
             "npm:@types/react",
@@ -264,8 +264,9 @@
         },
         {
           "file": "apps/frontend/src/app/layout.tsx",
-          "hash": "15381652875203348495",
+          "hash": "1310121331388010879",
           "deps": [
+            "npm:next",
             "npm:react"
           ]
         },
