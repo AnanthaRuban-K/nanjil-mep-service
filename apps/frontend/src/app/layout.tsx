@@ -1,22 +1,23 @@
-// apps/frontend/src/app/layout.tsx - FIXED PROPERTY NAMES
-import { Inter } from "next/font/google";
-import "./global.css"; // Make sure this file exists
-import { ReactNode } from "react";
-import { ClientProviders } from "./ClientProviders";
+// src/app/layout.tsx - ULTRA MINIMAL VERSION
+import './global.css'
+import { ReactNode } from 'react'
 
-const inter = Inter({ subsets: ["latin"] });
+// FORCE EVERYTHING TO BE DYNAMIC
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const fetchCache = 'force-no-store'
 
 export const metadata = {
-  title: "நாஞ்சில் MEP சேவை",
-  description: "நாஞ்சில் மின்சாரம் மற்றும் பிளம்பிங் சேவைகள்",
-};
+  title: 'நாஞ்சில் MEP சேவை',
+  description: 'நாஞ்சில் மின்சாரம் மற்றும் பிளம்பிங் சேவைகள்',
+}
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ta" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
-        <ClientProviders>{children}</ClientProviders>
+    <html lang="en">
+      <body suppressHydrationWarning={true}>
+        {children}
       </body>
     </html>
-  );
+  )
 }
