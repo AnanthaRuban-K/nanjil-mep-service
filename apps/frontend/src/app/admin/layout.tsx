@@ -1,42 +1,31 @@
-// apps/frontend/src/app/admin/layout.tsx
-'use client'
-import { useUser, SignOutButton } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { currentUser, SignOutButton } from "@clerk/nextjs";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoaded, isSignedIn } = useUser();
-  const router = useRouter();
+  const user = await currentUser();
 
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      router.push("/admin/login");
-    }
-  }, [isLoaded, isSignedIn, router]);
-
-  if (!isLoaded) {
+  if (!user) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
+        <Link
+          href="/admin/login"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+        >
+          Go to Login
+        </Link>
       </div>
     );
   }
 
-  if (!isSignedIn) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <p>Redirecting to login...</p>
-        </div>
-      </div>
-    );
+  // Check if user is admin (matching your existing logic)
+  const userRole = user.publicMetadata?.role as string;
+  if (userRole !== 'admin' && userRole !== 'ADMIN') {
+    redirect("/");
   }
 
   return (
@@ -44,17 +33,18 @@ export default function AdminLayout({
       <header className="flex justify-between items-center bg-white shadow px-6 py-4">
         <div>
           <h1 className="text-xl font-semibold">Admin Dashboard</h1>
-          {user && (
-            <p className="text-sm text-gray-600">
-              Welcome, {user.firstName || user.emailAddresses[0]?.emailAddress}
-            </p>
-          )}
+          <p className="text-sm text-gray-600">நாஞ்சில் MEP நிர்வாகம்</p>
         </div>
-        <SignOutButton>
-          <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-            Logout
-          </button>
-        </SignOutButton>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-600">
+            {user.firstName || user.emailAddresses[0]?.emailAddress?.split('@')[0]}
+          </span>
+          <SignOutButton>
+            <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+              வெளியேறு / Logout
+            </button>
+          </SignOutButton>
+        </div>
       </header>
       <main className="p-6">{children}</main>
     </div>

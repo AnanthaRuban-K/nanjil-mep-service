@@ -14,7 +14,7 @@
         "metadata": {
           "targetGroups": {},
           "js": {
-            "packageName": "frontend",
+            "packageName": "nanjil-mep-frontend",
             "isInPackageManagerWorkspaces": false
           }
         },
@@ -14553,11 +14553,6 @@
       },
       {
         "source": "frontend",
-        "target": "npm:tailwindcss",
-        "type": "static"
-      },
-      {
-        "source": "frontend",
         "target": "npm:typescript",
         "type": "static"
       },
@@ -14604,6 +14599,11 @@
       {
         "source": "frontend",
         "target": "npm:react-hook-form",
+        "type": "static"
+      },
+      {
+        "source": "frontend",
+        "target": "npm:tailwindcss",
         "type": "static"
       },
       {
@@ -32557,5 +32557,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1758172985042
+  "computedAt": 1758189885649
 }

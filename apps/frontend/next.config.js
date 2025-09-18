@@ -1,47 +1,44 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove conflicting experimental settings
-  experimental: {
-    serverComponentsExternalPackages: ['@clerk/nextjs']
-  },
-  
-  // Keep output standalone for deployment
-  output: 'standalone',
-  
-  // Remove invalid config - generateStaticParams is not a Next.js config option
-  // It's a function used in app directory for dynamic routes
-  
-  // Basic optimizations
+  reactStrictMode: true,
   swcMinify: true,
   
-  // Remove invalid appDir - this is automatically true in Next.js 13+ app directory
-  
-  // Generate a simple build ID
-  generateBuildId: () => 'build-' + Date.now(),
-  
-  // Handle the specific build errors
-  typescript: {
-    // Temporarily ignore build errors to get deployment working
-    ignoreBuildErrors: true,
+  // Enable experimental features if needed
+  experimental: {
+    // Add any experimental features here
   },
-  
-  // Skip linting during build to avoid blocking deployment
-  eslint: {
-    ignoreDuringBuilds: true,
+
+  // Environment variables
+  env: {
+    CUSTOM_KEY: 'my-value',
   },
-  
-  // Remove problematic webpack config that disables optimizations
-  
-  // Add proper image domains if needed
+
+  // Webpack configuration
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Add custom webpack config here if needed
+    return config
+  },
+
+  // Redirects
+  async redirects() {
+    return []
+  },
+
+  // Headers
+  async headers() {
+    return []
+  },
+
+  // Image optimization
   images: {
     domains: [],
-    unoptimized: true // Disable image optimization for simpler deployment
   },
+
+  // Output configuration
+  output: 'standalone',
   
-  // Ensure proper handling of environment variables
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
+  // Disable telemetry
+  telemetry: false,
 }
 
-module.exports = nextConfig
+export default nextConfig
