@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const api = axios.create({
   // Use environment variable or default to your backend URL
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3101/',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://api.nanjilmepservice.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
