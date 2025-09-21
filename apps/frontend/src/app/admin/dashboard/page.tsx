@@ -60,7 +60,7 @@ export default function ProductionAdminDashboard() {
   }, [])
 
   // API base URL
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3101"
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://api.nanjilmepservice.com/api"
 
   // Fetch dashboard metrics
   const fetchDashboardStats = useCallback(async () => {
