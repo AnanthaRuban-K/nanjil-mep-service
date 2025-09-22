@@ -1,329 +1,448 @@
+// File: app/page.tsx - Bilingual Homepage with Animated Booking Button
 'use client'
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Zap, Wrench, Phone, MapPin, Star, Clock, Shield, Globe } from 'lucide-react'
-import Image from 'next/image'
+import React, { useState, useEffect } from 'react'
+import CustomerHeader from '@/components/CustomerHeader'
+import { AnimatedBookingButton } from '@/components/AnimatedBookingButton'
+import { 
+  Phone, 
+  MessageCircle, 
+  Zap, 
+  Wrench,
+  CheckCircle,
+  Star,
+  Clock,
+  MapPin
+} from 'lucide-react'
+
+// Language content
+const content = {
+  ta: {
+    emergencyService: "அவசர சேவை",
+    homeProblem: "🏠 மின்சாரம் அல்லது பிளம்பிங் பிரச்சனை இருக்கிறதா?",
+    callImmediately: "உடனே அழையுங்கள் - நாங்கள் வந்து சரி செய்கிறோம்!",
+    electrical: "மின்சாரம்",
+    electricalDesc: "விசிறி, விளக்கு, ஸ்விட்ச்",
+    plumbing: "குழாய்",
+    plumbingDesc: "கசிவு, கழிவறை, தண்ணீர்",
+    clickToCall: "📞 அழைக்க இங்கே அழுத்துங்கள்",
+    whatsappMsg: "💬 WhatsApp மெசேஜ்",
+    instantReply: "உடனே பதில்",
+    whyChooseUs: "⭐ எங்களை ஏன் தேர்வு செய்ய வேண்டும்?",
+    service247: "24/7 சேவை",
+    service247Desc: "எந்த நேரமும் கிடைக்கிறோம்",
+    reliableService: "நம்பகமான சேவை",
+    reliableServiceDesc: "500+ மக்கள் நம்பிக்கை",
+    nagercoilArea: "நாகர்கோவில் முழுவதும்",
+    nagercoilAreaDesc: "எங்கு வேண்டுமானாலும் வருவோம்",
+    whatWeFix: "🔧 நாங்கள் என்ன சரி செய்கிறோம்?",
+    electricalProblems: "மின்சார பிரச்சனைகள்",
+    plumbingProblems: "குழாய் பிரச்சனைகள்",
+    fanNotWorking: "⚡ விசிறி வேலை செய்யலை",
+    lightNotWorking: "💡 விளக்கு எரியலை",
+    switchBroken: "🔌 ஸ்விட்ச் கெட்டுப் போச்சு",
+    noPower: "⚡ கரண்ட் இல்லை",
+    shortCircuit: "🔥 ஷார்ட் சர்க்யூட்",
+    pipeLeak: "💧 குழாய் லீக் ஆகுது",
+    noWater: "🚿 தண்ணீர் வரலை",
+    toiletFlush: "🚽 டாய்லெட் ஃப்ளஷ் வேலை செய்யலை",
+    heaterProblem: "🔥 ஹீட்டர் ஜடாவாய் இருக்கு",
+    drainBlock: "🕳️ ட்ரைன் ப்ளாக் ஆகுது",
+    priceFrom: "💰 ₹300 முதல் - என்ன பிரச்சனை என்று பார்த்து சொல்வோம்",
+    plumbingPriceFrom: "💰 ₹350 முதல் - என்ன பிரச்சனை என்று பார்த்து சொல்வோம்",
+    whatPeopleSay: "😊 மக்கள் என்ன சொல்றாங்க?",
+    review1: "சூப்பர் சர்வீஸ்! விசிறி கெட்டுப் போனது, ஒரே நாள்ல வந்து சரி செஞ்சுட்டாங்க.",
+    review2: "குழாய் லீக் ஆகிது, இவங்க வந்து உடனே சரி செஞ்சுட்டாங்க. நல்ல விலை.",
+    review3: "நைட் டைம்ல கூட வந்துட்டாங்க. எமெர்ஜென்சி சர்வீஸ் ரொம்ப நல்லா இருக்கு.",
+    emergencyServiceNeeded: "🚨 அவசர சேவை வேணுமா?",
+    callNow24x7: "இப்பவே அழையுங்கள் - 24 மணி நேரமும் கிடைக்கிறோம்!",
+    when: "⏰ எப்போ?",
+    anytime: "24/7 - எந்த நேரமும்",
+    where: "📍 எங்கே?",
+    nagercoilSurrounding: "நாகர்கோவில் & சுற்றுப்புறம்",
+    howFast: "⚡ எவ்வளவு சீக்கிரம்?",
+    within2Hours: "2 மணி நேரத்தில்",
+    footerDesc: "நாகர்கோவில்ல நம்பகமான மின்சாரம் & குழாய் சேவை",
+    allRightsReserved: "அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டுள்ளன."
+  },
+  en: {
+    emergencyService: "Emergency Service",
+    homeProblem: "🏠 Do you have an electrical or plumbing problem?",
+    callImmediately: "Call us immediately - We'll come and fix it!",
+    electrical: "Electrical",
+    electricalDesc: "Fan, Light, Switch",
+    plumbing: "Plumbing",
+    plumbingDesc: "Leak, Toilet, Water",
+    clickToCall: "📞 Click Here to Call",
+    whatsappMsg: "💬 WhatsApp Message",
+    instantReply: "Instant Reply",
+    whyChooseUs: "⭐ Why Choose Us?",
+    service247: "24/7 Service",
+    service247Desc: "Available anytime",
+    reliableService: "Reliable Service",
+    reliableServiceDesc: "500+ people trust us",
+    nagercoilArea: "All of Nagercoil",
+    nagercoilAreaDesc: "We'll come anywhere",
+    whatWeFix: "🔧 What Do We Fix?",
+    electricalProblems: "Electrical Problems",
+    plumbingProblems: "Plumbing Problems",
+    fanNotWorking: "⚡ Fan not working",
+    lightNotWorking: "💡 Light not working",
+    switchBroken: "🔌 Switch broken",
+    noPower: "⚡ No power",
+    shortCircuit: "🔥 Short circuit",
+    pipeLeak: "💧 Pipe leaking",
+    noWater: "🚿 No water",
+    toiletFlush: "🚽 Toilet flush not working",
+    heaterProblem: "🔥 Water heater problem",
+    drainBlock: "🕳️ Drain blocked",
+    priceFrom: "💰 From ₹300 - We'll check and tell you the exact cost",
+    plumbingPriceFrom: "💰 From ₹350 - We'll check and tell you the exact cost",
+    whatPeopleSay: "😊 What People Say?",
+    review1: "Super service! Fan was broken, they came and fixed it in one day.",
+    review2: "Pipe was leaking, they came and fixed it immediately. Good price.",
+    review3: "They came even at night time. Emergency service is very good.",
+    emergencyServiceNeeded: "🚨 Need Emergency Service?",
+    callNow24x7: "Call now - Available 24 hours!",
+    when: "⏰ When?",
+    anytime: "24/7 - Anytime",
+    where: "📍 Where?",
+    nagercoilSurrounding: "Nagercoil & Surrounding",
+    howFast: "⚡ How Fast?",
+    within2Hours: "Within 2 hours",
+    footerDesc: "Trusted electrical & plumbing service in Nagercoil",
+    allRightsReserved: "All rights reserved."
+  }
+}
 
 export default function HomePage() {
-  const router = useRouter()
-  const [language, setLanguage] = useState<'ta' | 'en'>('ta') // Default to Tamil
+  const [language, setLanguage] = useState<'ta' | 'en'>('ta')
 
-  const handleBookService = () => {
-    router.push('/services')
-  }
+  // Listen for language changes from CustomerHeader
+  useEffect(() => {
+    // Get initial language from localStorage
+    const savedLanguage = localStorage.getItem('language') as 'ta' | 'en'
+    if (savedLanguage) {
+      setLanguage(savedLanguage)
+    }
 
-  const handleEmergencyCall = () => {
-    window.location.href = 'tel:+919384851596'
-  }
+    // Listen for language changes from CustomerHeader
+    const handleLanguageChange = (event: CustomEvent) => {
+      const newLanguage = event.detail as 'ta' | 'en'
+      setLanguage(newLanguage)
+    }
 
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'ta' ? 'en' : 'ta')
-  }
+    // Listen for the custom event dispatched by CustomerHeader
+    window.addEventListener('languageChanged', handleLanguageChange as EventListener)
 
-  // Content in both languages
-  const content = {
-    ta: {
-      header: {
-        title: 'நாஞ்சில் MEP சேவை',
-        subtitle: 'Nanjil MEP Service',
-        emergency: 'அவசரம்'
-      },
-      hero: {
-        title: 'மின்சாரம் • குழாய் • அவசர சேவை',
-        subtitle: 'Electrical • Plumbing • Emergency Service',
-        description: 'வீட்டு மின்சாரம் மற்றும் குழாய் பிரச்சனைகளுக்கு நம்பகமான சேவை'
-      },
-      services: {
-        electrical: {
-          title: 'மின்சாரம்',
-          subtitle: 'Electrical',
-          items: [
-            'விசிறி சரி செய்தல் (Fan Repair)',
-            'விளக்கு பொருத்துதல் (Light Fitting)',
-            'சுவிட்ச் மாற்றுதல் (Switch Replacement)',
-            'வயரிங் சரிசெய்தல் (Wiring Fix)'
-          ]
-        },
-        plumbing: {
-          title: 'குழாய்',
-          subtitle: 'Plumbing',
-          items: [
-            'குழாய் லீக்கேஜ் (Pipe Leakage)',
-            'கழிவறை சரிசெய்தல் (Toilet Repair)',
-            'டேப் மாற்றுதல் (Tap Replacement)',
-            'வாட்டர் டேங்க் (Water Tank Service)'
-          ]
-        },
-        emergency: {
-          title: 'அவசரம்',
-          subtitle: 'Emergency',
-          items: [
-            '24 மணி நேரம் (24 Hours)',
-            'உடனடி சேவை (Immediate)',
-            'பவர் கட் (Power Cut)',
-            'வாட்டர் லீக்கேஜ் (Water Leakage)'
-          ]
-        }
-      },
-      bookButton: {
-        main: '🏠 சேவை பதிவு செய்யுங்கள்',
-        sub: 'Book Service'
-      },
-      features: [
-        { title: 'விரைவான சேவை', subtitle: 'Quick Service' },
-        { title: 'தரமான வேலை', subtitle: 'Quality Work' },
-        { title: 'உள்ளூர் சேவை', subtitle: 'Local Service' }
-      ],
-      emergency: {
-        title: 'அவசர சேவைக்கு உடனே அழைக்கவும்',
-        subtitle: 'For Emergency Service Call Immediately'
-      },
-      footer: {
-        main: 'நாஞ்சில் MEP சேவை - நம்பகமான வீட்டு சேவைகள்',
-        sub: 'Nanjil MEP Service - Trusted Home Services'
-      }
-    },
-    en: {
-      header: {
-        title: 'Nanjil MEP Service',
-        subtitle: 'நாஞ்சில் MEP சேவை',
-        emergency: 'Emergency'
-      },
-      hero: {
-        title: 'Electrical • Plumbing • Emergency Service',
-        subtitle: 'மின்சாரம் • குழாய் • அவசர சேவை',
-        description: 'Reliable home electrical and plumbing services you can trust'
-      },
-      services: {
-        electrical: {
-          title: 'Electrical',
-          subtitle: 'மின்சாரம்',
-          items: [
-            'Fan Repair (விசிறி சரி செய்தல்)',
-            'Light Fitting (விளக்கு பொருத்துதல்)',
-            'Switch Replacement (சுவிட்ச் மாற்றுதல்)',
-            'Wiring Fix (வயரிங் சரிசெய்தல்)'
-          ]
-        },
-        plumbing: {
-          title: 'Plumbing',
-          subtitle: 'குழாய்',
-          items: [
-            'Pipe Leakage (குழாய் லீக்கேஜ்)',
-            'Toilet Repair (கழிவறை சரிசெய்தல்)',
-            'Tap Replacement (டேப் மாற்றுதல்)',
-            'Water Tank Service (வாட்டர் டேங்க்)'
-          ]
-        },
-        emergency: {
-          title: 'Emergency',
-          subtitle: 'அவசரம்',
-          items: [
-            '24 Hours (24 மணி நேரம்)',
-            'Immediate (உடனடி சேவை)',
-            'Power Cut (பவர் கட்)',
-            'Water Leakage (வாட்டர் லீக்கேஜ்)'
-          ]
-        }
-      },
-      bookButton: {
-        main: '🏠 Book Service',
-        sub: 'சேவை பதிவு செய்யுங்கள்'
-      },
-      features: [
-        { title: 'Quick Service', subtitle: 'விரைவான சேவை' },
-        { title: 'Quality Work', subtitle: 'தரமான வேலை' },
-        { title: 'Local Service', subtitle: 'உள்ளூர் சேவை' }
-      ],
-      emergency: {
-        title: 'For Emergency Service Call Immediately',
-        subtitle: 'அவசர சேவைக்கு உடனே அழைக்கவும்'
-      },
-      footer: {
-        main: 'Nanjil MEP Service - Trusted Home Services',
-        sub: 'நாஞ்சில் MEP சேவை - நம்பகமான வீட்டு சேவைகள்'
+    // Also listen for storage changes as fallback
+    const handleStorageChange = () => {
+      const newLanguage = localStorage.getItem('language') as 'ta' | 'en'
+      if (newLanguage && newLanguage !== language) {
+        setLanguage(newLanguage)
       }
     }
-  }
 
-  const currentContent = content[language]
+    window.addEventListener('storage', handleStorageChange)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('languageChanged', handleLanguageChange as EventListener)
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [language])
+
+  const t = content[language]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Image
-                src="/nanjil-logo.jpg"
-                alt="Nanjil MEP Logo"
-                width={100}
-                height={100}
-                className="object-contain"
-              />
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">{currentContent.header.title}</h1>
-                <p className="text-sm text-gray-600">{currentContent.header.subtitle}</p>
-              </div>
+    <div className="min-h-screen bg-white">
+      {/* Enhanced CustomerHeader with Language Toggle */}
+      <CustomerHeader />
+
+      {/* Animated Booking Button */}
+      <AnimatedBookingButton language={language} />
+
+      {/* Main Hero Section */}
+      <section className="bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Simple Title */}
+          <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+            {t.homeProblem}
+          </h1>
+          <h2 className="text-xl md:text-2xl text-blue-600 font-semibold mb-8">
+            {t.callImmediately}
+          </h2>
+          
+          {/* What We Fix - Simple Icons */}
+          <div className="grid grid-cols-2 gap-6 mb-12 max-w-2xl mx-auto">
+            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 text-center">
+              <Zap className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-gray-800 mb-2">{t.electrical}</h3>
+              <p className="text-sm text-gray-600">{t.electricalDesc}</p>
+            </div>
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center">
+              <Wrench className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-gray-800 mb-2">{t.plumbing}</h3>
+              <p className="text-sm text-gray-600">{t.plumbingDesc}</p>
+            </div>
+          </div>
+
+          {/* Big Call Buttons */}
+          <div className="space-y-4">
+            <a
+              href="tel:1800-NANJIL"
+              className="block w-full max-w-md mx-auto bg-green-500 hover:bg-green-600 text-white text-xl font-bold py-6 px-8 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105"
+            >
+              {t.clickToCall}
+              <div className="text-lg mt-1">1800-NANJIL</div>
+            </a>
+            
+            <a
+              href="https://wa.me/1800NANJIL"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full max-w-md mx-auto bg-green-600 hover:bg-green-700 text-white text-xl font-bold py-6 px-8 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105"
+            >
+              {t.whatsappMsg}
+              <div className="text-lg mt-1">{t.instantReply}</div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-12">
+            {t.whyChooseUs}
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-6 text-center shadow-md">
+              <Clock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-bold mb-2">{t.service247}</h3>
+              <p className="text-gray-600">{t.service247Desc}</p>
             </div>
             
-            <div className="flex items-center space-x-3">
-              {/* Language Toggle Button */}
-              <button
-                onClick={toggleLanguage}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-                title="Switch Language"
-              >
-                <Globe className="w-4 h-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">
-                  {language === 'ta' ? 'EN' : 'தமிழ்'}
-                </span>
-              </button>
-
-              {/* Emergency Button */}
-              <button
-                onClick={handleEmergencyCall}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium animate-pulse"
-              >
-                <Phone className="w-4 h-4 inline mr-2" />
-                <div className="inline-flex flex-col items-start">
-                  <span className="text-sm font-bold">{currentContent.header.emergency}</span>
-                  <span className="text-xs opacity-90">9384851596</span>
-                </div>
-              </button>
+            <div className="bg-white rounded-xl p-6 text-center shadow-md">
+              <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-bold mb-2">{t.reliableService}</h3>
+              <p className="text-gray-600">{t.reliableServiceDesc}</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 text-center shadow-md">
+              <MapPin className="w-12 h-12 text-red-600 mx-auto mb-4" />
+              <h3 className="text-lg font-bold mb-2">{t.nagercoilArea}</h3>
+              <p className="text-gray-600">{t.nagercoilAreaDesc}</p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            {currentContent.hero.title}
+      {/* What We Do */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-12">
+            {t.whatWeFix}
           </h2>
-          <p className="text-lg text-gray-600 mb-2">
-            {currentContent.hero.subtitle}
-          </p>
-          <p className="text-gray-500 max-w-2xl mx-auto">
-            {currentContent.hero.description}
-          </p>
-        </div>
-
-        {/* Service Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {/* Electrical Service */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-yellow-100">
-            <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <Zap className="w-8 h-8 text-yellow-600" />
+          
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* Electrical */}
+            <div className="bg-yellow-50 rounded-xl p-8">
+              <div className="flex items-center mb-6">
+                <Zap className="w-8 h-8 text-yellow-600 mr-3" />
+                <h3 className="text-xl font-bold text-gray-800">{t.electricalProblems}</h3>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.fanNotWorking}</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.lightNotWorking}</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.switchBroken}</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.noPower}</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.shortCircuit}</span>
+                </li>
+              </ul>
+              <div className="mt-6 p-4 bg-yellow-100 rounded-lg">
+                <p className="text-sm font-semibold text-yellow-800">
+                  {t.priceFrom}
+                </p>
+              </div>
             </div>
-            <h3 className="text-lg font-bold text-center mb-2 text-gray-800">
-              {currentContent.services.electrical.title}
-            </h3>
-            <p className="text-center text-gray-600 text-sm mb-4">
-              {currentContent.services.electrical.subtitle}
-            </p>
-            <ul className="text-sm text-gray-600 space-y-2">
-              {currentContent.services.electrical.items.map((item, index) => (
-                <li key={index}>• {item}</li>
-              ))}
-            </ul>
-          </div>
 
-          {/* Plumbing Service */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-blue-100">
-            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <Wrench className="w-8 h-8 text-blue-600" />
+            {/* Plumbing */}
+            <div className="bg-blue-50 rounded-xl p-8">
+              <div className="flex items-center mb-6">
+                <Wrench className="w-8 h-8 text-blue-600 mr-3" />
+                <h3 className="text-xl font-bold text-gray-800">{t.plumbingProblems}</h3>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.pipeLeak}</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.noWater}</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.toiletFlush}</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.heaterProblem}</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                  <span>{t.drainBlock}</span>
+                </li>
+              </ul>
+              <div className="mt-6 p-4 bg-blue-100 rounded-lg">
+                <p className="text-sm font-semibold text-blue-800">
+                  {t.plumbingPriceFrom}
+                </p>
+              </div>
             </div>
-            <h3 className="text-lg font-bold text-center mb-2 text-gray-800">
-              {currentContent.services.plumbing.title}
-            </h3>
-            <p className="text-center text-gray-600 text-sm mb-4">
-              {currentContent.services.plumbing.subtitle}
-            </p>
-            <ul className="text-sm text-gray-600 space-y-2">
-              {currentContent.services.plumbing.items.map((item, index) => (
-                <li key={index}>• {item}</li>
-              ))}
-            </ul>
           </div>
+        </div>
+      </section>
 
-          {/* Emergency Service */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-red-100">
-            <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <Shield className="w-8 h-8 text-red-600" />
+      {/* Customer Reviews */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-12">
+            {t.whatPeopleSay}
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-blue-600 font-bold text-lg">ர</span>
+                </div>
+                <div>
+                  <h4 className="font-bold">ராஜா குமார்</h4>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 italic">"{t.review1}"</p>
             </div>
-            <h3 className="text-lg font-bold text-center mb-2 text-gray-800">
-              {currentContent.services.emergency.title}
-            </h3>
-            <p className="text-center text-gray-600 text-sm mb-4">
-              {currentContent.services.emergency.subtitle}
-            </p>
-            <ul className="text-sm text-gray-600 space-y-2">
-              {currentContent.services.emergency.items.map((item, index) => (
-                <li key={index}>• {item}</li>
-              ))}
-            </ul>
+
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-green-600 font-bold text-lg">ச</span>
+                </div>
+                <div>
+                  <h4 className="font-bold">சுந்தரி அம்மாள்</h4>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 italic">"{t.review2}"</p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-purple-600 font-bold text-lg">ம</span>
+                </div>
+                <div>
+                  <h4 className="font-bold">முருகன் சார்</h4>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 italic">"{t.review3}"</p>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Main Action Button */}
-        <div className="text-center mb-12">
-          <button
-            onClick={handleBookService}
-            className="bg-green-500 hover:bg-green-600 text-white text-xl font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 min-h-[60px]"
-          >
-            {currentContent.bookButton.main}
-            <div className="text-sm font-normal">{currentContent.bookButton.sub}</div>
-          </button>
-        </div>
-
-        {/* Features */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="text-center">
-            <Clock className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-            <h4 className="font-semibold text-gray-800">{currentContent.features[0].title}</h4>
-            <p className="text-sm text-gray-600">{currentContent.features[0].subtitle}</p>
-          </div>
-          <div className="text-center">
-            <Star className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
-            <h4 className="font-semibold text-gray-800">{currentContent.features[1].title}</h4>
-            <p className="text-sm text-gray-600">{currentContent.features[1].subtitle}</p>
-          </div>
-          <div className="text-center">
-            <MapPin className="w-12 h-12 text-green-600 mx-auto mb-3" />
-            <h4 className="font-semibold text-gray-800">{currentContent.features[2].title}</h4>
-            <p className="text-sm text-gray-600">{currentContent.features[2].subtitle}</p>
-          </div>
-        </div>
-
-        {/* Emergency Contact */}
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
-          <h3 className="text-lg font-bold text-red-800 mb-2">
-            {currentContent.emergency.title}
-          </h3>
-          <p className="text-red-600 mb-4">{currentContent.emergency.subtitle}</p>
-          <button
-            onClick={handleEmergencyCall}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl inline-flex items-center space-x-2"
-          >
-            <Phone className="w-5 h-5" />
-            <span>9384851596</span>
-          </button>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-12 pt-8 border-t border-gray-200">
-          <p className="text-gray-600 text-sm">
-            {currentContent.footer.main}
+      {/* Final CTA */}
+      <section className="py-20 px-4 bg-blue-600 text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            {t.emergencyServiceNeeded}
+          </h2>
+          <p className="text-xl mb-8">
+            {t.callNow24x7}
           </p>
-          <p className="text-gray-500 text-xs mt-1">
-            {currentContent.footer.sub}
-          </p>
+          
+          <div className="space-y-4">
+            <a
+              href="tel:1800-NANJIL"
+              className="inline-block bg-green-500 hover:bg-green-600 text-white text-2xl font-bold py-6 px-12 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105 mr-4"
+            >
+              📞 1800-NANJIL
+            </a>
+            
+            <a
+              href="https://wa.me/1800NANJIL"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-green-600 hover:bg-green-700 text-white text-2xl font-bold py-6 px-12 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105"
+            >
+              💬 WhatsApp
+            </a>
+          </div>
+
+          <div className="mt-12 grid md:grid-cols-3 gap-8 text-center">
+            <div>
+              <h4 className="font-bold text-xl mb-2">{t.when}</h4>
+              <p className="opacity-90">{t.anytime}</p>
+            </div>
+            <div>
+              <h4 className="font-bold text-xl mb-2">{t.where}</h4>
+              <p className="opacity-90">{t.nagercoilSurrounding}</p>
+            </div>
+            <div>
+              <h4 className="font-bold text-xl mb-2">{t.howFast}</h4>
+              <p className="opacity-90">{t.within2Hours}</p>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Simple Footer */}
+      <footer className="bg-gray-800 text-white py-8 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h3 className="text-xl font-bold mb-4">நாஞ்சில் MEP சேவை</h3>
+          <p className="text-gray-400 mb-4">
+            {t.footerDesc}
+          </p>
+          <div className="space-y-2 text-gray-400">
+            <p>📞 1800-NANJIL</p>
+            <p>📧 info@nanjilmepservice.com</p>
+            <p>📍 நாகர்கோவில், தமிழ்நாடு</p>
+          </div>
+          <div className="mt-6 pt-6 border-t border-gray-700">
+            <p className="text-gray-500">&copy; 2024 நாஞ்சில் MEP Services. {t.allRightsReserved}</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

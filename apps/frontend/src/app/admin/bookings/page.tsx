@@ -1,429 +1,434 @@
-// apps/frontend/src/app/admin/bookings/page.tsx
 'use client'
-import React, { useState, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
+import React, { useState } from 'react'
+import { useAdminBookings, useUpdateBookingStatus } from '@/hooks/useAdmin'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { 
   Calendar, 
-  Clock, 
-  User, 
   Phone, 
   MapPin, 
-  Zap, 
-  Wrench, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
-  Eye,
-  ArrowLeft,
+  Eye, 
+  RefreshCw,
   Filter,
-  Search
+  Search,
+  Download
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
-// Mock data for testing - replace with real API calls later
-const mockBookings = [
-  {
-    id: 1,
-    bookingNumber: 'NMS240901001',
-    serviceType: 'electrical',
-    priority: 'emergency',
-    description: 'மின்சாரம் போகுது, ஃபான் ஓடவில்லை - Power cut, fan not working',
-    contactInfo: {
-      name: 'ராஜேஷ் குமார்',
-      phone: '9876543210',
-      address: 'No.15, காமராஜ் தெரு, நாகர்கோவில்'
-    },
-    scheduledTime: '2024-09-01T10:00:00Z',
-    status: 'pending',
-    createdAt: '2024-09-01T08:30:00Z',
-    totalCost: '450'
-  },
-  {
-    id: 2,
-    bookingNumber: 'NMS240901002',
-    serviceType: 'plumbing',
-    priority: 'normal',
-    description: 'குழாய் நீர் கசிவு - Pipe water leakage in bathroom',
-    contactInfo: {
-      name: 'சுமித்ரா தேவி',
-      phone: '9876543211',
-      address: 'No.28, விவேகானந்த தெரு, நாகர்கோவில்'
-    },
-    scheduledTime: '2024-09-01T14:00:00Z',
-    status: 'confirmed',
-    createdAt: '2024-09-01T09:15:00Z',
-    totalCost: '350'
-  },
-  {
-    id: 3,
-    bookingNumber: 'NMS240901003',
-    serviceType: 'electrical',
-    priority: 'urgent',
-    description: 'சுவிட்ச் போர்ட் பிரச்சினை - Switch board sparking issue',
-    contactInfo: {
-      name: 'முருகன் பிள்ளை',
-      phone: '9876543212',
-      address: 'No.42, தியாகராஜர் தெரு, நாகர்கோவில்'
-    },
-    scheduledTime: '2024-09-01T16:30:00Z',
-    status: 'in_progress',
-    createdAt: '2024-09-01T10:00:00Z',
-    totalCost: '500'
-  }
-]
-
-const statusColors = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  confirmed: 'bg-blue-100 text-blue-800', 
-  in_progress: 'bg-green-100 text-green-800',
-  completed: 'bg-gray-100 text-gray-800',
-  cancelled: 'bg-red-100 text-red-800'
-}
-
-const priorityColors = {
-  normal: 'bg-gray-100 text-gray-800',
-  urgent: 'bg-orange-100 text-orange-800',
-  emergency: 'bg-red-100 text-red-800'
-}
-
-const serviceIcons = {
-  electrical: Zap,
-  plumbing: Wrench
-}
-
-export default function AdminBookings() {
-  const { user, isLoaded, isSignedIn } = useUser()
-  const router = useRouter()
-  const [bookings, setBookings] = useState(mockBookings)
-  const [filteredBookings, setFilteredBookings] = useState(mockBookings)
-  const [selectedStatus, setSelectedStatus] = useState('all')
-  const [selectedService, setSelectedService] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
+export default function AdminBookingsPage() {
+  const [filters, setFilters] = useState({
+    status: '',
+    priority: '',
+    serviceType: '',
+    search: ''
+  })
+  const [currentPage, setCurrentPage] = useState(1)
   const [selectedBooking, setSelectedBooking] = useState<any>(null)
-  const [showDetailsModal, setShowDetailsModal] = useState(false)
 
-  // Filter bookings based on selected filters
-  useEffect(() => {
-    let filtered = bookings
+  const { 
+    data: bookingsData, 
+    isLoading, 
+    error, 
+    refetch 
+  } = useAdminBookings({
+    page: currentPage,
+    limit: 20,
+    ...filters
+  })
 
-    if (selectedStatus !== 'all') {
-      filtered = filtered.filter(booking => booking.status === selectedStatus)
-    }
+  const updateStatusMutation = useUpdateBookingStatus()
 
-    if (selectedService !== 'all') {
-      filtered = filtered.filter(booking => booking.serviceType === selectedService)
-    }
-
-    if (searchTerm) {
-      filtered = filtered.filter(booking => 
-        booking.contactInfo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.bookingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.contactInfo.phone.includes(searchTerm)
-      )
-    }
-
-    setFilteredBookings(filtered)
-  }, [selectedStatus, selectedService, searchTerm, bookings])
-
-  // Handle status update
-  const updateBookingStatus = (bookingId: number, newStatus: string) => {
-    setBookings(prev => prev.map(booking => 
-      booking.id === bookingId 
-        ? { ...booking, status: newStatus }
-        : booking
-    ))
-  }
-
-  // Format date and time
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString)
-    return {
-      date: date.toLocaleDateString('en-IN'),
-      time: date.toLocaleTimeString('en-IN', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
+  const handleStatusUpdate = async (bookingId: number, newStatus: string) => {
+    try {
+      await updateStatusMutation.mutateAsync({
+        bookingId,
+        status: newStatus
       })
+      toast.success(`நிலை புதுப்பிக்கப்பட்டது • Status updated to ${newStatus}`)
+      setSelectedBooking(null)
+    } catch (error) {
+      toast.error('நிலை புதுப்பிக்க முடியவில்லை • Failed to update status')
     }
   }
 
-  if (!isLoaded) {
+  const exportBookings = () => {
+    toast.success('CSV export started • CSV ஏற்றுமதி தொடங்கியது')
+    // Implement CSV export logic
+  }
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-xl">Loading bookings...</p>
-        </div>
+      <div className="flex items-center justify-center h-96">
+        <LoadingSpinner size="lg" text="Loading bookings..." />
       </div>
     )
   }
 
+  if (error) {
+    return <ErrorMessage error={error} onRetry={refetch} />
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <button
-                onClick={() => router.push('/admin/dashboard')}
-                className="mr-4 p-2 text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeft className="h-6 w-6" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Bookings Management
-                </h1>
-                <p className="text-sm text-gray-600">
-                  பதிவுகள் நிர்வாகம் / Manage service bookings
-                </p>
-              </div>
-            </div>
-            
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">
-                Total Bookings: {filteredBookings.length}
-              </p>
-              <p className="text-xs text-gray-500">
-                {new Date().toLocaleDateString('en-IN')}
-              </p>
-            </div>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            பதிவுகள் நிர்வாகம் • Bookings Management
+          </h1>
+          <p className="text-gray-600">
+            அனைத்து சேவை பதிவுகளை நிர்வகிக்கவும் • Manage all service bookings
+          </p>
+        </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => refetch()}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>புதுப்பிக்க • Refresh</span>
+          </button>
+          <button
+            onClick={exportBookings}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            <Download className="w-4 h-4" />
+            <span>CSV Export</span>
+          </button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            {/* Search */}
-            <div className="flex-1 min-w-64">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <input
-                  type="text"
-                  placeholder="Search by name, booking number, or phone..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Status Filter */}
-            <div>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-
-            {/* Service Filter */}
-            <div>
-              <select
-                value={selectedService}
-                onChange={(e) => setSelectedService(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">All Services</option>
-                <option value="electrical">Electrical / மின்சாரம்</option>
-                <option value="plumbing">Plumbing / பிளம்பிங்</option>
-              </select>
+      <div className="bg-white p-6 rounded-xl shadow-sm border">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              தேடல் • Search
+            </label>
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Customer name, phone..."
+                value={filters.search}
+                onChange={(e) => setFilters({...filters, search: e.target.value})}
+                className="pl-10 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
-        </div>
 
-        {/* Bookings Table */}
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Booking Details
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Service & Priority
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Schedule
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredBookings.map((booking) => {
-                  const ServiceIcon = serviceIcons[booking.serviceType as keyof typeof serviceIcons]
-                  const scheduledDateTime = formatDateTime(booking.scheduledTime)
-                  
-                  return (
-                    <tr key={booking.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {booking.bookingNumber}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            ₹{booking.totalCost}
-                          </div>
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-4">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {booking.contactInfo.name}
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <Phone className="h-3 w-3 mr-1" />
-                            {booking.contactInfo.phone}
-                          </div>
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <ServiceIcon className="h-5 w-5 mr-2 text-gray-400" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900 capitalize">
-                              {booking.serviceType}
-                            </div>
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${priorityColors[booking.priority as keyof typeof priorityColors]}`}>
-                              {booking.priority}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {scheduledDateTime.date}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {scheduledDateTime.time}
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={booking.status}
-                          onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
-                          className={`text-sm rounded-full px-3 py-1 font-medium border-0 ${statusColors[booking.status as keyof typeof statusColors]}`}
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="confirmed">Confirmed</option>
-                          <option value="in_progress">In Progress</option>
-                          <option value="completed">Completed</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => {
-                            setSelectedBooking(booking)
-                            setShowDetailsModal(true)
-                          }}
-                          className="text-blue-600 hover:text-blue-900 mr-3"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              நிலை • Status
+            </label>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({...filters, status: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
           </div>
-          
-          {filteredBookings.length === 0 && (
-            <div className="text-center py-12">
-              <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No bookings found
-              </h3>
-              <p className="text-gray-500">
-                No bookings match your current filters.
-              </p>
-            </div>
-          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              முன்னுரிமை • Priority
+            </label>
+            <select
+              value={filters.priority}
+              onChange={(e) => setFilters({...filters, priority: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Priority</option>
+              <option value="normal">Normal</option>
+              <option value="urgent">Urgent</option>
+              <option value="emergency">Emergency</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              சேவை வகை • Service Type
+            </label>
+            <select
+              value={filters.serviceType}
+              onChange={(e) => setFilters({...filters, serviceType: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Services</option>
+              <option value="electrical">Electrical</option>
+              <option value="plumbing">Plumbing</option>
+            </select>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={() => setFilters({ status: '', priority: '', serviceType: '', search: '' })}
+              className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+            >
+              Clear Filters
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Booking Details Modal */}
-      {showDetailsModal && selectedBooking && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+      {/* Bookings Table */}
+      <div className="bg-white rounded-xl shadow-sm border">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Bookings ({bookingsData?.total || 0})
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Booking Details
-                </h3>
-                <button
-                  onClick={() => setShowDetailsModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XCircle className="h-6 w-6" />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-gray-900">Booking Number</h4>
-                  <p className="text-gray-600">{selectedBooking.bookingNumber}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900">Customer</h4>
-                  <p className="text-gray-600">{selectedBooking.contactInfo.name}</p>
-                  <p className="text-gray-600">{selectedBooking.contactInfo.phone}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900">Address</h4>
-                  <p className="text-gray-600">{selectedBooking.contactInfo.address}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900">Problem Description</h4>
-                  <p className="text-gray-600">{selectedBooking.description}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900">Cost</h4>
-                  <p className="text-gray-600">₹{selectedBooking.totalCost}</p>
-                </div>
-              </div>
-              
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={() => setShowDetailsModal(false)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Close
-                </button>
-              </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Customer
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Service
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {bookingsData?.bookings.map((booking: any) => (
+                <BookingRow
+                  key={booking.id}
+                  booking={booking}
+                  onView={() => setSelectedBooking(booking)}
+                  onStatusUpdate={handleStatusUpdate}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="px-6 py-4 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Showing {((currentPage - 1) * 20) + 1} to {Math.min(currentPage * 20, bookingsData?.total || 0)} of {bookingsData?.total || 0} results
+            </div>
+            <div className="flex space-x-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+                className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="px-3 py-1">{currentPage}</span>
+              <button
+                disabled={currentPage * 20 >= (bookingsData?.total || 0)}
+                onClick={() => setCurrentPage(currentPage + 1)}
+                className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Booking Detail Modal */}
+      {selectedBooking && (
+        <BookingDetailModal
+          booking={selectedBooking}
+          onClose={() => setSelectedBooking(null)}
+          onStatusUpdate={handleStatusUpdate}
+          isUpdating={updateStatusMutation.isPending}
+        />
       )}
+    </div>
+  )
+}
+
+// Booking Row Component
+function BookingRow({ booking, onView, onStatusUpdate }: any) {
+  const getStatusColor = (status: string) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      confirmed: 'bg-blue-100 text-blue-800',
+      in_progress: 'bg-green-100 text-green-800',
+      completed: 'bg-gray-100 text-gray-800',
+      cancelled: 'bg-red-100 text-red-800'
+    }
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+  }
+
+  const getPriorityColor = (priority: string) => {
+    const colors = {
+      normal: 'bg-gray-100 text-gray-800',
+      urgent: 'bg-orange-100 text-orange-800',
+      emergency: 'bg-red-100 text-red-800'
+    }
+    return colors[priority as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+  }
+
+  return (
+    <tr className="hover:bg-gray-50">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div>
+          <div className="text-sm font-medium text-gray-900">{booking.bookingNumber}</div>
+          <div className="text-sm text-gray-500">{new Date(booking.createdAt).toLocaleDateString()}</div>
+          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(booking.priority)}`}>
+            {booking.priority}
+          </span>
+        </div>
+      </td>
+      <td className="px-6 py-4">
+        <div>
+          <div className="text-sm font-medium text-gray-900">{booking.contactInfo.name}</div>
+          <div className="text-sm text-gray-500 flex items-center">
+            <Phone className="w-3 h-3 mr-1" />
+            {booking.contactInfo.phone}
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4">
+        <div>
+          <div className="text-sm font-medium text-gray-900 capitalize">{booking.serviceType}</div>
+          <div className="text-sm text-gray-500">{booking.description.substring(0, 50)}...</div>
+          <div className="text-sm font-medium text-gray-900">₹{booking.totalCost}</div>
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
+          {booking.status}
+        </span>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button
+          onClick={onView}
+          className="text-blue-600 hover:text-blue-900 mr-3"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+        <select
+          onChange={(e) => {
+            if (e.target.value) {
+              onStatusUpdate(booking.id, e.target.value)
+              e.target.value = '' // Reset select
+            }
+          }}
+          className="text-sm border border-gray-300 rounded px-2 py-1"
+          defaultValue=""
+        >
+          <option value="">Update Status</option>
+          <option value="confirmed">Confirm</option>
+          <option value="in_progress">Start Work</option>
+          <option value="completed">Complete</option>
+          <option value="cancelled">Cancel</option>
+        </select>
+      </td>
+    </tr>
+  )
+}
+
+// Booking Detail Modal Component
+function BookingDetailModal({ booking, onClose, onStatusUpdate, isUpdating }: any) {
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-[700px] shadow-lg rounded-xl bg-white">
+        <div className="mt-3">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-gray-900">
+              Booking Details: {booking.bookingNumber}
+            </h3>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-2xl"
+            >
+              ×
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Customer Information</h4>
+                <div className="space-y-2 text-sm">
+                  <p><strong>Name:</strong> {booking.contactInfo.name}</p>
+                  <p><strong>Phone:</strong> {booking.contactInfo.phone}</p>
+                  <p><strong>Address:</strong> {booking.contactInfo.address}</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Service Details</h4>
+                <div className="space-y-2 text-sm">
+                  <p><strong>Type:</strong> {booking.serviceType}</p>
+                  <p><strong>Priority:</strong> {booking.priority}</p>
+                  <p><strong>Status:</strong> {booking.status}</p>
+                  <p><strong>Cost:</strong> ₹{booking.totalCost}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Problem Description</h4>
+                <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
+                  {booking.description}
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Timing</h4>
+                <div className="space-y-2 text-sm">
+                  <p><strong>Created:</strong> {new Date(booking.createdAt).toLocaleString()}</p>
+                  <p><strong>Scheduled:</strong> {new Date(booking.scheduledTime).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <h4 className="font-semibold text-gray-900 mb-3">Update Status</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {['confirmed', 'in_progress', 'completed', 'cancelled'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => onStatusUpdate(booking.id, status)}
+                  disabled={isUpdating || booking.status === status}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    booking.status === status
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400'
+                  }`}
+                >
+                  {status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <button
+              onClick={onClose}
+              className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

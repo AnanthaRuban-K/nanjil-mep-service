@@ -1,4 +1,3 @@
-// apps/frontend/src/app/schedule/page.tsx
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -6,7 +5,6 @@ import { ArrowLeft, Clock, Calendar as CalendarIcon } from 'lucide-react'
 
 export default function SchedulePage() {
   const router = useRouter()
-  const [selectedService, setSelectedService] = useState<string>('')
   const [selectedTime, setSelectedTime] = useState<string>('')
   const [selectedDate, setSelectedDate] = useState<string>('')
 
@@ -21,16 +19,10 @@ export default function SchedulePage() {
       return
     }
     
-    setSelectedService(service)
-    
     // Set default date to today
     const today = new Date()
     setSelectedDate(today.toISOString().split('T')[0])
   }, [router])
-
-  const handleTimeSelect = (timeSlot: string) => {
-    setSelectedTime(timeSlot)
-  }
 
   const handleNext = () => {
     if (!selectedTime) {
@@ -41,10 +33,6 @@ export default function SchedulePage() {
     const scheduledDateTime = `${selectedDate}T${selectedTime}`
     sessionStorage.setItem('scheduledTime', scheduledDateTime)
     router.push('/summary')
-  }
-
-  const handleBack = () => {
-    router.back()
   }
 
   const timeSlots = [
@@ -61,7 +49,7 @@ export default function SchedulePage() {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <button
-              onClick={handleBack}
+              onClick={() => router.back()}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="w-6 h-6 text-gray-600" />
@@ -75,37 +63,13 @@ export default function SchedulePage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Progress Indicator */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center space-x-2 text-green-600">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</div>
-              <span>சேவை</span>
-            </div>
-            <div className="flex items-center space-x-2 text-green-600">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</div>
-              <span>பிரச்சனை</span>
-            </div>
-            <div className="flex items-center space-x-2 text-green-600">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</div>
-              <span>தொடர்பு</span>
-            </div>
-            <div className="flex items-center space-x-2 text-blue-600 font-semibold">
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">4</div>
-              <span>நேரம்</span>
-            </div>
-          </div>
-        </div>
-
         {/* Date Selection */}
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
           <div className="flex items-center space-x-3 mb-4">
             <CalendarIcon className="w-6 h-6 text-blue-600" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-800">
-                தேதி தேர்வு (Select Date)
-              </h2>
-            </div>
+            <h2 className="text-lg font-semibold text-gray-800">
+              தேதி தேர்வு (Select Date)
+            </h2>
           </div>
           
           <input
@@ -121,18 +85,16 @@ export default function SchedulePage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
           <div className="flex items-center space-x-3 mb-4">
             <Clock className="w-6 h-6 text-green-600" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-800">
-                நேரம் தேர்வு (Select Time)
-              </h2>
-            </div>
+            <h2 className="text-lg font-semibold text-gray-800">
+              நேரம் தேர்வு (Select Time)
+            </h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             {timeSlots.map((slot) => (
               <button
                 key={slot.time}
-                onClick={() => slot.available && handleTimeSelect(slot.time)}
+                onClick={() => slot.available && setSelectedTime(slot.time)}
                 disabled={!slot.available}
                 className={`p-4 rounded-xl border-2 transition-all duration-200 ${
                   selectedTime === slot.time
@@ -165,7 +127,7 @@ export default function SchedulePage() {
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            அடுத்தது: விபரங்களை பார்ப்பு →
+            அடுத்ததி: விபரங்களை பார்ப்பு →
             <div className="text-sm font-normal">Next: Review Details</div>
           </button>
         </div>

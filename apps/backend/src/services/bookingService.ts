@@ -1,9 +1,8 @@
 import { db } from '../db/index.js'
-import { bookings, type NewBooking } from '../db/schema.js'
-import { eq, desc, and, gte, lt } from 'drizzle-orm'
-import { NotificationService } from './notificationService.js'
+import { bookings, customers, type NewBooking } from '../db/schema.js'
+import { eq, desc, and, gte, lt, sql } from 'drizzle-orm'
+
 export class BookingService {
-  private notificationService = new NotificationService()
   async createBooking(data: {
     serviceType: 'electrical' | 'plumbing'
     priority: 'normal' | 'urgent' | 'emergency'
@@ -17,7 +16,7 @@ export class BookingService {
   }) {
     try {
       const bookingNumber = this.generateBookingNumber()
-      const totalCost = this.calculateBasicCost(data.serviceType, data.priority)
+      const totalCost = this.calculateCost(data.serviceType, data.priority)
       
       const newBooking: NewBooking = {
         bookingNumber,
@@ -30,27 +29,11 @@ export class BookingService {
         status: 'pending'
       }
       
-      
       const [booking] = await db.insert(bookings).values(newBooking).returning()
       
+      // Create customer if doesn't exist
+      await this.createOrUpdateCustomer(data.contactInfo)
       
-      // 🔔 CREATE NOTIFICATION FOR ADMIN
-      const serviceNameTa = data.serviceType === 'electrical' ? 'மின்சாரம்' : 'குழாய்'
-      const serviceNameEn = data.serviceType === 'electrical' ? 'Electrical' : 'Plumbing'
-      
-      await this.notificationService.createNotification({
-        type: data.priority === 'emergency' ? 'emergency_booking' : 'new_booking',
-        title: data.priority === 'emergency' 
-          ? `🚨 அவசர சேவை கோரிக்கை / Emergency Service Request`
-          : `📋 புதிய சேவை கோரிக்கை / New Service Request`,
-        message: `${data.contactInfo.name} requested ${serviceNameEn} service (${serviceNameTa}). Priority: ${data.priority}`,
-        bookingId: booking.id,
-        bookingNumber: booking.bookingNumber,
-        priority: data.priority
-      })
-      
-    
-
       return booking
       
     } catch (error) {
@@ -59,145 +42,126 @@ export class BookingService {
     }
   }
 
-  
-
-  async getBookingById(id: number) {
+  async getBooking(id: string) {
     try {
-      const [booking] = await db.select().from(bookings).where(eq(bookings.id, id))
-      return booking || null
+      const isNumeric = !isNaN(Number(id))
+      
+      if (isNumeric) {
+        const result = await db.select().from(bookings).where(eq(bookings.id, Number(id)))
+        return result[0] || null
+      } else {
+        const result = await db.select().from(bookings).where(eq(bookings.bookingNumber, id))
+        return result[0] || null
+      }
+      
     } catch (error) {
-      console.error('getBookingById error:', error)
+      console.error('getBooking error:', error)
       throw new Error(`Failed to get booking`)
     }
   }
 
-  async getBookingByNumber(bookingNumber: string) {
+  async getAllBookings(limit = 50, offset = 0, status?: string) {
     try {
-      const [booking] = await db.select().from(bookings).where(eq(bookings.bookingNumber, bookingNumber))
-      return booking || null
-    } catch (error) {
-      console.error('getBookingByNumber error:', error)
-      throw new Error(`Failed to get booking`)
-    }
-  }
-
-  async getAllBookings(limit = 50, offset = 0) {
-    try {
-      return await db
-        .select()
-        .from(bookings)
-        .orderBy(desc(bookings.createdAt))
-        .limit(limit)
-        .offset(offset)
+      if (status) {
+        return await db
+          .select()
+          .from(bookings)
+          .where(eq(bookings.status, status as any))
+          .orderBy(desc(bookings.createdAt))
+          .limit(limit)
+          .offset(offset)
+      } else {
+        return await db
+          .select()
+          .from(bookings)
+          .orderBy(desc(bookings.createdAt))
+          .limit(limit)
+          .offset(offset)
+      }
     } catch (error) {
       console.error('getAllBookings error:', error)
       throw new Error(`Failed to get bookings`)
     }
   }
 
-  async updateBookingStatus(bookingId: string, status: string) {
+  async cancelBooking(bookingId: string, reason?: string) {
     try {
       const isNumeric = !isNaN(Number(bookingId))
-      const completedAt = status === 'completed' ? new Date() : undefined
+      const completedAt = new Date()
       
-      const updateData: any = {
-        status,
+      const updateData = {
+        status: 'cancelled' as const,
         updatedAt: new Date(),
-        ...(completedAt && { completedAt })
+        completedAt
       }
       
       if (isNumeric) {
-        await db.update(bookings).set(updateData).where(eq(bookings.id, Number(bookingId)))
+        await db.update(bookings)
+          .set(updateData)
+          .where(eq(bookings.id, Number(bookingId)))
       } else {
-        await db.update(bookings).set(updateData).where(eq(bookings.bookingNumber, bookingId))
-      }
-
-      // 🔔 CREATE STATUS UPDATE NOTIFICATION
-      const booking = isNumeric 
-        ? await this.getBookingById(Number(bookingId))
-        : await this.getBookingByNumber(bookingId)
-
-      if (booking) {
-        await this.notificationService.createNotification({
-          type: 'booking_updated',
-          title: `📝 Booking Status Updated`,
-          message: `Booking ${booking.bookingNumber} status changed to ${status}`,
-          bookingId: booking.id,
-          bookingNumber: booking.bookingNumber,
-          priority: 'normal'
-        })
+        await db.update(bookings)
+          .set(updateData)
+          .where(eq(bookings.bookingNumber, bookingId))
       }
       
       return true
-    } catch (error) {
-      console.error('updateBookingStatus error:', error)
-      throw new Error(`Failed to update booking status`)
-    }
-  }
-
-  async cancelBooking(bookingId: string, reason?: string) {
-    try {
-      return this.updateBookingStatus(bookingId, 'cancelled')
     } catch (error) {
       console.error('cancelBooking error:', error)
       throw new Error(`Failed to cancel booking`)
     }
   }
 
-  async rateBooking(bookingId: string, rating: number, review: string) {
+  async submitFeedback(bookingId: string, rating: number, review: string) {
     try {
       const isNumeric = !isNaN(Number(bookingId))
-      const updateData = { rating, review, updatedAt: new Date() }
+      const updateData = { 
+        rating, 
+        review, 
+        updatedAt: new Date() 
+      }
       
       if (isNumeric) {
-        await db.update(bookings).set(updateData).where(eq(bookings.id, Number(bookingId)))
+        await db.update(bookings)
+          .set(updateData)
+          .where(eq(bookings.id, Number(bookingId)))
       } else {
-        await db.update(bookings).set(updateData).where(eq(bookings.bookingNumber, bookingId))
+        await db.update(bookings)
+          .set(updateData)
+          .where(eq(bookings.bookingNumber, bookingId))
       }
       
       return true
     } catch (error) {
-      console.error('rateBooking error:', error)
-      throw new Error(`Failed to rate booking`)
+      console.error('submitFeedback error:', error)
+      throw new Error(`Failed to submit feedback`)
     }
   }
 
-  async getDashboardMetrics() {
+  async getUserBookings(userId: string) {
     try {
-      const allBookings = await db.select().from(bookings)
-      
-      const today = new Date()
-      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-      const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
-      
-      const todayBookings = allBookings.filter(b => {
-        const bookingDate = new Date(b.createdAt || '')
-        return bookingDate >= startOfDay && bookingDate < endOfDay
-      })
-      
-      return {
-        today: {
-          bookings: todayBookings.length,
-          completed: todayBookings.filter(b => b.status === 'completed').length,
-          pending: todayBookings.filter(b => b.status === 'pending').length,
-          inProgress: todayBookings.filter(b => b.status === 'in_progress').length,
-          revenue: todayBookings
-            .filter(b => b.status === 'completed')
-            .reduce((sum, b) => sum + parseFloat(b.totalCost || '0'), 0)
-        },
-        overall: {
-          totalBookings: allBookings.length,
-          completedJobs: allBookings.filter(b => b.status === 'completed').length,
-          pendingJobs: allBookings.filter(b => b.status === 'pending').length,
-          emergencyJobs: allBookings.filter(b => b.priority === 'emergency').length,
-          totalRevenue: allBookings
-            .filter(b => b.status === 'completed')
-            .reduce((sum, b) => sum + parseFloat(b.totalCost || '0'), 0)
-        }
-      }
+      // Since we don't have user authentication fully implemented,
+      // return recent bookings for now
+      return await db.select()
+        .from(bookings)
+        .orderBy(desc(bookings.createdAt))
+        .limit(20)
     } catch (error) {
-      console.error('getDashboardMetrics error:', error)
-      throw new Error(`Failed to get dashboard metrics`)
+      console.error('getUserBookings error:', error)
+      throw new Error(`Failed to get user bookings`)
+    }
+  }
+
+  async getBookingHistory(customerId: string, limit = 20, offset = 0) {
+    try {
+      return await db.select()
+        .from(bookings)
+        .orderBy(desc(bookings.createdAt))
+        .limit(limit)
+        .offset(offset)
+    } catch (error) {
+      console.error('getBookingHistory error:', error)
+      throw new Error(`Failed to get booking history`)
     }
   }
 
@@ -206,12 +170,12 @@ export class BookingService {
     const year = date.getFullYear().toString().slice(-2)
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     const day = date.getDate().toString().padStart(2, '0')
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
     
     return `NMS${year}${month}${day}${random}`
   }
 
-  private calculateBasicCost(serviceType: 'electrical' | 'plumbing', priority: 'normal' | 'urgent' | 'emergency'): number {
+  private calculateCost(serviceType: 'electrical' | 'plumbing', priority: 'normal' | 'urgent' | 'emergency'): number {
     const baseCosts = {
       electrical: 300,
       plumbing: 350
@@ -223,6 +187,32 @@ export class BookingService {
       emergency: 1.5
     }
     
-    return Math.round(baseCosts[serviceType] * priorityMultipliers[priority])
+    const travelCharge = 50
+    const baseCost = baseCosts[serviceType] * priorityMultipliers[priority]
+    
+    return Math.round(baseCost + travelCharge)
+  }
+
+  private async createOrUpdateCustomer(contactInfo: { name: string; phone: string; address: string }) {
+    try {
+      // Check if customer exists
+      const existingCustomer = await db.select()
+        .from(customers)
+        .where(eq(customers.phone, contactInfo.phone))
+        .limit(1)
+
+      if (existingCustomer.length === 0) {
+        // Create new customer
+        await db.insert(customers).values({
+          name: contactInfo.name,
+          phone: contactInfo.phone,
+          address: contactInfo.address,
+          language: 'ta'
+        })
+      }
+    } catch (error) {
+      console.error('createOrUpdateCustomer error:', error)
+      // Don't throw error as this is secondary functionality
+    }
   }
 }

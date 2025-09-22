@@ -1,34 +1,82 @@
+// File: src/types/booking.ts - Fixed Booking Types
 export interface ContactInfo {
   name: string
   phone: string
   address: string
+  email?: string
 }
 
 export interface Booking {
   id: number
   bookingNumber: string
+  customerName: string
+  customerPhone: string
+  customerEmail?: string
   serviceType: 'electrical' | 'plumbing'
+  service: string
   priority: 'normal' | 'urgent' | 'emergency'
+  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'
   description: string
   contactInfo: ContactInfo
-  scheduledTime: string | Date
-  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'
-  totalCost?: string
+  scheduledTime: string
+  estimatedCost?: number
+  actualCost?: number
+  technicianName?: string
+  technicianPhone?: string
   rating?: number
   review?: string
-  createdAt?: string | Date
-  updatedAt?: string | Date
-  completedAt?: string | Date
+  createdAt: string
+  updatedAt: string
+  completedAt?: string
+  cancellationReason?: string // Added this field
+  adminNotes?: string // Added this field
 }
 
-export interface AdminMetrics {
-  todayBookings: number
-  completedJobs: number
-  pendingJobs: number
-  emergencyJobs: number
-  totalBookings: number
+export interface CreateBookingData {
+  serviceType: 'electrical' | 'plumbing'
+  priority?: 'normal' | 'urgent' | 'emergency'
+  description: string
+  contactInfo: ContactInfo
+  scheduledTime: string
 }
 
-export type BookingStatus = Booking['status']
-export type ServiceType = Booking['serviceType']
-export type Priority = Booking['priority']
+export interface UpdateBookingStatusData {
+  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'
+  technicianName?: string
+  technicianPhone?: string
+  actualCost?: number
+  notes?: string
+}
+
+export interface BookingResponse {
+  success: boolean
+  booking: Booking
+  message: string
+}
+
+export interface BookingsListResponse {
+  success: boolean
+  bookings: Booking[]
+  count: number
+  total?: number
+  pagination?: {
+    page: number
+    limit: number
+    totalPages: number
+    hasMore: boolean
+  }
+}
+
+export interface AdminBooking extends Booking {
+  address: string // Flattened from contactInfo for admin view
+}
+
+export interface CancelBookingData {
+  bookingId: string
+  reason?: string
+}
+
+export interface FeedbackData {
+  rating: number
+  review?: string
+}

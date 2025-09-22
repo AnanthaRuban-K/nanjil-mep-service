@@ -2,7 +2,6 @@
   "name": "nanjil-mep-frontend",
   "version": "2.0.0",
   "private": true,
-  
   "scripts": {
     "dev": "next dev -p 3100",
     "build": "next build",
@@ -10,15 +9,19 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/localizations": "^3.25.1",
     "@clerk/nextjs": "^4.31.8",
     "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.28.6",
+    "@tanstack/react-query-devtools": "^5.89.0",
     "axios": "^1.6.8",
+    "firebase": "^12.3.0",
     "lucide-react": "^0.263.1",
     "next": "14.2.25",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.1",
+    "react-hot-toast": "^2.6.0",
     "tailwindcss": "^3.4.1",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"

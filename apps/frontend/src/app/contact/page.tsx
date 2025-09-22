@@ -1,4 +1,3 @@
-// apps/frontend/src/app/contact/page.tsx - SIMPLIFIED CONTACT INFO
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -7,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { ArrowLeft, User, Phone, MapPin, AlertCircle } from 'lucide-react'
 
-// Simple validation schema
 const contactSchema = z.object({
   name: z.string()
     .min(2, 'பெயர் குறைந்தது 2 எழுத்துக்கள் வேண்டும் / Name must be at least 2 characters')
@@ -25,44 +23,81 @@ export default function ContactPage() {
   const router = useRouter()
   const [selectedService, setSelectedService] = useState<string>('')
   const [isEmergency, setIsEmergency] = useState(false)
+  const [description, setDescription] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
-    watch
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
     mode: 'onChange'
   })
 
   useEffect(() => {
-    // Check if user came from previous steps
-    const service = sessionStorage.getItem('selectedService')
-    const emergency = sessionStorage.getItem('isEmergency') === 'true'
-    const description = sessionStorage.getItem('problemDescription')
-    
-    if (!service || !description) {
-      router.push('/services')
-      return
+    const checkPreviousData = () => {
+      try {
+        // Check for service and description (required from previous steps)
+        const service = sessionStorage.getItem('selectedService')
+        const emergency = sessionStorage.getItem('isEmergency') === 'true'
+        const desc = sessionStorage.getItem('problemDescription')
+        
+        console.log('Contact page - checking data:', { service, emergency, desc })
+        
+        // Only redirect if missing data from previous steps
+        if (!service || !desc) {
+          console.log('Missing previous step data, redirecting to services')
+          router.push('/services')
+          return
+        }
+        
+        setSelectedService(service)
+        setIsEmergency(emergency)
+        setDescription(desc)
+        setIsLoading(false)
+        
+        console.log('Previous step data loaded successfully')
+      } catch (error) {
+        console.error('Error accessing sessionStorage:', error)
+        router.push('/services')
+      }
     }
-    
-    setSelectedService(service)
-    setIsEmergency(emergency)
+
+    const timer = setTimeout(checkPreviousData, 100)
+    return () => clearTimeout(timer)
   }, [router])
 
-  const handleBack = () => {
-    router.back()
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      // Store contact info in sessionStorage
+      const contactInfo = {
+        name: data.name,
+        phone: data.phone,
+        address: data.address
+      }
+      
+      sessionStorage.setItem('contactInfo', JSON.stringify(contactInfo))
+      console.log('Contact info stored:', contactInfo)
+      
+      // Navigate to schedule page
+      router.push('/schedule')
+    } catch (error) {
+      console.error('Error storing contact info:', error)
+      alert('Error saving contact information. Please try again.')
+    }
   }
 
-  const onSubmit = (data: ContactFormData) => {
-    // Store contact info and proceed to scheduling
-    sessionStorage.setItem('contactInfo', JSON.stringify(data))
-    router.push('/schedule')
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
   }
-
-  // Watch form values for real-time validation feedback
-  const watchedValues = watch()
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -71,207 +106,138 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <button
-              onClick={handleBack}
+              onClick={() => router.back()}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="w-6 h-6 text-gray-600" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-800">உங்கள் விபரங்கள்</h1>
-              <p className="text-sm text-gray-600">Your Contact Details</p>
+              <h1 className="text-xl font-bold text-gray-800">தொடர்பு விவரங்கள்</h1>
+              <p className="text-sm text-gray-600">Contact Information</p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Progress Indicator */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center space-x-2 text-green-600">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</div>
-              <span>சேவை தேர்வு</span>
+        {/* Service Summary */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-lg ${
+              selectedService === 'electrical' ? 'bg-yellow-500' : 'bg-blue-500'
+            }`}>
+              <span className="text-white">
+                {selectedService === 'electrical' ? '⚡' : '🔧'}
+              </span>
             </div>
-            <div className="flex items-center space-x-2 text-green-600">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">✓</div>
-              <span>பிரச்சனை</span>
+            <div className="flex-1">
+              <h3 className="font-semibold text-blue-800">
+                {selectedService === 'electrical' ? 'மின்சார சேவை' : 'குழாய் சேவை'} • 
+                {selectedService === 'electrical' ? ' Electrical Service' : ' Plumbing Service'}
+              </h3>
+              <p className="text-blue-600 text-sm mt-1">{description}</p>
             </div>
-            <div className="flex items-center space-x-2 text-blue-600 font-semibold">
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">3</div>
-              <span>தொடர்பு விவரம்</span>
-            </div>
-            <div className="flex items-center space-x-2 text-gray-400">
-              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-bold">4</div>
-              <span>நேரம்</span>
-            </div>
+            {isEmergency && (
+              <div className="bg-red-100 px-3 py-1 rounded-full">
+                <span className="text-red-800 text-xs font-semibold">அவசரம் • Emergency</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Emergency Banner */}
-        {isEmergency && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6">
-            <div className="flex items-center space-x-3 text-red-800">
-              <AlertCircle className="w-6 h-6" />
-              <div>
-                <p className="font-semibold">அவசர சேவை தேர்வு செய்யப்பட்டது</p>
-                <p className="text-sm">Emergency service selected - We will prioritize your request</p>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Contact Form */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-gray-800 mb-6">
+            உங்கள் தொடர்பு விவரங்கள் • Your Contact Details
+          </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Name Field */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center space-x-3 mb-4">
-              <User className="w-6 h-6 text-blue-600" />
-              <div>
-                <label className="text-lg font-semibold text-gray-800">
-                  பெயர் (Name) *
-                </label>
-                <p className="text-sm text-gray-600">உங்கள் முழு பெயர் / Your full name</p>
-              </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Name Field */}
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                <User className="w-4 h-4" />
+                <span>பெயர் • Full Name *</span>
+              </label>
+              <input
+                {...register('name')}
+                type="text"
+                placeholder="உங்கள் முழு பெயரை எழுதுங்கள் / Enter your full name"
+                className={`w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.name ? 'border-red-300' : 'border-gray-300'
+                }`}
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-600 flex items-center space-x-1">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{errors.name.message}</span>
+                </p>
+              )}
             </div>
-            
-            <input
-              {...register('name')}
-              type="text"
-              placeholder="உங்கள் பெயர் எழுதுங்கள் / Enter your name"
-              className={`w-full p-4 text-lg border-2 rounded-xl transition-colors ${
-                errors.name 
-                  ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
-                  : watchedValues.name && watchedValues.name.length >= 2
-                    ? 'border-green-300 focus:border-green-500 focus:ring-green-200'
-                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
-              } focus:ring-2 focus:outline-none`}
-              style={{ fontFamily: 'Noto Sans Tamil, sans-serif' }}
-            />
-            
-            {errors.name && (
-              <p className="text-red-600 text-sm mt-2 flex items-center space-x-2">
-                <AlertCircle className="w-4 h-4" />
-                <span>{errors.name.message}</span>
-              </p>
-            )}
-          </div>
 
-          {/* Phone Field */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center space-x-3 mb-4">
-              <Phone className="w-6 h-6 text-green-600" />
-              <div>
-                <label className="text-lg font-semibold text-gray-800">
-                  மொபைல் எண் (Mobile Number) *
-                </label>
-                <p className="text-sm text-gray-600">10 digit mobile number / 10 இலக்க மொபைல் எண்</p>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">
-                +91
-              </span>
+            {/* Phone Field */}
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                <Phone className="w-4 h-4" />
+                <span>மொபைல் எண் • Mobile Number *</span>
+              </label>
               <input
                 {...register('phone')}
                 type="tel"
-                placeholder="98765 43210"
-                maxLength={10}
-                className={`w-full p-4 pl-16 text-lg border-2 rounded-xl transition-colors font-mono ${
-                  errors.phone 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
-                    : watchedValues.phone && /^[6-9]\d{9}$/.test(watchedValues.phone)
-                      ? 'border-green-300 focus:border-green-500 focus:ring-green-200'
-                      : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
-                } focus:ring-2 focus:outline-none`}
+                placeholder="மொபைல் எண் / Mobile number (10 digits)"
+                className={`w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.phone ? 'border-red-300' : 'border-gray-300'
+                }`}
               />
-            </div>
-            
-            {errors.phone && (
-              <p className="text-red-600 text-sm mt-2 flex items-center space-x-2">
-                <AlertCircle className="w-4 h-4" />
-                <span>{errors.phone.message}</span>
-              </p>
-            )}
-          </div>
-
-          {/* Address Field */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center space-x-3 mb-4">
-              <MapPin className="w-6 h-6 text-purple-600" />
-              <div>
-                <label className="text-lg font-semibold text-gray-800">
-                  முகவரி (Address) *
-                </label>
-                <p className="text-sm text-gray-600">வீட்டு முகவரி விரிவாக / Complete house address</p>
-              </div>
-            </div>
-            
-            <textarea
-              {...register('address')}
-              placeholder="வீட்டு எண், தெரு, பகுதி, நகரம், பின் கோட்
-House number, street, area, city, pincode"
-              rows={4}
-              className={`w-full p-4 text-lg border-2 rounded-xl resize-none transition-colors ${
-                errors.address 
-                  ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
-                  : watchedValues.address && watchedValues.address.length >= 20
-                    ? 'border-green-300 focus:border-green-500 focus:ring-green-200'
-                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
-              } focus:ring-2 focus:outline-none`}
-              style={{ fontFamily: 'Noto Sans Tamil, sans-serif' }}
-            />
-            
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-sm text-gray-500">
-                {watchedValues.address?.length || 0}/200 characters (minimum 20)
-              </span>
-              {watchedValues.address && (
-                <span className={`text-sm ${watchedValues.address.length >= 20 ? 'text-green-600' : 'text-red-500'}`}>
-                  {watchedValues.address.length >= 20 ? '✓ Complete' : '✗ Need more details'}
-                </span>
+              {errors.phone && (
+                <p className="mt-1 text-sm text-red-600 flex items-center space-x-1">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{errors.phone.message}</span>
+                </p>
               )}
             </div>
-            
-            {errors.address && (
-              <p className="text-red-600 text-sm mt-2 flex items-center space-x-2">
-                <AlertCircle className="w-4 h-4" />
-                <span>{errors.address.message}</span>
-              </p>
-            )}
-          </div>
 
-          {/* Submit Button */}
-          <div className="text-center pt-6">
+            {/* Address Field */}
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                <MapPin className="w-4 h-4" />
+                <span>முகவரி • Complete Address *</span>
+              </label>
+              <textarea
+                {...register('address')}
+                rows={3}
+                placeholder="வீட்டு எண், தெரு, பகுதி, நகரம், பின் கோட் / House no, Street, Area, City, Pincode"
+                className={`w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
+                  errors.address ? 'border-red-300' : 'border-gray-300'
+                }`}
+              />
+              {errors.address && (
+                <p className="mt-1 text-sm text-red-600 flex items-center space-x-1">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{errors.address.message}</span>
+                </p>
+              )}
+            </div>
+
+          
+
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={!isValid}
-              className={`font-bold py-4 px-8 rounded-2xl shadow-lg transition-all duration-300 min-w-[250px] ${
-                isValid
-                  ? 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-xl transform hover:-translate-y-1'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl transition-colors"
             >
-              அடுத்தது: நேரம் தேர்வு →
-              <div className="text-sm font-normal">Next: Select Time</div>
+              அடுத்த படி • Next Step
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
 
-        {/* Help Text */}
-        <div className="mt-8 text-center">
-          <p className="text-gray-600 text-sm">
-            உங்கள் தகவல்கள் பாதுகாப்பானவை • Your information is secure
+        {/* Privacy Notice */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            🔒 உங்கள் தகவல்கள் பாதுகாப்பாக வைக்கப்படும் • Your information is kept secure
           </p>
         </div>
       </div>
     </div>
   )
 }
-
-// REMOVED COMPLEX FEATURES:
-// - Location auto-detection with GPS
-// - Address validation with Google Maps
-// - Previous customer data pre-filling
-// - Alternative contact methods
-// - Verification via OTP
-// - Social login integration

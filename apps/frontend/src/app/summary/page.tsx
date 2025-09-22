@@ -1,18 +1,14 @@
-// Update your summary page to use the correct API URL
-// apps/frontend/src/app/summary/page.tsx
-
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, User, Phone, MapPin, Calendar, Clock } from 'lucide-react'
+import { useCreateBooking } from '@/hooks'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export default function SummaryPage() {
   const router = useRouter()
   const [bookingData, setBookingData] = useState<any>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // ADD THIS: Get the correct API base URL
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://api.nanjilmepservice.com/api'
+  const createBookingMutation = useCreateBooking()
 
   useEffect(() => {
     // Collect all booking data from sessionStorage
@@ -36,10 +32,6 @@ export default function SummaryPage() {
     })
   }, [router])
 
-  const handleBack = () => {
-    router.back()
-  }
-
   const calculateCost = () => {
     const baseCost = bookingData.serviceType === 'electrical' ? 300 : 350
     const emergencyMultiplier = bookingData.priority === 'emergency' ? 1.5 : 1
@@ -48,23 +40,16 @@ export default function SummaryPage() {
   }
 
   const handleConfirm = async () => {
-    setIsSubmitting(true)
-    
     try {
-      // FIX: Use the correct API URL
-      const response = await fetch(`${API_BASE}/api/bookings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bookingData)
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to create booking')
+      // FIXED: Convert scheduledTime to proper ISO format
+      const bookingPayload = {
+        ...bookingData,
+        scheduledTime: new Date(bookingData.scheduledTime).toISOString()
       }
 
-      const result = await response.json()
+      console.log('📤 Sending booking payload:', JSON.stringify(bookingPayload, null, 2))
+      
+      const result = await createBookingMutation.mutateAsync(bookingPayload)
       
       // Clear session storage
       sessionStorage.clear()
@@ -74,9 +59,21 @@ export default function SummaryPage() {
       
     } catch (error) {
       console.error('Booking submission error:', error)
-      alert('பதிவு செய்வதில் பிழை ஏற்பட்டது / Error creating booking')
-    } finally {
-      setIsSubmitting(false)
+      
+      // Show more specific error message
+      let errorMessage = 'பதிவு செய்வதில் பிழை ஏற்பட்டது / Error creating booking'
+      
+      if (error instanceof Error) {
+        if (error.message.includes('future')) {
+          errorMessage = 'தயவுசெய்து எதிர்கால நேரத்தை தேர்வு செய்யவும் / Please select a future time'
+        } else if (error.message.includes('phone')) {
+          errorMessage = 'செல்பேசி எண் சரியில்லை / Invalid phone number format'
+        } else if (error.message.includes('service')) {
+          errorMessage = 'சேவை வகை செல்லுபடியாகவில்லை / Invalid service type'
+        }
+      }
+      
+      alert(errorMessage)
     }
   }
 
@@ -92,6 +89,28 @@ export default function SummaryPage() {
     })
   }
 
+  // ADDED: Validation to check if the scheduled time is in the future
+  const isScheduledTimeValid = () => {
+    if (!bookingData.scheduledTime) return false
+    const scheduledDate = new Date(bookingData.scheduledTime)
+    const now = new Date()
+    return scheduledDate > now
+  }
+
+  if (createBookingMutation.isPending) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+          <LoadingSpinner size="lg" />
+          <p className="text-lg font-semibold text-gray-800 mt-4">
+            பதிவு செய்கிறோம்...
+          </p>
+          <p className="text-gray-600">Creating your booking...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -99,7 +118,7 @@ export default function SummaryPage() {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <button
-              onClick={handleBack}
+              onClick={() => router.back()}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="w-6 h-6 text-gray-600" />
@@ -113,16 +132,6 @@ export default function SummaryPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Debug info - remove in production */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-sm">
-          <strong>Debug Info:</strong>
-          <br />API Base: {API_BASE}
-          <br />Current URL: {typeof window !== 'undefined' ? window.location.origin : 'N/A'}
-        </div>
-
-        {/* Rest of your existing JSX remains the same */}
-        {/* ... existing booking summary JSX ... */}
-        
         {/* Booking Summary */}
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-6">
@@ -183,19 +192,32 @@ export default function SummaryPage() {
             </div>
 
             {/* Schedule */}
-            <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-xl">
-              <Calendar className="w-5 h-5 text-blue-600" />
+            <div className={`flex items-center space-x-3 p-4 rounded-xl ${
+              isScheduledTimeValid() ? 'bg-blue-50' : 'bg-red-50 border border-red-200'
+            }`}>
+              <Calendar className={`w-5 h-5 ${
+                isScheduledTimeValid() ? 'text-blue-600' : 'text-red-600'
+              }`} />
               <div>
-                <div className="text-sm text-blue-600">நேரம் (Scheduled Time)</div>
+                <div className={`text-sm ${
+                  isScheduledTimeValid() ? 'text-blue-600' : 'text-red-600'
+                }`}>
+                  நேரம் (Scheduled Time)
+                </div>
                 <div className="font-semibold text-gray-800">
                   {bookingData.scheduledTime && formatDateTime(bookingData.scheduledTime)}
                 </div>
+                {!isScheduledTimeValid() && (
+                  <div className="text-sm text-red-600 mt-1">
+                    ⚠️ கடந்த நேரம் தேர்வு செய்யப்பட்டுள்ளது / Past time selected
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Problem Description */}
             <div className="p-4 bg-gray-50 rounded-xl">
-              <div className="text-sm text-gray-600 mb-2">🔍 பிரச்சனை (Problem Description)</div>
+              <div className="text-sm text-gray-600 mb-2">📝 பிரச்சனை (Problem Description)</div>
               <div className="font-semibold text-gray-800">{bookingData.description}</div>
             </div>
 
@@ -217,21 +239,41 @@ export default function SummaryPage() {
           </div>
         </div>
 
+        {/* ADDED: Warning if time is invalid */}
+        {!isScheduledTimeValid() && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="text-red-600">⚠️</div>
+              <div>
+                <div className="font-semibold text-red-800">நேரம் சரியில்லை / Invalid Time</div>
+                <div className="text-sm text-red-700">
+                  தயவுசெய்து எதிர்கால நேரத்தை தேர்வு செய்யவும் / Please select a future time
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Confirm Button */}
         <div className="text-center">
           <button
             onClick={handleConfirm}
-            disabled={isSubmitting}
+            disabled={createBookingMutation.isPending || !isScheduledTimeValid()}
             className={`font-bold py-4 px-8 rounded-2xl shadow-lg transition-all duration-300 min-w-[250px] ${
-              isSubmitting
+              createBookingMutation.isPending || !isScheduledTimeValid()
                 ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                 : 'bg-green-500 hover:bg-green-600 text-white hover:shadow-xl transform hover:-translate-y-1'
             }`}
           >
-            {isSubmitting ? (
+            {createBookingMutation.isPending ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white inline-block mr-2"></div>
                 பதிவு செய்கிறோம்...
+              </>
+            ) : !isScheduledTimeValid() ? (
+              <>
+                ⚠️ நேரம் சரியில்லை
+                <div className="text-sm font-normal">Invalid Time Selected</div>
               </>
             ) : (
               <>

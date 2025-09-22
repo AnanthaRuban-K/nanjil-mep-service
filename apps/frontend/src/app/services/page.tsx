@@ -1,196 +1,111 @@
-// apps/frontend/src/app/services/page.tsx - SIMPLIFIED SERVICE SELECTION
+// app/services/page.tsx
 'use client'
-import React from 'react'
-import { useRouter } from 'next/navigation'
-import { ArrowLeft, Zap, Wrench, AlertTriangle } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { RoleGuard } from '@/components/RoleGuard'
+import CustomerLayout from '@/components/layouts/CustomerLayout'
+import { LoginButton } from '@/components/LoginButton'
+import { ServiceSelector } from '@/components/booking/ServiceSelector'
 
 export default function ServicesPage() {
-  const router = useRouter()
+  const { isSignedIn } = useAuth()
 
-  const handleServiceSelect = (serviceType: 'electrical' | 'plumbing', isEmergency = false) => {
-    // Store selection in sessionStorage for the booking flow
-    sessionStorage.setItem('selectedService', serviceType)
-    sessionStorage.setItem('isEmergency', isEmergency.toString())
+  return (
+    <CustomerLayout>
+      <div className="max-w-6xl mx-auto py-8">
+        <h1 className="text-3xl font-bold text-center mb-8">
+          எங்கள் சேவைகள் • Our Services
+        </h1>
+        
+        {/* Show services to everyone, but booking requires auth */}
+        <ServiceSelector />
+        
+        {!isSignedIn && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mt-8 text-center">
+            <h3 className="text-lg font-semibold text-blue-800 mb-2">
+              சேவை பதிவு செய்ய உள்நுழையுங்கள்
+            </h3>
+            <p className="text-blue-600 mb-4">
+              Login required to book services
+            </p>
+            <LoginButton />
+          </div>
+        )}
+      </div>
+    </CustomerLayout>
+  )
+}
+
+// Service booking with protection
+function ServiceGrid() {
+  const { isSignedIn } = useAuth()
+  
+  const handleServiceClick = (serviceType: string) => {
+    if (!isSignedIn) {
+      // Show login prompt
+      const confirm = window.confirm(
+        'சேவை பதிவு செய்ய உள்நுழைய வேண்டும். உள்நுழைய விரும்புகிறீர்களா?\n' +
+        'Login required to book service. Do you want to login?'
+      )
+      if (confirm) {
+        window.location.href = '/sign-in'
+      }
+      return
+    }
     
-    // Navigate to problem description
-    router.push('/describe')
-  }
-
-  const handleBack = () => {
-    router.back()
+    // User is logged in, proceed with booking
+    sessionStorage.setItem('selectedService', serviceType)
+    window.location.href = '/describe'
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={handleBack}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <ArrowLeft className="w-6 h-6 text-gray-600" />
-            </button>
-            <div>
-              <h1 className="text-xl font-bold text-gray-800">எந்த சேவை வேண்டும்?</h1>
-              <p className="text-sm text-gray-600">Which Service Do You Need?</p>
-            </div>
+    <div className="grid md:grid-cols-2 gap-6">
+      {/* Electrical Service */}
+      <div className="bg-white rounded-xl p-6 shadow-lg border">
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="bg-yellow-500 p-3 rounded-lg">
+            <span className="text-white text-2xl">⚡</span>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold">மின்சார சேவை</h3>
+            <p className="text-gray-600">Electrical Service</p>
           </div>
         </div>
+        <ul className="space-y-2 mb-6">
+          <li>• விசிறி மற்றும் விளக்கு பழுது</li>
+          <li>• வயரிங் பிரச்சனைகள்</li>
+          <li>• ஸ்விட்ச் மற்றும் சாக்கெட்</li>
+        </ul>
+        <button
+          onClick={() => handleServiceClick('electrical')}
+          className="w-full bg-yellow-500 text-white py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
+        >
+          இப்போது பதிவு செய்யுங்கள் • Book Now
+        </button>
       </div>
 
-      {/* Service Selection */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Electrical Service */}
-          <button
-            onClick={() => handleServiceSelect('electrical')}
-            className="bg-white border-2 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 rounded-3xl p-8 transition-all duration-300 hover:shadow-lg text-left group"
-          >
-            <div className="flex items-center justify-center mb-6">
-              <div className="bg-yellow-100 group-hover:bg-yellow-200 w-20 h-20 rounded-full flex items-center justify-center transition-colors">
-                <Zap className="w-10 h-10 text-yellow-600" />
-              </div>
-            </div>
-            
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
-              மின்சாரம்
-            </h2>
-            <p className="text-center text-gray-600 mb-4 font-medium">
-              ELECTRICAL
-            </p>
-            
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span>விசிறி ஓடவில்லை • Fan Not Working</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span>விளக்கு எரியவில்லை • Light Not Working</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span>சுவிட்ச் பழுது • Switch Problem</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span>வயரிங் பிரச்சனை • Wiring Issue</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Plumbing Service */}
-          <button
-            onClick={() => handleServiceSelect('plumbing')}
-            className="bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 rounded-3xl p-8 transition-all duration-300 hover:shadow-lg text-left group"
-          >
-            <div className="flex items-center justify-center mb-6">
-              <div className="bg-blue-100 group-hover:bg-blue-200 w-20 h-20 rounded-full flex items-center justify-center transition-colors">
-                <Wrench className="w-10 h-10 text-blue-600" />
-              </div>
-            </div>
-            
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
-              குழாய்
-            </h2>
-            <p className="text-center text-gray-600 mb-4 font-medium">
-              PLUMBING
-            </p>
-            
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>கழிவறை பிரச்சனை • Toilet Problem</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>குழாய் லீக்கேஜ் • Pipe Leakage</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>டேப் சரியாகவில்லை • Tap Not Working</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-700">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>வாட்டர் பிரச்சனை • Water Issue</span>
-              </div>
-            </div>
-          </button>
-        </div>
-
-        {/* Emergency Service */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-3xl p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-red-400 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
-            <div className="relative z-10">
-              <div className="flex items-center justify-center mb-4">
-                <AlertTriangle className="w-12 h-12 animate-pulse" />
-              </div>
-              <h2 className="text-3xl font-bold text-center mb-2">
-                🚨 அவசரம்
-              </h2>
-              <p className="text-center text-red-100 mb-4 font-medium text-lg">
-                EMERGENCY
-              </p>
-              <p className="text-center text-red-100 mb-6">
-                24 மணி நேரம் • உடனடி சேவை<br />
-                24 Hours • Immediate Service
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <button
-                  onClick={() => handleServiceSelect('electrical', true)}
-                  className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-sm border border-white border-opacity-30 rounded-2xl p-4 transition-all duration-300"
-                >
-                  <Zap className="w-8 h-8 mx-auto mb-2" />
-                  <div className="text-sm font-semibold">பவர் கட் Emergency</div>
-                  <div className="text-xs opacity-90">Power Cut</div>
-                </button>
-                <button
-                  onClick={() => handleServiceSelect('plumbing', true)}
-                  className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-sm border border-white border-opacity-30 rounded-2xl p-4 transition-all duration-300"
-                >
-                  <Wrench className="w-8 h-8 mx-auto mb-2" />
-                  <div className="text-sm font-semibold">வாட்டர் லீக்கேஜ்</div>
-                  <div className="text-xs opacity-90">Water Leakage</div>
-                </button>
-              </div>
-              
-              <div className="text-center">
-                <p className="text-red-100 text-sm">
-                  அவசர கட்டணம் கூடுதல் • Emergency charges apply
-                </p>
-              </div>
-            </div>
+      {/* Plumbing Service */}
+      <div className="bg-white rounded-xl p-6 shadow-lg border">
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="bg-blue-500 p-3 rounded-lg">
+            <span className="text-white text-2xl">🔧</span>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold">குழாய் சேவை</h3>
+            <p className="text-gray-600">Plumbing Service</p>
           </div>
         </div>
-
-        {/* Call Direct Option */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-          <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              அல்லது நேரடியாக அழைக்கவும்
-            </h3>
-            <p className="text-gray-600 mb-4">Or Call Directly</p>
-            <button
-              onClick={() => window.location.href = 'tel:1800-NANJIL'}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl inline-flex items-center space-x-2 transition-colors"
-            >
-              <span>📞 9384851596-NANJIL</span>
-            </button>
-          </div>
-        </div>
+        <ul className="space-y-2 mb-6">
+          <li>• குழாய் கசிவு பழுது</li>
+          <li>• கழிவறை பழுது</li>
+          <li>• வாட்டர் ஹீட்டர் பிரச்சனை</li>
+        </ul>
+        <button
+          onClick={() => handleServiceClick('plumbing')}
+          className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+        >
+          இப்போது பதிவு செய்யுங்கள் • Book Now
+        </button>
       </div>
     </div>
   )
 }
-
-// REMOVED COMPLEX FEATURES:
-// - Voice input for service selection
-// - Photo upload before selection  
-// - Location-based service availability
-// - Pricing calculator
-// - Team availability check
-// - Service history suggestions
