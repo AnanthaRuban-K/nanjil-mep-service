@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin'
-import { db } from "../db/index"
-import { adminTokens, notifications } from "../db/schema"
+import { db } from "../db/index.js"
+import { adminTokens, notifications } from "../db/schema.js"
 import { eq } from "drizzle-orm"
 
 export interface NotificationPayload {

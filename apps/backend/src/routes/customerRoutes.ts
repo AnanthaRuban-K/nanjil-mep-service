@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { CustomerController } from '../controllers/CustomerController'
+import { CustomerController } from '../controllers/CustomerController.js'
 
 const customerRoutes = new Hono()
 const customerController = new CustomerController()

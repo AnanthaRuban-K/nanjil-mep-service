@@ -2,7 +2,7 @@ import { Context, Next } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { clerkClient } from '@clerk/clerk-sdk-node'
 import { db } from '../db'
-import { customers, admins } from '../db/schema'
+import { customers, admins } from '../db/schema.js'
 import { eq } from 'drizzle-orm'
 
 interface User {

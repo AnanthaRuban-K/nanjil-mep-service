@@ -1,5 +1,5 @@
 import { Context } from 'hono'
-import { AdminService } from '../services/AdminService'
+import { AdminService } from '../services/AdminService.js'
 import { HTTPException } from 'hono/http-exception'
 
 export class AdminController {

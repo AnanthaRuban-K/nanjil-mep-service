@@ -1,5 +1,5 @@
 import { Context } from 'hono'
-import { CustomerService } from '../services/CustomerService'
+import { CustomerService } from '../services/CustomerService.js'
 import { HTTPException } from 'hono/http-exception'
 
 export class CustomerController {

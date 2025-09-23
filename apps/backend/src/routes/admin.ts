@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { NotificationService } from '../services/NotificationService'
+import { NotificationService } from '../services/NotificationService.js'
 
 const adminRouter = new Hono()
 const notificationService = new NotificationService()
