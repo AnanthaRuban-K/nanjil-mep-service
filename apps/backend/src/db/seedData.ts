@@ -1,6 +1,6 @@
 import { db } from './index.js'
 import { services, admins, customers, bookings } from './schema.js'
-import { generateUniqueBookingNumber, calculateEstimatedCostFromDB } from './helpers/bookingHelpers.js'
+import { generateUniqueBookingNumber, calculateEstimatedCostFromDB } from './helpers/BookingHelpers.js'
 
 export async function seedDatabase() {
   console.log('🌱 Seeding database with initial data...')

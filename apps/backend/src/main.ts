@@ -8,16 +8,16 @@ import { secureHeaders } from 'hono/secure-headers'
 import { timing } from 'hono/timing'
 
 // Routes
-import { bookingRoutes } from './routes/bookingRoutes.js'
-import { adminRoutes } from './routes/adminRoutes.js'
-import { serviceRoutes } from './routes/serviceRoutes.js'
-import { customerRoutes } from './routes/customerRoutes.js'
-import { authRoutes } from './routes/authRoutes.js'  // Fixed import
+import { bookingRoutes } from './routes/BookingRoutes.js'
+import { adminRoutes } from './routes/AdminRoutes.js'
+import { serviceRoutes } from './routes/ServiceRoutes.js'
+import { customerRoutes } from './routes/CustomerRoutes.js'
+import { authRoutes } from './routes/AuthRoutes.js'  // Fixed import
 
 // Middleware
-import { authMiddleware } from './middleware/authMiddleware.js'
-import { errorHandler } from './middleware/errorHandler.js'
-import { rateLimiter } from './middleware/rateLimiter.js'
+import { authMiddleware } from './middleware/AuthMiddleware.js'
+import { errorHandler } from './middleware/ErrorHandler.js'
+import { rateLimiter } from './middleware/RateLimiter.js'
 
 // Utils
 import { validateEnv } from './utils/env.js'
