@@ -12,11 +12,31 @@
       "apps/backend/package.json",
       "nx/core/package-json"
     ],
-    "tags.npm:private": [
+    "tags.npm:public": [
       "apps/backend/package.json",
       "nx/core/package-json"
     ],
     "metadata.targetGroups": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.1": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.2": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.3": [
       "apps/backend/package.json",
       "nx/core/package-json"
     ],
@@ -36,43 +56,135 @@
       "apps/backend/package.json",
       "nx/core/package-json"
     ],
-    "$schema": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "sourceRoot": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "projectType": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "tags.type:app": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "tags.scope:backend": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
     "targets.dev": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
+      "apps/backend/package.json",
+      "nx/core/package-json"
     ],
     "targets.dev.executor": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
+      "apps/backend/package.json",
+      "nx/core/package-json"
     ],
     "targets.dev.options": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
+      "apps/backend/package.json",
+      "nx/core/package-json"
     ],
-    "targets.dev.options.command": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
+    "targets.dev.metadata": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
     ],
-    "targets.dev.options.cwd": [
+    "targets.dev.options.script": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.dev.metadata.scriptContent": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.dev.metadata.runCommand": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.executor": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options.script": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.scriptContent": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.runCommand": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:migrate": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:migrate.executor": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:migrate.options": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:migrate.metadata": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:migrate.options.script": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:migrate.metadata.scriptContent": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:migrate.metadata.runCommand": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:seed": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:seed.executor": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:seed.options": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:seed.metadata": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:seed.options.script": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:seed.metadata.scriptContent": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.db:seed.metadata.runCommand": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.executor": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.dependsOn": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.nx-release-publish.options": [
+      "apps/backend/package.json",
+      "nx/core/package-json"
+    ],
+    "sourceRoot": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
@@ -96,11 +208,11 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.options.main": [
+    "targets.build.options.tsConfig": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.options.tsConfig": [
+    "targets.build.options.main": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
@@ -108,143 +220,27 @@
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.start": [
+    "targets.serve": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.start.executor": [
+    "targets.serve.executor": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.start.options": [
+    "targets.serve.defaultConfiguration": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.start.dependsOn": [
+    "targets.serve.options": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.start.options.command": [
+    "targets.serve.options.buildTarget": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
-    "targets.start.options.cwd": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint.executor": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint.outputs": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint.options": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint.options.lintFilePatterns": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.type-check": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.type-check.executor": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.type-check.options": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.type-check.options.command": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:generate": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:generate.executor": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:generate.options": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:generate.options.command": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:generate.options.cwd": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:migrate": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:migrate.executor": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:migrate.options": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:migrate.options.command": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:migrate.options.cwd": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:studio": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:studio.executor": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:studio.options": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:studio.options.command": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:studio.options.cwd": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:seed": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:seed.executor": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:seed.options": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:seed.options.command": [
-      "apps/backend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.db:seed.options.cwd": [
+    "targets.serve.options.watch": [
       "apps/backend/project.json",
       "nx/core/project-json"
     ],
@@ -269,18 +265,6 @@
       "nx/target-defaults"
     ],
     "targets.build.parallelism": [
-      "nx.json",
-      "nx/target-defaults"
-    ],
-    "targets.lint.cache": [
-      "nx.json",
-      "nx/target-defaults"
-    ],
-    "targets.lint.inputs": [
-      "nx.json",
-      "nx/target-defaults"
-    ],
-    "targets.lint.parallelism": [
       "nx.json",
       "nx/target-defaults"
     ]
@@ -306,6 +290,18 @@
       "apps/frontend/package.json",
       "nx/core/package-json"
     ],
+    "metadata.targetGroups.NPM Scripts": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.1": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
     "metadata.js": [
       "apps/frontend/package.json",
       "nx/core/package-json"
@@ -322,43 +318,63 @@
       "apps/frontend/package.json",
       "nx/core/package-json"
     ],
-    "$schema": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "sourceRoot": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "projectType": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "tags.type:app": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "tags.scope:frontend": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
     "targets.dev": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
+      "apps/frontend/package.json",
+      "nx/core/package-json"
     ],
     "targets.dev.executor": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
+      "apps/frontend/package.json",
+      "nx/core/package-json"
     ],
     "targets.dev.options": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
+      "apps/frontend/package.json",
+      "nx/core/package-json"
     ],
-    "targets.dev.options.port": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
+    "targets.dev.metadata": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
     ],
-    "targets.dev.options.dev": [
+    "targets.dev.options.script": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.dev.metadata.scriptContent": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.dev.metadata.runCommand": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.executor": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options.script": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.scriptContent": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.runCommand": [
+      "apps/frontend/package.json",
+      "nx/core/package-json"
+    ],
+    "sourceRoot": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
@@ -382,23 +398,27 @@
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.configurations": [
+    "targets.serve": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.options.outputPath": [
+    "targets.serve.executor": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.configurations.development": [
+    "targets.serve.defaultConfiguration": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.configurations.development.outputPath": [
+    "targets.serve.options": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
-    "targets.build.configurations.production": [
+    "targets.serve.options.dev": [
+      "apps/frontend/project.json",
+      "nx/core/project-json"
+    ],
+    "targets.serve.options.port": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
@@ -410,35 +430,19 @@
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
+    "targets.start.defaultConfiguration": [
+      "apps/frontend/project.json",
+      "nx/core/project-json"
+    ],
     "targets.start.options": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
-    "targets.start.dependsOn": [
+    "targets.start.options.dev": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
     "targets.start.options.port": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint.executor": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint.outputs": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint.options": [
-      "apps/frontend/project.json",
-      "nx/core/project-json"
-    ],
-    "targets.lint.options.lintFilePatterns": [
       "apps/frontend/project.json",
       "nx/core/project-json"
     ],
@@ -447,6 +451,18 @@
       "nx/target-defaults"
     ],
     "targets.dev.parallelism": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.lint.cache": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.lint.inputs": [
+      "nx.json",
+      "nx/target-defaults"
+    ],
+    "targets.lint.parallelism": [
       "nx.json",
       "nx/target-defaults"
     ],
@@ -463,18 +479,6 @@
       "nx/target-defaults"
     ],
     "targets.build.parallelism": [
-      "nx.json",
-      "nx/target-defaults"
-    ],
-    "targets.lint.cache": [
-      "nx.json",
-      "nx/target-defaults"
-    ],
-    "targets.lint.inputs": [
-      "nx.json",
-      "nx/target-defaults"
-    ],
-    "targets.lint.parallelism": [
       "nx.json",
       "nx/target-defaults"
     ]

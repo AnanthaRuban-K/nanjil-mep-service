@@ -10,18 +10,6 @@
         "hash": "5443105041930014821"
       },
       {
-        "file": ".env.production",
-        "hash": "7333865718283557639"
-      },
-      {
-        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
-        "hash": "7931736663588028422"
-      },
-      {
-        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
-        "hash": "1445852493764896065"
-      },
-      {
         "file": ".github/pull_request_template.md",
         "hash": "2788755260168459697"
       },
@@ -30,64 +18,76 @@
         "hash": "794121244803854593"
       },
       {
-        "file": ".prettierignore",
-        "hash": "14688272390704683536"
-      },
-      {
-        "file": ".prettierrc",
-        "hash": "16267754514737964994"
-      },
-      {
-        "file": "DEPLOYMENT.md",
-        "hash": "5997703399884897577"
-      },
-      {
-        "file": "Dockerfile.backend",
-        "hash": "824879728931815620"
-      },
-      {
-        "file": "Dockerfile.frontend",
-        "hash": "7004066885937108249"
-      },
-      {
-        "file": "LICENSE",
-        "hash": "9555439355558940311"
-      },
-      {
-        "file": "README.md",
-        "hash": "1092509514459091072"
-      },
-      {
-        "file": "coolify.yml",
-        "hash": "10189223219846369094"
-      },
-      {
-        "file": "docker-compose.yml",
-        "hash": "2777483950022711085"
-      },
-      {
         "file": "nx.json",
         "hash": "1587157688121701354"
-      },
-      {
-        "file": "package-lock.json",
-        "hash": "15300960300773010901"
-      },
-      {
-        "file": "package.json",
-        "hash": "6420985062845107298"
       },
       {
         "file": "scripts/deploy.sh",
         "hash": "17046331438570067664"
       },
       {
-        "file": "scripts/health-check.sh",
-        "hash": "7965516863560647107"
+        "file": "README.md",
+        "hash": "1092509514459091072"
       },
       {
         "file": "tsconfig.base.json",
         "hash": "17226025119457913132"
+      },
+      {
+        "file": "Dockerfile.backend",
+        "hash": "824879728931815620"
+      },
+      {
+        "file": "docker-compose.yml",
+        "hash": "2777483950022711085"
+      },
+      {
+        "file": "DEPLOYMENT.md",
+        "hash": "5997703399884897577"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "9555439355558940311"
+      },
+      {
+        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
+        "hash": "1445852493764896065"
+      },
+      {
+        "file": "scripts/health-check.sh",
+        "hash": "7965516863560647107"
+      },
+      {
+        "file": ".prettierignore",
+        "hash": "14688272390704683536"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "1924094253721891643"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "16267754514737964994"
+      },
+      {
+        "file": "coolify.yml",
+        "hash": "10189223219846369094"
+      },
+      {
+        "file": ".env.production",
+        "hash": "11199403493327229128"
+      },
+      {
+        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
+        "hash": "7931736663588028422"
+      },
+      {
+        "file": "Dockerfile.frontend",
+        "hash": "7004066885937108249"
+      },
+      {
+        "file": "package.json",
+        "hash": "8104960663168184634"
       }
     ],
     "projectFileMap": {
@@ -141,30 +141,20 @@
           "hash": "3901776660986312857"
         },
         {
-          "file": "apps/backend/package-lock.json",
-          "hash": "14050491372120344826"
-        },
-        {
           "file": "apps/backend/package.json",
-          "hash": "7462869083463878666",
+          "hash": "16208009017570687820",
           "deps": [
-            "npm:@types/cors",
             "npm:@types/node",
-            "npm:drizzle-kit",
-            "npm:tsx",
             "npm:typescript",
-            "npm:@clerk/backend",
             "npm:@hono/node-server",
-            "npm:cors",
-            "npm:dotenv",
-            "npm:drizzle-orm",
             "npm:hono",
+            "npm:drizzle-orm",
             "npm:postgres"
           ]
         },
         {
           "file": "apps/backend/project.json",
-          "hash": "11787871645909831243"
+          "hash": "17438494162668402856"
         },
         {
           "file": "apps/backend/src/assets/.gitkeep",
@@ -172,49 +162,50 @@
         },
         {
           "file": "apps/backend/src/controllers/AdminController.ts",
-          "hash": "9395500569079091784",
+          "hash": "7156032388475188263",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/controllers/AuthController.ts",
-          "hash": "4753139650414909394",
+          "hash": "5374953462229790014",
           "deps": [
-            "npm:hono"
+            "npm:hono",
+            "npm:drizzle-orm"
           ]
         },
         {
           "file": "apps/backend/src/controllers/BookingController.ts",
-          "hash": "9978428293142191687",
+          "hash": "6110452484381010177",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/controllers/CustomerController.ts",
-          "hash": "12371480920951063064",
+          "hash": "13221809896615635366",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/controllers/ServiceController.ts",
-          "hash": "2726018770888900433",
+          "hash": "9517488635814419760",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/db/helpers/bookingHelpers.ts",
-          "hash": "2390781155740544741",
+          "hash": "8349239070792493967",
           "deps": [
             "npm:drizzle-orm"
           ]
         },
         {
           "file": "apps/backend/src/db/index.ts",
-          "hash": "3423169235418647229",
+          "hash": "4012502249870229888",
           "deps": [
             "npm:drizzle-orm",
             "npm:postgres",
@@ -223,7 +214,7 @@
         },
         {
           "file": "apps/backend/src/db/migrate.ts",
-          "hash": "10369521159408184172",
+          "hash": "6341710893167176687",
           "deps": [
             "npm:drizzle-orm"
           ]
@@ -237,15 +228,15 @@
         },
         {
           "file": "apps/backend/src/db/seed.ts",
-          "hash": "1727741895662417714"
+          "hash": "11431156189483503384"
         },
         {
           "file": "apps/backend/src/db/seedData.ts",
-          "hash": "4632003902792037783"
+          "hash": "5463036625124983054"
         },
         {
           "file": "apps/backend/src/main.ts",
-          "hash": "10468624701023045269",
+          "hash": "950518298723822165",
           "deps": [
             "npm:@hono/node-server",
             "npm:hono"
@@ -260,9 +251,10 @@
         },
         {
           "file": "apps/backend/src/middleware/authMiddleware.ts",
-          "hash": "3351492200391464501",
+          "hash": "16711676087294291025",
           "deps": [
-            "npm:hono"
+            "npm:hono",
+            "npm:drizzle-orm"
           ]
         },
         {
@@ -288,28 +280,28 @@
         },
         {
           "file": "apps/backend/src/routes/admin.ts",
-          "hash": "12729369913511150838",
+          "hash": "1171200770350660520",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/routes/adminRoutes.ts",
-          "hash": "8751315508306464159",
+          "hash": "10996261101840365582",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/routes/authRoutes.ts",
-          "hash": "8849601849251325948",
+          "hash": "16117660865925600012",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/routes/bookingRoutes.ts",
-          "hash": "13598952178442391658",
+          "hash": "1478274204699567671",
           "deps": [
             "npm:hono",
             "npm:drizzle-orm"
@@ -317,53 +309,57 @@
         },
         {
           "file": "apps/backend/src/routes/customerRoutes.ts",
-          "hash": "7492750668547662399",
+          "hash": "110865934638304857",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/routes/serviceRoutes.ts",
-          "hash": "972235927135417168",
+          "hash": "1170531736149506504",
           "deps": [
             "npm:hono"
           ]
         },
         {
           "file": "apps/backend/src/services/AdminService.ts",
-          "hash": "7090755532609940535",
+          "hash": "7099454505270580304",
           "deps": [
             "npm:drizzle-orm"
           ]
         },
         {
           "file": "apps/backend/src/services/AuthService.ts",
-          "hash": "18040894187428379576"
+          "hash": "9107509158413401236",
+          "deps": [
+            "npm:drizzle-orm",
+            "npm:hono"
+          ]
         },
         {
           "file": "apps/backend/src/services/BookingService.ts",
-          "hash": "14187827418201229575",
+          "hash": "12675090376247493259",
           "deps": [
             "npm:drizzle-orm"
           ]
         },
         {
           "file": "apps/backend/src/services/CustomerService.ts",
-          "hash": "10914128399637329977",
+          "hash": "7821756924467922990",
           "deps": [
             "npm:drizzle-orm"
           ]
         },
         {
           "file": "apps/backend/src/services/ServiceService.ts",
-          "hash": "5309178579735226006",
+          "hash": "8036435482891959729",
           "deps": [
             "npm:drizzle-orm"
           ]
         },
         {
           "file": "apps/backend/src/services/notificationService.ts",
-          "hash": "16060616800053677242",
+          "hash": "16151894039585079209",
           "deps": [
             "npm:drizzle-orm"
           ]
@@ -378,13 +374,13 @@
         },
         {
           "file": "apps/backend/tsconfig.json",
-          "hash": "571520361327566589"
+          "hash": "1257094901990963950"
         }
       ],
       "frontend": [
         {
           "file": "apps/frontend/.env.production",
-          "hash": "4573723416561642557"
+          "hash": "14936155476980111979"
         },
         {
           "file": "apps/frontend/.npmrc",
@@ -404,37 +400,35 @@
         },
         {
           "file": "apps/frontend/next.config.js",
-          "hash": "16824687558162060799"
+          "hash": "4244538148519262821"
         },
         {
           "file": "apps/frontend/nixpacks.toml",
           "hash": "10490178657580124816"
         },
         {
-          "file": "apps/frontend/package-lock.json",
-          "hash": "12186466449205872620"
-        },
-        {
           "file": "apps/frontend/package.json",
-          "hash": "8912576773184947965",
+          "hash": "302100081623324760",
           "deps": [
             "npm:@types/node",
             "npm:@types/react",
             "npm:@types/react-dom",
             "npm:autoprefixer",
-            "npm:eslint",
             "npm:postcss@8.5.6",
+            "npm:tailwindcss",
             "npm:typescript",
-            "npm:@clerk/nextjs",
-            "npm:@hookform/resolvers",
-            "npm:@tanstack/react-query",
-            "npm:axios",
-            "npm:lucide-react",
+            "npm:eslint",
             "npm:next",
             "npm:react",
             "npm:react-dom",
+            "npm:@clerk/nextjs",
+            "npm:@tanstack/react-query",
+            "npm:@hookform/resolvers",
             "npm:react-hook-form",
-            "npm:tailwindcss",
+            "npm:lucide-react",
+            "npm:clsx",
+            "npm:tailwind-merge",
+            "npm:axios",
             "npm:zod",
             "npm:zustand"
           ]
@@ -445,7 +439,7 @@
         },
         {
           "file": "apps/frontend/project.json",
-          "hash": "8416125061948997680"
+          "hash": "4415455724974766369"
         },
         {
           "file": "apps/frontend/public/.gitkeep",
@@ -579,6 +573,10 @@
           ]
         },
         {
+          "file": "apps/frontend/src/app/global-error.tsx",
+          "hash": "4501212020993820380"
+        },
+        {
           "file": "apps/frontend/src/app/global.css",
           "hash": "291024361394925992"
         },
@@ -592,7 +590,10 @@
         },
         {
           "file": "apps/frontend/src/app/not-found.tsx",
-          "hash": "9208013352369533353"
+          "hash": "16664945173589560556",
+          "deps": [
+            "npm:next"
+          ]
         },
         {
           "file": "apps/frontend/src/app/page.tsx",

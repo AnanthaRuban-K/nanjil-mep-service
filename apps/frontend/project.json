@@ -1,44 +1,29 @@
 {
   "name": "frontend",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/frontend/src",
-  "projectType": "application",
+  "root": "apps/frontend",
+  "sourceRoot": "apps/frontend",
   "targets": {
-    "dev": {
-      "executor": "@nx/next:dev",
-      "options": {
-        "port": 3100,
-        "dev": true
-      }
-    },
     "build": {
       "executor": "@nx/next:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/.next"],
       "defaultConfiguration": "production",
+      "options": {}
+    },
+    "serve": {
+      "executor": "@nx/next:dev",
+      "defaultConfiguration": "development",
       "options": {
-        "outputPath": "dist/apps/frontend"
-      },
-      "configurations": {
-        "development": {
-          "outputPath": "apps/frontend"
-        },
-        "production": {}
+        "dev": true,
+        "port": 3000
       }
     },
     "start": {
-      "executor": "@nx/next:start",
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "production",
       "options": {
-        "port": 3100
-      },
-      "dependsOn": ["build"]
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/frontend/**/*.{ts,tsx,js,jsx}"]
+        "dev": false,
+        "port": 3000
       }
     }
-  },
-  "tags": ["type:app", "scope:frontend"]
+  }
 }

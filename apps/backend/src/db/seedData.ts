@@ -1,6 +1,6 @@
-import { db } from './index.js'
-import { services, admins, customers, bookings } from './schema.js'
-import { generateUniqueBookingNumber, calculateEstimatedCostFromDB } from './helpers/bookingHelpers.js'
+import { db } from './index'
+import { services, admins, customers, bookings } from './schema'
+import { generateUniqueBookingNumber, calculateEstimatedCostFromDB } from './helpers/bookingHelpers'
 
 export async function seedDatabase() {
   console.log('🌱 Seeding database with initial data...')
@@ -178,8 +178,10 @@ export async function seedDatabase() {
   }
 }
 
-// Run seeding if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+// CommonJS-compatible way to check if file is being run directly
+const isMainModule = require.main === module
+
+if (isMainModule) {
   seedDatabase()
     .then(() => process.exit(0))
     .catch(() => process.exit(1))

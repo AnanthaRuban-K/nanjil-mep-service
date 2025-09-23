@@ -10,7 +10,7 @@
     "strict": true,
     "declaration": false,
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "../../dist/apps/backend",
     "rootDir": "./src",
     "removeComments": true,
     "skipLibCheck": true,
@@ -18,13 +18,27 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "verbatimModuleSyntax": false
+    "allowImportingTsExtensions": false,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@/db/*": ["db/*"],
+      "@/services/*": ["services/*"],
+      "@/controllers/*": ["controllers/*"],
+      "@/routes/*": ["routes/*"],
+      "@/middleware/*": ["middleware/*"],
+      "@/utils/*": ["utils/*"],
+      "@/types/*": ["types/*"]
+    }
   },
   "include": [
     "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "../../dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
   ]
 }

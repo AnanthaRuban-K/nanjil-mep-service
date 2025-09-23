@@ -1,38 +1,40 @@
-// File: middleware.ts - Fixed for Latest Clerk Version
-import { authMiddleware } from "@clerk/nextjs"
+// File: middleware.ts - Updated for Latest Clerk Version
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-export default authMiddleware({
-  // Public routes (accessible without authentication)
-  publicRoutes: [
-    "/",
-    "/services", 
-    "/describe", 
-    "/contact", 
-    "/schedule", 
-    "/summary", 
-    "/success",
-    "/sign-in(.*)", 
-    "/sign-up(.*)",
-    "/api/bookings",  // Allow public booking creation
-    "/about",
-    "/privacy",
-    "/terms"
-  ],
+// Define public routes that don't require authentication
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/services', 
+  '/describe', 
+  '/contact', 
+  '/schedule', 
+  '/summary', 
+  '/success',
+  '/sign-in(.*)', 
+  '/sign-up(.*)',
+  '/api/bookings',
+  '/about',
+  '/privacy',
+  '/terms',
+  '/api/webhook(.*)',
+  '/api/health'
+])
+
+export default clerkMiddleware((auth, req) => {
+  // Allow public routes without authentication
+  if (isPublicRoute(req)) {
+    return
+  }
   
-  // Ignored routes (no auth check at all)
-  ignoredRoutes: [
-    "/api/webhook(.*)",
-    "/api/health",
-    "/_next(.*)",
-    "/favicon.ico",
-    "/robots.txt",
-    "/sitemap.xml"
-  ],
-
-  // Debug mode for development only
-  debug: process.env.NODE_ENV === 'development'
+  // Protect all other routes
+  auth().protect()
 })
 
 export const config = {
-  matcher: ["/((?!_next|.*\\..*).*)"]
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 }

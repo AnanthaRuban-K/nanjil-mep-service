@@ -12,7 +12,7 @@ import { bookingRoutes } from './routes/bookingRoutes.js'
 import { adminRoutes } from './routes/adminRoutes.js'
 import { serviceRoutes } from './routes/serviceRoutes.js'
 import { customerRoutes } from './routes/customerRoutes.js'
-import { authRoutes } from './routes/authRoutes.js'
+import { authRoutes } from './routes/authRoutes.js'  // Fixed import
 
 // Middleware
 import { authMiddleware } from './middleware/authMiddleware.js'
@@ -70,7 +70,7 @@ app.get('/health', (c) => {
     environment: process.env.NODE_ENV || 'development',
     version: '1.0.0',
     service: 'Nanjil MEP Service API',
-    database: 'connected', // You can add actual DB health check here
+    database: 'connected',
     memory: {
       used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100,
       total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100
@@ -78,8 +78,10 @@ app.get('/health', (c) => {
   })
 })
 
-// API Routes
+// Setup Auth Routes (replaced function call with route mounting)
 app.route('/api/auth', authRoutes)
+
+// API Routes
 app.route('/api/bookings', bookingRoutes)
 app.route('/api/admin', adminRoutes)
 app.route('/api/services', serviceRoutes)
@@ -100,7 +102,7 @@ app.get('/', (c) => {
       'Tamil/English bilingual support',
       'Mobile-optimized responses',
       'Real-time notifications',
-      'Secure authentication',
+      'Secure authentication with Clerk',
       'Rate limiting protection'
     ],
     endpoints: {
@@ -113,21 +115,37 @@ app.get('/', (c) => {
   })
 })
 
-// API Documentation (Basic)
+// API Documentation (Updated)
 app.get('/api/docs', (c) => {
   return c.json({
     title: 'Nanjil MEP Service API Documentation',
     version: '1.0.0',
     baseUrl: process.env.API_BASE_URL || 'http://localhost:3101',
+    authentication: 'Bearer token (Clerk JWT)',
     endpoints: {
+      // Auth endpoints
+      'GET /api/auth/me': 'Get current user profile',
+      'PUT /api/auth/profile': 'Update user profile',
+      'POST /api/auth/logout': 'Logout user',
+      'POST /api/auth/admin/create': 'Create admin user (admin only)',
+      'GET /api/auth/admin/users': 'List all users (admin only)',
+      'PUT /api/auth/admin/users/:id/deactivate': 'Deactivate user (admin only)',
+      
+      // Booking endpoints
       'POST /api/bookings': 'Create a new service booking',
       'GET /api/bookings/:id': 'Get booking details',
       'PUT /api/bookings/:id/cancel': 'Cancel a booking',
       'POST /api/bookings/:id/feedback': 'Submit booking feedback',
+      
+      // Admin endpoints
       'GET /api/admin/dashboard': 'Get admin dashboard metrics',
       'GET /api/admin/bookings': 'Get all bookings (admin)',
       'PUT /api/admin/bookings/:id/status': 'Update booking status',
+      
+      // Service endpoints
       'GET /api/services': 'Get available services',
+      
+      // Customer endpoints
       'POST /api/customers': 'Create customer profile',
       'GET /api/customers/profile': 'Get customer profile'
     }
@@ -143,20 +161,32 @@ app.notFound((c) => {
       'GET /',
       'GET /health',
       'GET /api/docs',
+      
+      // Auth
+      'GET /api/auth/me',
+      'PUT /api/auth/profile',
+      'POST /api/auth/logout',
+      'POST /api/auth/admin/create',
+      'GET /api/auth/admin/users',
+      'PUT /api/auth/admin/users/:id/deactivate',
+      
+      // Bookings
       'POST /api/bookings',
-      'GET /api/bookings/my',
       'GET /api/bookings/:id',
       'PUT /api/bookings/:id/cancel',
       'POST /api/bookings/:id/feedback',
+      
+      // Admin
       'GET /api/admin/dashboard',
       'GET /api/admin/bookings',
       'PUT /api/admin/bookings/:id/status',
+      
+      // Services
       'GET /api/services',
+      
+      // Customers
       'POST /api/customers',
-      'GET /api/customers/profile',
-      'GET /api/admin/customers',          // NEW
-      'POST /api/admin/customers/:id/block', // NEW
-      'PUT /api/admin/customers/:id',       // NEW
+      'GET /api/customers/profile'
     ]
   }, 404)
 })
@@ -179,7 +209,7 @@ serve({
   console.log(`📊 Health Check: http://${hostname}:${port}/health`)
   console.log(`📚 Documentation: http://${hostname}:${port}/api/docs`)
   console.log(`🔧 Features: Booking Management, Admin Dashboard, Real-time Updates`)
+  console.log(`🔐 Authentication: Clerk JWT with local role management`)
   console.log(`🏠 Tamil/English Support for MEP Services`)
   console.log('✅ Server ready to handle requests')
 })
-

@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin'
-import { db } from "../db/index.js"
-import { adminTokens, notifications } from "../db/schema.js"  // Import your schema tables
-import { eq, inArray } from "drizzle-orm"  // Import drizzle-orm functions
+import { db } from "../db/index"
+import { adminTokens, notifications } from "../db/schema"
+import { eq } from "drizzle-orm"
 
 export interface NotificationPayload {
   type: 'new_booking' | 'booking_updated' | 'emergency_booking' | 'customer_message'
@@ -15,58 +15,59 @@ export interface NotificationPayload {
 }
 
 export class NotificationService {
-  // Store admin FCM tokens (you can store these in database)
-  private adminTokens: string[] = []
-
   constructor() {
-    // Initialize Firebase Admin SDK if not already done
     this.initializeFirebase()
   }
 
   private initializeFirebase() {
-    // Initialize Firebase Admin SDK with your service account
-    // Make sure to add FIREBASE_SERVICE_ACCOUNT_KEY to environment variables
+    // Only initialize if not already initialized
     if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        }),
-      })
+      try {
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+          }),
+        })
+        console.log('Firebase Admin initialized successfully')
+      } catch (error) {
+        console.error('Failed to initialize Firebase Admin:', error)
+      }
     }
   }
 
   // Add admin FCM token
   async addAdminToken(token: string) {
-    if (!this.adminTokens.includes(token)) {
-      this.adminTokens.push(token)
-      // Save to database
-      await this.saveTokenToDatabase(token)
-    }
-  }
-
-  private async saveTokenToDatabase(token: string) {
     try {
-      // Save FCM token to database (implement based on your schema)
-      await db.insert(adminTokens).values({
-        token,
-        isActive: true,
-        createdAt: new Date(),
-      })
+      // Check if token already exists
+      const existing = await db.select()
+        .from(adminTokens)
+        .where(eq(adminTokens.token, token))
+        .limit(1)
+
+      if (existing.length === 0) {
+        await db.insert(adminTokens).values({
+          token,
+          isActive: true,
+          createdAt: new Date(),
+        })
+        console.log('Admin token saved to database')
+      }
     } catch (error) {
       console.error('Error saving token to database:', error)
     }
   }
 
-  // Send push notification to all admins
+  // Send notification to all admin tokens
   async sendToAllAdmins(notification: NotificationPayload) {
     try {
-      // Get all active admin tokens from database
       const tokens = await this.getActiveAdminTokens()
       
       if (tokens.length === 0) {
         console.log('No admin tokens found')
+        // Still save notification to database for history
+        await this.saveNotificationToDatabase(notification)
         return
       }
 
@@ -81,33 +82,46 @@ export class NotificationService {
           bookingId: notification.bookingId?.toString() || '',
           bookingNumber: notification.bookingNumber || '',
           customerId: notification.customerId?.toString() || '',
-          ...notification.data,
+          click_action: 'FLUTTER_NOTIFICATION_CLICK', // For mobile apps
         },
-        tokens: tokens,
       }
 
-      const response = await admin.messaging().sendMulticast(message)
+      // Send to each token individually (Firebase Admin SDK way)
+      const promises = tokens.map(async (token) => {
+        try {
+          const response = await admin.messaging().send({
+            ...message,
+            token: token,
+          })
+          console.log('Notification sent successfully to token:', token.substring(0, 20) + '...')
+          return { success: true, token }
+        } catch (error) {
+          console.error('Failed to send to token:', token.substring(0, 20) + '...', error)
+          // Mark token as inactive if it's invalid
+          await this.markTokenInactive(token)
+          return { success: false, token, error }
+        }
+      })
+
+      const results = await Promise.allSettled(promises)
+      const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length
       
-      console.log('Push notifications sent:', response.successCount, 'successful')
-      
-      // Handle failed tokens (remove invalid ones)
-      if (response.failureCount > 0) {
-        await this.handleFailedTokens(response, tokens)
-      }
+      console.log(`Push notifications: ${successCount}/${tokens.length} successful`)
 
       // Save notification to database
       await this.saveNotificationToDatabase(notification)
 
-      return response
+      return { successCount, totalCount: tokens.length }
     } catch (error) {
       console.error('Error sending push notifications:', error)
-      throw error
+      // Don't throw error - still save to database
+      await this.saveNotificationToDatabase(notification)
+      return { successCount: 0, totalCount: 0 }
     }
   }
 
   private async getActiveAdminTokens(): Promise<string[]> {
     try {
-      // Implement based on your database schema
       const result = await db.select({ token: adminTokens.token })
         .from(adminTokens)
         .where(eq(adminTokens.isActive, true))
@@ -119,20 +133,13 @@ export class NotificationService {
     }
   }
 
-  private async handleFailedTokens(response: any, tokens: string[]) {
-    const failedTokens: string[] = []
-    
-    response.responses.forEach((resp: any, idx: number) => {
-      if (!resp.success) {
-        failedTokens.push(tokens[idx])
-      }
-    })
-
-    // Remove invalid tokens from database
-    if (failedTokens.length > 0) {
+  private async markTokenInactive(token: string) {
+    try {
       await db.update(adminTokens)
         .set({ isActive: false })
-        .where(inArray(adminTokens.token, failedTokens))
+        .where(eq(adminTokens.token, token))
+    } catch (error) {
+      console.error('Error marking token inactive:', error)
     }
   }
 
@@ -142,9 +149,9 @@ export class NotificationService {
         type: notification.type,
         title: notification.title,
         message: notification.message,
-        bookingId: notification.bookingId,
+        bookingId: notification.bookingId || null,
         priority: notification.priority,
-        isRead: 'false', // Since your schema uses varchar for boolean
+        isRead: 'false',
         createdAt: new Date(),
       })
     } catch (error) {
@@ -152,12 +159,12 @@ export class NotificationService {
     }
   }
 
-  // Create booking notifications
+  // Simplified notification methods
   async notifyNewBooking(booking: any, customer: any) {
     const urgencyEmoji = this.getUrgencyEmoji(booking.priority)
     const serviceEmoji = booking.serviceType === 'electrical' ? '⚡' : '🔧'
     
-    await this.sendToAllAdmins({
+    return this.sendToAllAdmins({
       type: 'new_booking',
       title: `${urgencyEmoji} New Service Booking`,
       message: `${serviceEmoji} ${customer.name} booked ${booking.serviceType} service - ${booking.priority.toUpperCase()}`,
@@ -175,7 +182,7 @@ export class NotificationService {
   }
 
   async notifyEmergencyBooking(booking: any, customer: any) {
-    await this.sendToAllAdmins({
+    return this.sendToAllAdmins({
       type: 'emergency_booking',
       title: '🚨 EMERGENCY SERVICE REQUEST',
       message: `⚡ URGENT: ${customer.name} needs immediate ${booking.serviceType} service!`,
@@ -200,4 +207,28 @@ export class NotificationService {
       default: return '📋'
     }
   }
+
+  // Test notification method
+  async testNotification() {
+    return this.sendToAllAdmins({
+      type: 'new_booking',
+      title: '🧪 Test Notification',
+      message: 'This is a test notification for admin dashboard',
+      priority: 'normal'
+    })
+  }
 }
+
+// Simple usage example:
+/*
+const notificationService = new NotificationService()
+
+// Register admin token
+await notificationService.addAdminToken('your-fcm-token-here')
+
+// Send notification
+await notificationService.notifyNewBooking(booking, customer)
+
+// Test notification
+await notificationService.testNotification()
+*/

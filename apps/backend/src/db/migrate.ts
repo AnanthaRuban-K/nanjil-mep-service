@@ -1,5 +1,8 @@
+// Fixed migration file for CommonJS
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
-import { migrationDb } from './index.js'
+import { migrationDb } from './index'
+import * as path from 'path'
+import { fileURLToPath } from 'url'
 
 async function runMigrations() {
   console.log('🔄 Running database migrations...')
@@ -13,7 +16,10 @@ async function runMigrations() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// CommonJS-compatible way to check if file is being run directly
+const isMainModule = require.main === module
+
+if (isMainModule) {
   runMigrations()
 }
 

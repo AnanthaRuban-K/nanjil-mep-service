@@ -1,5 +1,5 @@
-import { db } from '../db/index.js'
-import { bookings, customers, services } from '../db/schema.js'
+import { db } from '../db/index'
+import { bookings, customers, services } from '../db/schema'
 import { eq, desc, and, gte, lt, sql, count, sum } from 'drizzle-orm'
 
 export class AdminService {

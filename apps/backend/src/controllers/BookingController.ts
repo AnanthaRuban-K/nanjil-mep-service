@@ -1,6 +1,6 @@
 import { Context } from 'hono'
-import { BookingService } from '../services/BookingService.js'
-import { NotificationService } from '../services/notificationService.js'
+import { BookingService } from '../services/BookingService'
+import { NotificationService } from '../services/notificationService'
 import { HTTPException } from 'hono/http-exception'
 
 export class BookingController {

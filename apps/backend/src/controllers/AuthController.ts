@@ -1,125 +1,246 @@
+// src/controllers/AuthController.ts
 import { Context } from 'hono'
-import { AuthService } from '../services/AuthService.js'
 import { HTTPException } from 'hono/http-exception'
+import { getAuthenticatedUser } from '../middleware/authMiddleware'
+import { db } from '../db'
+import { customers, admins } from '../db/schema'
+import { eq } from 'drizzle-orm'
 
 export class AuthController {
-  private authService: AuthService
-
-  constructor() {
-    this.authService = new AuthService()
-  }
-
-  async login(c: Context) {
+  
+  // Get current user profile
+  async me(c: Context) {
     try {
-      console.log('🔐 User login attempt...')
-      const { email, password } = await c.req.json()
-
-      if (!email || !password) {
-        throw new HTTPException(400, { message: 'Email and password are required' })
-      }
-
-      const result = await this.authService.login(email, password)
-
-      console.log('✅ User logged in successfully')
+      const user = getAuthenticatedUser(c)
+      
       return c.json({
         success: true,
-        ...result,
-        message: 'Login successful'
+        user
       })
-
     } catch (error) {
-      console.error('❌ Login error:', error)
-      if (error instanceof HTTPException) {
-        throw error
-      }
-      throw new HTTPException(401, { message: 'Invalid credentials' })
+      throw new HTTPException(401, { message: 'User not authenticated' })
     }
   }
 
-  async register(c: Context) {
+  // Update user profile
+  async updateProfile(c: Context) {
     try {
-      console.log('📝 User registration attempt...')
-      const { email, password, name, phone } = await c.req.json()
+      const user = getAuthenticatedUser(c)
+      const { name, phone, address } = await c.req.json()
 
-      if (!email || !password || !name) {
-        throw new HTTPException(400, { message: 'Email, password, and name are required' })
+      if (!name || name.trim().length < 2) {
+        throw new HTTPException(400, { message: 'Valid name is required' })
       }
 
-      const result = await this.authService.register({ email, password, name, phone })
+      if (user.role === 'admin') {
+        await db
+          .update(admins)
+          .set({
+            name: name.trim(),
+            phone: phone?.trim(),
+            updatedAt: new Date()
+          })
+          .where(eq(admins.id, parseInt(user.id)))
+      } else {
+        await db
+          .update(customers)
+          .set({
+            name: name.trim(),
+            phone: phone?.trim(),
+            address: address?.trim(),
+            updatedAt: new Date()
+          })
+          .where(eq(customers.id, parseInt(user.id)))
+      }
 
-      console.log('✅ User registered successfully')
       return c.json({
         success: true,
-        ...result,
-        message: 'Registration successful'
+        message: 'Profile updated successfully'
+      })
+
+    } catch (error) {
+      console.error('Update profile error:', error)
+      if (error instanceof HTTPException) {
+        throw error
+      }
+      throw new HTTPException(500, { message: 'Failed to update profile' })
+    }
+  }
+
+  // Admin: Create admin user
+  async createAdmin(c: Context) {
+    try {
+      const currentUser = getAuthenticatedUser(c)
+      
+      if (currentUser.role !== 'admin') {
+        throw new HTTPException(403, { message: 'Admin access required' })
+      }
+
+      const { clerkUserId, name, email, phone, role = 'admin' } = await c.req.json()
+
+      if (!clerkUserId || !name || !email) {
+        throw new HTTPException(400, { message: 'Clerk User ID, name, and email are required' })
+      }
+
+      const existingAdmin = await db
+        .select({ id: admins.id })
+        .from(admins)
+        .where(eq(admins.clerkUserId, clerkUserId))
+        .limit(1)
+
+      if (existingAdmin.length > 0) {
+        throw new HTTPException(400, { message: 'Admin already exists' })
+      }
+
+      const newAdmin = await db
+        .insert(admins)
+        .values({
+          clerkUserId,
+          name: name.trim(),
+          email: email.toLowerCase().trim(),
+          phone: phone?.trim(),
+          role
+        })
+        .returning({
+          id: admins.id,
+          name: admins.name,
+          email: admins.email,
+          role: admins.role
+        })
+
+      console.log(`Admin created: ${email}`)
+
+      return c.json({
+        success: true,
+        message: 'Admin created successfully',
+        admin: newAdmin[0]
       }, 201)
 
     } catch (error) {
-      console.error('❌ Registration error:', error)
+      console.error('Create admin error:', error)
       if (error instanceof HTTPException) {
         throw error
       }
-      throw new HTTPException(500, { message: 'Failed to register user' })
+      throw new HTTPException(500, { message: 'Failed to create admin' })
     }
   }
 
-  async verifyToken(c: Context) {
+  // Admin: List all users
+  async listUsers(c: Context) {
     try {
-      const { token } = await c.req.json()
-
-      if (!token) {
-        throw new HTTPException(400, { message: 'Token is required' })
+      const currentUser = getAuthenticatedUser(c)
+      
+      if (currentUser.role !== 'admin') {
+        throw new HTTPException(403, { message: 'Admin access required' })
       }
 
-      const result = await this.authService.verifyToken(token)
+      const page = parseInt(c.req.query('page') || '1')
+      const limit = parseInt(c.req.query('limit') || '20')
+      const offset = (page - 1) * limit
+
+      const customersList = await db
+        .select({
+          id: customers.id,
+          clerkUserId: customers.clerkUserId,
+          name: customers.name,
+          phone: customers.phone,
+          isActive: customers.isActive,
+          createdAt: customers.createdAt
+        })
+        .from(customers)
+        .limit(limit)
+        .offset(offset)
+
+      const adminsList = await db
+        .select({
+          id: admins.id,
+          clerkUserId: admins.clerkUserId,
+          name: admins.name,
+          email: admins.email,
+          phone: admins.phone,
+          role: admins.role,
+          isActive: admins.isActive,
+          createdAt: admins.createdAt
+        })
+        .from(admins)
+        .limit(limit)
+        .offset(offset)
 
       return c.json({
         success: true,
-        ...result
+        data: {
+          customers: customersList,
+          admins: adminsList,
+          pagination: {
+            page,
+            limit,
+            hasMore: customersList.length === limit || adminsList.length === limit
+          }
+        }
       })
 
     } catch (error) {
-      console.error('❌ Token verification error:', error)
-      throw new HTTPException(401, { message: 'Invalid token' })
+      console.error('List users error:', error)
+      if (error instanceof HTTPException) {
+        throw error
+      }
+      throw new HTTPException(500, { message: 'Failed to list users' })
     }
   }
 
-  async refreshToken(c: Context) {
+  // Admin: Deactivate user
+  async deactivateUser(c: Context) {
     try {
-      const { refreshToken } = await c.req.json()
-
-      if (!refreshToken) {
-        throw new HTTPException(400, { message: 'Refresh token is required' })
+      const currentUser = getAuthenticatedUser(c)
+      
+      if (currentUser.role !== 'admin') {
+        throw new HTTPException(403, { message: 'Admin access required' })
       }
 
-      const result = await this.authService.refreshToken(refreshToken)
+      const userId = c.req.param('userId')
+      const { userType } = await c.req.json()
+
+      if (!userId || !userType) {
+        throw new HTTPException(400, { message: 'User ID and user type are required' })
+      }
+
+      if (userType === 'admin') {
+        await db
+          .update(admins)
+          .set({ isActive: 'false', updatedAt: new Date() })
+          .where(eq(admins.id, parseInt(userId)))
+      } else {
+        await db
+          .update(customers)
+          .set({ isActive: 'false', updatedAt: new Date() })
+          .where(eq(customers.id, parseInt(userId)))
+      }
 
       return c.json({
         success: true,
-        ...result
+        message: 'User deactivated successfully'
       })
 
     } catch (error) {
-      console.error('❌ Token refresh error:', error)
-      throw new HTTPException(401, { message: 'Invalid refresh token' })
+      console.error('Deactivate user error:', error)
+      if (error instanceof HTTPException) {
+        throw error
+      }
+      throw new HTTPException(500, { message: 'Failed to deactivate user' })
     }
   }
 
+  // Simple logout
   async logout(c: Context) {
     try {
-      const { token } = await c.req.json()
-
-      if (token) {
-        await this.authService.logout(token)
-      }
-
+      const user = getAuthenticatedUser(c)
+      console.log(`User logged out: ${user.email}`)
+      
       return c.json({
         success: true,
         message: 'Logged out successfully'
       })
-
     } catch (error) {
-      console.error('❌ Logout error:', error)
       return c.json({
         success: true,
         message: 'Logged out successfully'

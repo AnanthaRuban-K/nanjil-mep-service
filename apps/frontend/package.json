@@ -1,43 +1,40 @@
 {
-  "name": "nanjil-mep-frontend",
+  "name": "@nanjil-mep-service/frontend",
   "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3100",
     "build": "next build",
-    "start": "next start -p 3100",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/localizations": "^3.25.1",
-    "@clerk/nextjs": "^4.31.8",
-    "@hookform/resolvers": "^3.3.4",
-    "@tanstack/react-query": "^5.28.6",
-    "@tanstack/react-query-devtools": "^5.89.0",
-    "axios": "^1.6.8",
+    "@clerk/nextjs": "^5.7.1",
+    "@hookform/resolvers": "^5.2.1",
+    "@tanstack/react-query": "^5.87.1",
+    "@tanstack/react-query-devtools": "^5.90.1",
+    "axios": "^1.11.0",
+    "clsx": "^2.1.1",
     "firebase": "^12.3.0",
-    "lucide-react": "^0.263.1",
+    "lucide-react": "^0.542.0",
     "next": "14.2.25",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-hook-form": "^7.51.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-hook-form": "^7.62.0",
     "react-hot-toast": "^2.6.0",
-    "tailwindcss": "^3.4.1",
-    "zod": "^3.22.4",
-    "zustand": "^4.5.2"
+    "tailwind-merge": "^3.3.1",
+    "zod": "^3.23.8",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
-    "@types/react": "^18.2.73",
-    "@types/react-dom": "^18.2.23",
-    "autoprefixer": "^10.4.19",
+    "@types/node": "^20.19.9",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.13",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.25",
     "postcss": "^8.4.38",
-    "typescript": "^5.4.3"
-  },
-  "engines": {
-    "node": ">=18.17.0",
-    "npm": ">=9.0.0"
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.3.0"
   }
 }

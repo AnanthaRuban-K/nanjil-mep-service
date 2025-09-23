@@ -1,5 +1,5 @@
-import { db } from './index.js'
-import { services, admins } from './schema.js'
+import { db } from './index'
+import { services, admins } from './schema'
 
 async function seed() {
   console.log('Seeding database...')

@@ -1,119 +1,450 @@
+import { clerkClient } from '@clerk/clerk-sdk-node'
+import { db } from '../db'
+import { customers, admins } from '../db/schema'
+import { eq } from 'drizzle-orm'
+
+interface User {
+  id: string
+  clerkUserId: string
+  email: string
+  name: string
+  role: 'admin' | 'customer'
+  phone?: string
+  isActive: boolean
+}
+
 export class AuthService {
-  async login(email: string, password: string) {
+  
+  // Get user from Clerk ID and sync with local database
+  async getUserFromClerkId(clerkUserId: string): Promise<User | null> {
     try {
-      // For demonstration - in production, integrate with Clerk or your auth system
-      console.log(`Login attempt for: ${email}`)
+      // Get user details from Clerk
+      const clerkUser = await clerkClient.users.getUser(clerkUserId)
       
-      // Mock authentication - replace with real auth logic
-      if (email === 'admin@nanjilmep.com' && password === 'admin123') {
+      if (!clerkUser) {
+        return null
+      }
+
+      // Check if user exists in admins table first
+      const adminResult = await db
+        .select({
+          id: admins.id,
+          clerkUserId: admins.clerkUserId,
+          name: admins.name,
+          email: admins.email,
+          phone: admins.phone,
+          role: admins.role,
+          isActive: admins.isActive
+        })
+        .from(admins)
+        .where(eq(admins.clerkUserId, clerkUserId))
+        .limit(1)
+
+      if (adminResult.length > 0) {
+        const admin = adminResult[0]
         return {
-          user: {
-            id: '1',
-            email,
-            name: 'Admin User',
-            role: 'admin'
-          },
-          token: 'mock-jwt-token',
-          refreshToken: 'mock-refresh-token'
+          id: admin.id.toString(),
+          clerkUserId: admin.clerkUserId!,
+          email: admin.email,
+          name: admin.name,
+          phone: admin.phone || undefined,
+          role: 'admin',
+          isActive: admin.isActive === 'true'
         }
       }
 
-      if (email.includes('@') && password.length >= 6) {
+      // Check customers table
+      const customerResult = await db
+        .select({
+          id: customers.id,
+          clerkUserId: customers.clerkUserId,
+          name: customers.name,
+          phone: customers.phone,
+          isActive: customers.isActive
+        })
+        .from(customers)
+        .where(eq(customers.clerkUserId, clerkUserId))
+        .limit(1)
+
+      if (customerResult.length > 0) {
+        const customer = customerResult[0]
         return {
-          user: {
-            id: '2',
-            email,
-            name: 'Customer User',
-            role: 'customer'
-          },
-          token: 'mock-jwt-token',
-          refreshToken: 'mock-refresh-token'
+          id: customer.id.toString(),
+          clerkUserId: customer.clerkUserId!,
+          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          name: customer.name,
+          phone: customer.phone || undefined,
+          role: 'customer',
+          isActive: customer.isActive === 'true'
         }
       }
 
-      throw new Error('Invalid credentials')
+      // User doesn't exist in local database, create as customer
+      return await this.createCustomerFromClerk(clerkUser)
+
     } catch (error) {
-      console.error('login error:', error)
-      throw new Error(`Login failed: ${error instanceof Error ? error.message : String(error)}`)
+      console.error('Error getting user from Clerk ID:', error)
+      return null
     }
   }
 
-  async register(data: {
-    email: string
-    password: string
-    name: string
-    phone?: string
-  }) {
+  // Create customer record from Clerk user
+  private async createCustomerFromClerk(clerkUser: any): Promise<User> {
     try {
-      console.log(`Registration attempt for: ${data.email}`)
+      const email = clerkUser.emailAddresses[0]?.emailAddress || ''
+      const phone = clerkUser.phoneNumbers[0]?.phoneNumber || ''
+      const name = clerkUser.firstName || clerkUser.username || email.split('@')[0]
+
+      const customerResult = await db
+        .insert(customers)
+        .values({
+          clerkUserId: clerkUser.id,
+          name,
+          phone,
+          language: 'ta'
+        })
+        .returning({
+          id: customers.id,
+          clerkUserId: customers.clerkUserId,
+          name: customers.name,
+          phone: customers.phone
+        })
+
+      const newCustomer = customerResult[0]
       
-      // Mock registration - replace with real auth logic
-      const user = {
-        id: Math.random().toString(36).substr(2, 9),
-        email: data.email,
-        name: data.name,
-        phone: data.phone,
-        role: 'customer'
-      }
+      console.log(`Created new customer from Clerk: ${email}`)
 
       return {
-        user,
-        token: 'mock-jwt-token',
-        refreshToken: 'mock-refresh-token'
+        id: newCustomer.id.toString(),
+        clerkUserId: newCustomer.clerkUserId!,
+        email,
+        name: newCustomer.name,
+        phone: newCustomer.phone || undefined,
+        role: 'customer',
+        isActive: true
       }
+
     } catch (error) {
-      console.error('register error:', error)
-      throw new Error(`Registration failed: ${error instanceof Error ? error.message : String(error)}`)
+      console.error('Error creating customer from Clerk:', error)
+      throw new Error('Failed to create user account')
     }
   }
 
-  async verifyToken(token: string) {
+  // Create admin user (manual process)
+  async createAdmin(data: {
+    clerkUserId: string
+    name: string
+    email: string
+    phone?: string
+    role?: string
+  }): Promise<User> {
     try {
-      // Mock token verification - replace with real JWT verification
-      if (token === 'mock-jwt-token') {
-        return {
-          valid: true,
-          user: {
-            id: '1',
-            email: 'user@example.com',
-            name: 'User',
-            role: 'customer'
-          }
-        }
+      // Verify Clerk user exists
+      const clerkUser = await clerkClient.users.getUser(data.clerkUserId)
+      if (!clerkUser) {
+        throw new Error('Clerk user not found')
       }
 
-      throw new Error('Invalid token')
+      // Check if admin already exists
+      const existingAdmin = await db
+        .select({ id: admins.id })
+        .from(admins)
+        .where(eq(admins.clerkUserId, data.clerkUserId))
+        .limit(1)
+
+      if (existingAdmin.length > 0) {
+        throw new Error('Admin already exists')
+      }
+
+      const adminResult = await db
+        .insert(admins)
+        .values({
+          clerkUserId: data.clerkUserId,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          role: data.role || 'admin'
+        })
+        .returning({
+          id: admins.id,
+          clerkUserId: admins.clerkUserId,
+          name: admins.name,
+          email: admins.email,
+          phone: admins.phone,
+          role: admins.role
+        })
+
+      const newAdmin = adminResult[0]
+      
+      console.log(`Created new admin: ${data.email}`)
+
+      return {
+        id: newAdmin.id.toString(),
+        clerkUserId: newAdmin.clerkUserId!,
+        email: newAdmin.email,
+        name: newAdmin.name,
+        phone: newAdmin.phone || undefined,
+        role: 'admin',
+        isActive: true
+      }
+
     } catch (error) {
-      console.error('verifyToken error:', error)
-      throw new Error(`Token verification failed`)
+      console.error('Error creating admin:', error)
+      throw new Error(error instanceof Error ? error.message : 'Failed to create admin')
     }
   }
 
-  async refreshToken(refreshToken: string) {
+  // Update user profile
+  async updateProfile(userId: string, updates: {
+    name?: string
+    phone?: string
+    address?: string
+  }): Promise<boolean> {
     try {
-      // Mock token refresh - replace with real logic
-      if (refreshToken === 'mock-refresh-token') {
-        return {
-          token: 'new-mock-jwt-token',
-          refreshToken: 'new-mock-refresh-token'
-        }
+      // Determine if user is admin or customer
+      const adminResult = await db
+        .select({ id: admins.id })
+        .from(admins)
+        .where(eq(admins.id, parseInt(userId)))
+        .limit(1)
+
+      if (adminResult.length > 0) {
+        // Update admin
+        await db
+          .update(admins)
+          .set({
+            name: updates.name,
+            phone: updates.phone,
+            updatedAt: new Date()
+          })
+          .where(eq(admins.id, parseInt(userId)))
+      } else {
+        // Update customer
+        await db
+          .update(customers)
+          .set({
+            name: updates.name,
+            phone: updates.phone,
+            address: updates.address,
+            updatedAt: new Date()
+          })
+          .where(eq(customers.id, parseInt(userId)))
       }
 
-      throw new Error('Invalid refresh token')
-    } catch (error) {
-      console.error('refreshToken error:', error)
-      throw new Error(`Token refresh failed`)
-    }
-  }
-
-  async logout(token: string) {
-    try {
-      // Mock logout - in production, invalidate the token
-      console.log(`Logout for token: ${token.substring(0, 10)}...`)
       return true
+
     } catch (error) {
-      console.error('logout error:', error)
-      throw new Error(`Logout failed`)
+      console.error('Error updating profile:', error)
+      return false
     }
   }
+
+  // Deactivate user account
+  async deactivateUser(userId: string): Promise<boolean> {
+    try {
+      // Check if user is admin first
+      const adminCheck = await db
+        .select({ id: admins.id })
+        .from(admins)
+        .where(eq(admins.id, parseInt(userId)))
+        .limit(1)
+
+      if (adminCheck.length > 0) {
+        // Update admin
+        await db
+          .update(admins)
+          .set({ isActive: 'false', updatedAt: new Date() })
+          .where(eq(admins.id, parseInt(userId)))
+      } else {
+        // Update customer
+        await db
+          .update(customers)
+          .set({ isActive: 'false', updatedAt: new Date() })
+          .where(eq(customers.id, parseInt(userId)))
+      }
+
+      return true
+
+    } catch (error) {
+      console.error('Error deactivating user:', error)
+      return false
+    }
+  }
+
+  // Get user role for authorization
+  async getUserRole(clerkUserId: string): Promise<'admin' | 'customer' | null> {
+    try {
+      // Check admin first
+      const adminResult = await db
+        .select({ role: admins.role })
+        .from(admins)
+        .where(eq(admins.clerkUserId, clerkUserId))
+        .limit(1)
+
+      if (adminResult.length > 0) {
+        return 'admin'
+      }
+
+      // Check customer
+      const customerResult = await db
+        .select({ id: customers.id })
+        .from(customers)
+        .where(eq(customers.clerkUserId, clerkUserId))
+        .limit(1)
+
+      if (customerResult.length > 0) {
+        return 'customer'
+      }
+
+      return null
+
+    } catch (error) {
+      console.error('Error getting user role:', error)
+      return null
+    }
+  }
+
+  // Validate user is active
+  async isUserActive(clerkUserId: string): Promise<boolean> {
+    try {
+      // Check admin
+      const adminResult = await db
+        .select({ isActive: admins.isActive })
+        .from(admins)
+        .where(eq(admins.clerkUserId, clerkUserId))
+        .limit(1)
+
+      if (adminResult.length > 0) {
+        return adminResult[0].isActive === 'true'
+      }
+
+      // Check customer
+      const customerResult = await db
+        .select({ isActive: customers.isActive })
+        .from(customers)
+        .where(eq(customers.clerkUserId, clerkUserId))
+        .limit(1)
+
+      if (customerResult.length > 0) {
+        return customerResult[0].isActive === 'true'
+      }
+
+      return false
+
+    } catch (error) {
+      console.error('Error checking user active status:', error)
+      return false
+    }
+  }
+}
+
+// Updated Auth Middleware for Clerk
+import { Context, Next } from 'hono'
+import { HTTPException } from 'hono/http-exception'
+
+export async function clerkAuthMiddleware(c: Context, next: Next) {
+  try {
+    const authHeader = c.req.header('Authorization')
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new HTTPException(401, { message: 'Authorization header required' })
+    }
+    
+    const token = authHeader.substring(7)
+
+    // Development mode - mock tokens
+    if (process.env.NODE_ENV === 'development') {
+      if (token === 'mock-jwt-token') {
+        c.set('user', {
+          id: '1',
+          clerkUserId: 'user_mock123',
+          email: 'customer@test.com',
+          name: 'Test Customer',
+          role: 'customer',
+          isActive: true
+        })
+        await next()
+        return
+      }
+      
+      if (token === 'mock-admin-token') {
+        c.set('user', {
+          id: 'admin-1',
+          clerkUserId: 'user_admin123',
+          email: 'admin@nanjilmep.com',
+          name: 'Test Admin',
+          role: 'admin',
+          isActive: true
+        })
+        await next()
+        return
+      }
+    }
+
+    // Production - verify Clerk JWT
+    try {
+      const clerkUser = await clerkClient.verifyToken(token)
+      
+      if (!clerkUser || !clerkUser.sub) {
+        throw new HTTPException(401, { message: 'Invalid token' })
+      }
+
+      const authService = new AuthService()
+      const user = await authService.getUserFromClerkId(clerkUser.sub)
+
+      if (!user) {
+        throw new HTTPException(401, { message: 'User not found' })
+      }
+
+      if (!user.isActive) {
+        throw new HTTPException(401, { message: 'Account is deactivated' })
+      }
+
+      c.set('user', user)
+      await next()
+
+    } catch (clerkError) {
+      console.error('Clerk token verification failed:', clerkError)
+      throw new HTTPException(401, { message: 'Token verification failed' })
+    }
+    
+  } catch (error) {
+    console.error('Auth middleware error:', error)
+    if (error instanceof HTTPException) {
+      throw error
+    }
+    throw new HTTPException(401, { message: 'Authentication failed' })
+  }
+}
+
+// Helper functions for role-based access
+export function requireAdmin(c: Context, next: Next) {
+  const user = c.get('user') as User
+  
+  if (!user || user.role !== 'admin') {
+    throw new HTTPException(403, { message: 'Admin access required' })
+  }
+  
+  return next()
+}
+
+export function requireCustomer(c: Context, next: Next) {
+  const user = c.get('user') as User
+  
+  if (!user || user.role !== 'customer') {
+    throw new HTTPException(403, { message: 'Customer access required' })
+  }
+  
+  return next()
+}
+
+// Get authenticated user helper
+export function getAuthenticatedUser(c: Context): User {
+  const user = c.get('user') as User
+  
+  if (!user) {
+    throw new HTTPException(401, { message: 'User not authenticated' })
+  }
+  
+  return user
 }
