@@ -1,5 +1,5 @@
 import { Context } from 'hono'
-import { BookingService } from '../services/BookingService'
+import { BookingService } from '../services/bookingservice'
 import { NotificationService } from '../services/notificationService'
 import { HTTPException } from 'hono/http-exception'
 
