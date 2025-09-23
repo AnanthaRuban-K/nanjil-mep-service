@@ -9,7 +9,7 @@ import { timing } from 'hono/timing'
 
 // Routes
 import { bookingRoutes } from './routes/BookingRoutes'
-import { adminRoutes } from './routes/AdminRoutes'
+import { adminRoutes } from './routes/adminRoutes'
 import { serviceRoutes } from './routes/ServiceRoutes'
 import { customerRoutes } from './routes/CustomerRoutes'
 import { authRoutes } from './routes/AuthRoutes'  // Fixed import
