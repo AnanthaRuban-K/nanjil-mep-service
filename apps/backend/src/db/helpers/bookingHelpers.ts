@@ -1,7 +1,7 @@
 // File: backend/src/db/helpers/bookingHelpers.ts - Database Helper Functions
 import { eq, desc, and, or, gte, lte, count, sql } from 'drizzle-orm'
-import { db } from '../index.js'
-import { bookings, services, customers, notifications, type NewBooking, type Booking } from '../schema.js'
+import { db } from '../index'
+import { bookings, services, customers, notifications, type NewBooking, type Booking } from '../schema'
 
 // Enhanced booking creation with customer management
 export async function createBookingWithCustomer(bookingData: {

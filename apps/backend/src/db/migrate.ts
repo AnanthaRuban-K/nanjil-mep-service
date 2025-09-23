@@ -1,6 +1,6 @@
 // Fixed migration file for CommonJS
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
-import { migrationDb } from './index.js'
+import { migrationDb } from './index'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 

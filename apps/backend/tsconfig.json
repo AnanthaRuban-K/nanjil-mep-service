@@ -2,43 +2,20 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "allowJs": true,
     "strict": true,
     "declaration": false,
     "sourceMap": true,
-    "outDir": "../../dist/apps/backend",
+    "outDir": "dist",
     "rootDir": "./src",
-    "removeComments": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": false,
-    "allowImportingTsExtensions": false,
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["*"],
-      "@/db/*": ["db/*"],
-      "@/services/*": ["services/*"],
-      "@/controllers/*": ["controllers/*"],
-      "@/routes/*": ["routes/*"],
-      "@/middleware/*": ["middleware/*"],
-      "@/utils/*": ["utils/*"],
-      "@/types/*": ["types/*"]
-    }
+    "isolatedModules": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "../../dist",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

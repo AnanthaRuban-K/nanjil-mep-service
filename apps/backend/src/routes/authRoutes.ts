@@ -1,7 +1,7 @@
 // src/routes/authRoutes.ts
 import { Hono } from 'hono'
-import { AuthController } from '../controllers/AuthController.js'
-import { authMiddleware, requireAdmin } from '../middleware/AuthMiddleware.js'
+import { AuthController } from '../controllers/AuthController'
+import { authMiddleware, requireAdmin } from '../middleware/AuthMiddleware'
 
 export const authRoutes = new Hono()
 const authController = new AuthController()

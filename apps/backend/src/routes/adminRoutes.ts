@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
-import { AdminController } from '../controllers/AdminController.js'
-import { authMiddleware } from '../middleware/AuthMiddleware.js'
-import { adminOnly } from '../middleware/AdminMiddleware.js'
+import { AdminController } from '../controllers/AdminController'
+import { authMiddleware } from '../middleware/AuthMiddleware'
+import { adminOnly } from '../middleware/AdminMiddleware'
 
 const adminRoutes = new Hono()
 const adminController = new AdminController()

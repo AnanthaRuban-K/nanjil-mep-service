@@ -2,8 +2,8 @@
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { eq, desc, asc, and, or, gte, lte, count, sql } from 'drizzle-orm'
-import { db } from '../db/index.js'
-import { bookings, services, customers, type NewBooking, type Booking } from '../db/schema.js'
+import { db } from '../db/index'
+import { bookings, services, customers, type NewBooking, type Booking } from '../db/schema'
 
 const app = new Hono()
 

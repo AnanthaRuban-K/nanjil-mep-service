@@ -1,5 +1,5 @@
 import { Context } from 'hono'
-import { ServiceService } from '../services/ServiceService.js'
+import { ServiceService } from '../services/ServiceService'
 import { HTTPException } from 'hono/http-exception'
 
 export class ServiceController {

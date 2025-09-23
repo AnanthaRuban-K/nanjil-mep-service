@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { ServiceController } from '../controllers/ServiceController.js'
+import { ServiceController } from '../controllers/ServiceController'
 
 const serviceRoutes = new Hono()
 const serviceController = new ServiceController()

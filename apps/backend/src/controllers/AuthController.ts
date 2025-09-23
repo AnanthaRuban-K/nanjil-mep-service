@@ -3,7 +3,7 @@ import { Context } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { getAuthenticatedUser } from '../middleware/AuthMiddleware'
 import { db } from '../db'
-import { customers, admins } from '../db/schema.js'
+import { customers, admins } from '../db/schema'
 import { eq } from 'drizzle-orm'
 
 export class AuthController {
