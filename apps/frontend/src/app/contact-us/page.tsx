@@ -117,7 +117,7 @@ export default function ContactUsPage() {
       submitRequest: 'சேவை கோரிக்கை அனுப்பு',
       sending: 'அனுப்புகிறோம்...',
       emergencyServiceNote: 'அவசர சேவைக்கு',
-      emergencyNote: 'உடனடி உதவிக்கு +91 94866 12345 என்ற எண்ணை அழைக்கவும்',
+      emergencyNote: 'உடனடி உதவிக்கு +91 93848 51596 என்ற எண்ணை அழைக்கவும்',
       whyChooseUs: 'எங்களை ஏன் தேர்ந்தெடுக்க வேண்டும்?',
       alwaysAvailable: 'Always Available',
       reliableService: 'நம்பகமான சேவை',
@@ -174,7 +174,7 @@ export default function ContactUsPage() {
       submitRequest: 'Submit Service Request',
       sending: 'Sending...',
       emergencyServiceNote: 'For Emergency Service',
-      emergencyNote: 'Call +91 94866 12345 for immediate assistance',
+      emergencyNote: 'Call +91 93848 51596 for immediate assistance',
       whyChooseUs: 'Why Choose Us?',
       alwaysAvailable: 'Always Available',
       reliableService: 'Reliable Service',
@@ -229,10 +229,10 @@ export default function ContactUsPage() {
                 <p className="text-xs text-gray-500">
                   {currentLang.emergencyCall}
                 </p>
-                <p className="text-sm font-bold text-blue-600">+91 94866 12345</p>
+                <p className="text-sm font-bold text-blue-600">+91 93848 51596</p>
               </div>
               <a
-                href="tel:+919486612345"
+                href="tel:+919384851596"
                 className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
               >
                 <Phone className="w-4 h-4" />
@@ -267,11 +267,11 @@ export default function ContactUsPage() {
                   {currentLang.emergencyCall}
                 </p>
                 <a
-                  href="tel:+919486612345"
+                  href="tel:+919384851596"
                   className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 w-fit"
                 >
                   <Phone className="w-4 h-4" />
-                  <span>+91 94866 12345</span>
+                  <span>+91 93848 51596</span>
                 </a>
               </div>
             </div>
@@ -332,7 +332,8 @@ export default function ContactUsPage() {
                     {currentLang.phoneCall}
                   </h3>
                   <p className="text-gray-600 mb-2">{currentLang.emergency247}</p>
-                  <p className="text-2xl font-bold text-blue-600">+91 94866 12345</p>
+                  <p className="text-2xl font-bold text-blue-600">+91 93848 51596
+</p>
                   <p className="text-gray-500 text-sm">{currentLang.immediateResponse}</p>
                 </div>
               </div>
@@ -346,7 +347,7 @@ export default function ContactUsPage() {
                     {currentLang.whatsapp}
                   </h3>
                   <p className="text-gray-600 mb-2">{currentLang.quickService}</p>
-                  <p className="text-xl font-bold text-green-600">+91 94866 12345</p>
+                  <p className="text-xl font-bold text-green-600">+91 93848 51596</p>
                   <p className="text-gray-500 text-sm">{currentLang.instantReply}</p>
                 </div>
               </div>
@@ -360,7 +361,7 @@ export default function ContactUsPage() {
                     {currentLang.email}
                   </h3>
                   <p className="text-gray-600 mb-2">{currentLang.detailedInquiries}</p>
-                  <p className="text-lg font-bold text-purple-600">info@nanjilmep.com</p>
+                  <p className="text-lg font-bold text-purple-600">sksenterprisesm@gmail.com</p>
                   <p className="text-gray-500 text-sm">{currentLang.reply24hours}</p>
                 </div>
               </div>
@@ -629,10 +630,10 @@ export default function ContactUsPage() {
                 className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center space-x-2"
               >
                 <Phone className="w-5 h-5" />
-                <span>+91 94866 12345</span>
+                <span>+91 +91 93848 51596</span>
               </a>
               <a
-                href="https://wa.me/919486612345"
+                href="https://wa.me/9384851596"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center space-x-2"

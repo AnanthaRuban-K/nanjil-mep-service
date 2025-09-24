@@ -27,12 +27,12 @@ function SuccessContent() {
 
   const handleWhatsApp = () => {
     const message = `Hi! I just booked a service. My booking ID is: ${bookingId}`
-    const whatsappUrl = `https://wa.me/1800NANJIL?text=${encodeURIComponent(message)}`
+    const whatsappUrl = `https://wa.me/9384851596NANJIL?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
   }
 
   const handleCall = () => {
-    window.location.href = "tel:1800-NANJIL"
+    window.location.href = "tel:9384851596-NANJIL"
   }
 
   const handleHome = () => {

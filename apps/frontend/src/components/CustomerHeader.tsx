@@ -93,15 +93,15 @@ export default function CustomerHeader({
             <div className="flex items-center space-x-4">
   {/* Company Logo */}
   <div className="flex-shrink-0">
-    <Image
-  src="/nanjil-logo.jpg"
-  alt="Company Logo"
-  width={200}   // increase width
-  height={200}  // increase height
-  className="h-20 w-auto"  // or h-24, h-32 for bigger size
-/>
+  <Image
+    src="/nanjil-logo.jpg"
+    alt="Company Logo"
+    width={200}
+    height={200}
+    className="h-12 w-auto"  // smaller size
+  />
+</div>
 
-  </div>
 
   
 
@@ -157,12 +157,12 @@ export default function CustomerHeader({
 
               {/* Emergency Phone (Desktop) */}
               <a
-                href="tel:1800-NANJIL"
+                href="tel:9384851596-NANJIL"
                 className="hidden xl:flex items-center space-x-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
                 title={getText('அவசர சேவை', 'Emergency Service')}
               >
                 <Phone className="w-4 h-4" />
-                <span className="text-sm font-medium">1800-NANJIL</span>
+                <span className="text-sm font-medium">9384851596-NANJIL</span>
               </a>
 
               {isSignedIn ? (
@@ -232,13 +232,13 @@ export default function CustomerHeader({
             <div className="px-4 py-2 space-y-1">
               {/* Emergency Phone - Mobile */}
               <a
-                href="tel:1800-NANJIL"
+                href="tel:9384851596-NANJIL"
                 className="flex items-center space-x-3 px-3 py-2 bg-red-500 text-white rounded-lg mb-3"
                 onClick={() => setShowMobileMenu(false)}
               >
                 <Phone className="w-5 h-5" />
                 <span className="font-medium">
-                  {getText('அவசர சேவை: 1800-NANJIL', 'Emergency: 1800-NANJIL')}
+                  {getText('அவசர சேவை: 9384851596-NANJIL', 'Emergency: 9384851596-NANJIL')}
                 </span>
               </a>
 

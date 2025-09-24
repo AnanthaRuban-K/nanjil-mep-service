@@ -189,15 +189,15 @@ export default function HomePage() {
           {/* Big Call Buttons */}
           <div className="space-y-4">
             <a
-              href="tel:1800-NANJIL"
+              href="tel:9384851596-NANJIL"
               className="block w-full max-w-md mx-auto bg-green-500 hover:bg-green-600 text-white text-xl font-bold py-6 px-8 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105"
             >
               {t.clickToCall}
-              <div className="text-lg mt-1">1800-NANJIL</div>
+              <div className="text-lg mt-1">9384851596-NANJIL</div>
             </a>
             
             <a
-              href="https://wa.me/1800NANJIL"
+              href="https://wa.me/9384851596"
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full max-w-md mx-auto bg-green-600 hover:bg-green-700 text-white text-xl font-bold py-6 px-8 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105"
@@ -392,22 +392,23 @@ export default function HomePage() {
           </p>
           
           <div className="space-y-4">
-            <a
-              href="tel:1800-NANJIL"
-              className="inline-block bg-green-500 hover:bg-green-600 text-white text-2xl font-bold py-6 px-12 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105 mr-4"
-            >
-              📞 1800-NANJIL
-            </a>
-            
-            <a
-              href="https://wa.me/1800NANJIL"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-green-600 hover:bg-green-700 text-white text-2xl font-bold py-6 px-12 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105"
-            >
-              💬 WhatsApp
-            </a>
-          </div>
+  <a
+    href="tel:9384851596"
+    className="inline-block bg-green-500 hover:bg-green-600 text-white text-2xl font-bold py-6 px-12 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105 mr-4"
+  >
+    📞 9384851596-NANJIL
+  </a>
+  
+  <a
+    href="https://wa.me/919384851596" // Use full international format (91 for India)
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block bg-green-600 hover:bg-green-700 text-white text-2xl font-bold py-6 px-12 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-105"
+  >
+    💬 WhatsApp
+  </a>
+</div>
+
 
           <div className="mt-12 grid md:grid-cols-3 gap-8 text-center">
             <div>
@@ -434,12 +435,12 @@ export default function HomePage() {
             {t.footerDesc}
           </p>
           <div className="space-y-2 text-gray-400">
-            <p>📞 1800-NANJIL</p>
-            <p>📧 info@nanjilmepservice.com</p>
-            <p>📍 நாகர்கோவில், தமிழ்நாடு</p>
+            <p>📞 9384851596-NANJIL</p>
+            <p>📧 sksenterprisesm@gmail.com</p>
+            <p>📍 Peyodu Junction, Saral Post-629203</p>
           </div>
           <div className="mt-6 pt-6 border-t border-gray-700">
-            <p className="text-gray-500">&copy; 2024 நாஞ்சில் MEP Services. {t.allRightsReserved}</p>
+            <p className="text-gray-500">&copy; 2026 நாஞ்சில் MEP Services. {t.allRightsReserved}</p>
           </div>
         </div>
       </footer>
