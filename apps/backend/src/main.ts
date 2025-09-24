@@ -39,12 +39,12 @@ app.use('*', cors({
     ? [
         'https://nanjilmepservice.com',
         'https://www.nanjilmepservice.com',
-        'https://admin.nanjilmepservice.com'
+      
       ]
     : [
-        'http://localhost:3000',
+        
         'http://localhost:3100',
-        'http://127.0.0.1:3000'
+        
       ],
   allowHeaders: [
     'Content-Type', 
