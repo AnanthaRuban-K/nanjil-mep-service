@@ -1,32 +1,34 @@
-// apps/frontend/next.config.js - Fixed for Next.js 14.2.25
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  swcMinify: true,
   
-  // Image configuration
+  // Remove this line:
+  // serverExternalPackages: [...]
+  
+  // Other configurations
+  env: {
+    CUSTOM_KEY: 'my-value',
+  },
+
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    return config
+  },
+
+  async redirects() {
+    return []
+  },
+
+  async headers() {
+    return []
+  },
+
   images: {
-    domains: ['images.clerk.dev'],
+    domains: [],
   },
-  
-  // External packages that should not be bundled
-  serverExternalPackages: ['@clerk/nextjs'],
-  
-  // Transpile packages if needed
-  transpilePackages: ['lucide-react'],
-  
-  // ESLint configuration
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-  
-  // TypeScript configuration
-  typescript: {
-    ignoreBuildErrors: false,
-  },
-  
-  // Remove the problematic env and swcMinify options
-  // DO NOT include NODE_ENV in env config - Next.js handles this automatically
+
+  output: 'standalone',
+  telemetry: false,
 }
 
 module.exports = nextConfig
