@@ -2,16 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  
-  // Remove this line:
-  // serverExternalPackages: [...]
-  
-  // Other configurations
+
   env: {
     CUSTOM_KEY: 'my-value',
   },
 
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+  webpack: (config) => {
     return config
   },
 
@@ -26,9 +22,6 @@ const nextConfig = {
   images: {
     domains: [],
   },
-
-  output: 'standalone',
-  telemetry: false,
 }
 
 module.exports = nextConfig
