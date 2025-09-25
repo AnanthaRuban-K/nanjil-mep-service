@@ -4,8 +4,8 @@ import axios from 'axios'
 // Simple API configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (
   process.env.NODE_ENV === 'production' 
-    ? 'https://api.nanjilmepservice.com/api'  // Replace with your actual production API URL
-    : 'http://localhost:3101/api'
+    ? 'https://api.nanjilmepservice.com'  // Replace with your actual production API URL
+    : 'http://localhost:3101'
 )
 
 console.log('API Base URL:', API_BASE_URL)
