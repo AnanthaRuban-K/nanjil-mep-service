@@ -39,12 +39,11 @@ app.use('*', cors({
     ? [
         'https://nanjilmepservice.com',
         'https://www.nanjilmepservice.com',
-      
+        'http://nanjilmepservice.com',   // Add HTTP fallback
+        'http://api.nanjilmepservice.com' // Add API subdomain
       ]
     : [
-        
         'http://localhost:3100',
-        
       ],
   allowHeaders: [
     'Content-Type', 
@@ -55,7 +54,7 @@ app.use('*', cors({
   ],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   credentials: true,
-  maxAge: 86400, // 24 hours
+  maxAge: 86400,
 }))
 
 // Rate Limiting
@@ -181,8 +180,11 @@ app.notFound((c) => {
       'GET /api/admin/bookings',
       'PUT /api/admin/bookings/:id/status',
       
-      // Services
+      /// Services - ADD THESE
       'GET /api/services',
+      'GET /api/services/:id',
+      'GET /api/services/category/:category',
+      'GET /api/services/:id/pricing',
       
       // Customers
       'POST /api/customers',

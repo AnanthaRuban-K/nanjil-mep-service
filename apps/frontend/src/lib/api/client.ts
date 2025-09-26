@@ -11,12 +11,14 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (
 console.log('API Base URL:', API_BASE_URL)
 
 export const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: process.env.NODE_ENV === 'production' 
+    ? 'https://api.nanjilmepservice.com/api' // Use HTTPS in production
+    : 'http://localhost:3101/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds for production stability
-})
+  timeout: 10000,
+});
 
 // Simple auth token management
 const getAuthToken = (): string | null => {
