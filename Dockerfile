@@ -1,34 +1,24 @@
-FROM node:20-alpine AS base
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-COPY apps/backend/package*.json ./apps/backend/
-
-# Install dependencies
-RUN npm ci
-
-# Copy source code
-COPY . .
-
-# Build backend
-RUN cd apps/backend && npm run build
-
-# Production stage
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy necessary files
-COPY --from=base /app/package*.json ./
-COPY --from=base /app/apps/backend/package*.json ./apps/backend/
-COPY --from=base /app/apps/backend/dist ./apps/backend/dist
-COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/apps/backend/node_modules ./apps/backend/node_modules
+# Copy root package files
+COPY package*.json ./
 
-WORKDIR /app/apps/backend
+# Copy backend package files
+COPY apps/backend/package*.json ./apps/backend/
 
+# Install all dependencies (including devDependencies for build)
+RUN npm install
+
+# Copy all source code
+COPY . .
+
+# Build the backend
+RUN cd apps/backend && npm run build
+
+# Expose port
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Start the backend
+CMD ["node", "apps/backend/dist/main.js"]
