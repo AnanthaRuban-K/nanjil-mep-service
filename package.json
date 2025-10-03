@@ -8,6 +8,7 @@
     "dev:frontend": "cd apps/frontend && npm run dev",
     "dev:backend": "cd apps/backend && npm run dev",
     "build": "cd apps/frontend && npm run build",
+    "build:backend": "cd apps/backend && npm run build",
     "start": "cd apps/frontend && npm run start",
     "start:frontend": "cd apps/frontend && npm run start",
     "start:backend": "cd apps/backend && npm run start",
