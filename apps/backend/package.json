@@ -2,7 +2,6 @@
   "name": "@nanjil-mep-service/backend",
   "version": "1.0.0",
   "main": "dist/main.js",
-  
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/main.ts",
@@ -14,6 +13,7 @@
   "dependencies": {
     "@clerk/backend": "^2.12.1",
     "@clerk/clerk-sdk-node": "^5.1.6",
+    "@hono/clerk-auth": "^3.0.3",
     "@hono/node-server": "^1.19.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
@@ -30,13 +30,8 @@
     "tsx": "^4.20.5",
     "typescript": "^5.3.0"
   },
-
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
   }
-  
-
-
-
 }

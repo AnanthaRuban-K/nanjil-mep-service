@@ -5,6 +5,7 @@ import { RoleGuard } from '@/components/RoleGuard'
 import AdminHeader from '@/components/AdminHeader'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
+import NotificationHandler from '@/components/NotificationHandler'
 
 // Create a client for admin-specific data
 const adminQueryClient = new QueryClient({
@@ -35,6 +36,7 @@ export default function AdminLayout({
         <div className="min-h-screen bg-gray-50">
           <AdminHeader />
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <NotificationHandler />
             {children}
           </main>
           <Toaster 

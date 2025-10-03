@@ -1,250 +1,129 @@
-// src/controllers/AuthController.ts
 import { Context } from 'hono'
+import { AuthService } from '../services/AuthService'
 import { HTTPException } from 'hono/http-exception'
-import { getAuthenticatedUser } from '../middleware/AuthMiddleware'
-import { db } from '../db'
-import { customers, admins } from '../db/schema'
-import { eq } from 'drizzle-orm'
 
 export class AuthController {
-  
-  // Get current user profile
+  private authService: AuthService
+
+  constructor() {
+    this.authService = new AuthService()
+  }
+
   async me(c: Context) {
     try {
-      const user = getAuthenticatedUser(c)
+      const userId = c.get('userId')
       
+      console.log('Getting user profile:', userId)
+      
+      const user = await this.authService.getUserProfile(userId)
+      
+      if (!user) {
+        throw new HTTPException(404, { message: 'User not found' })
+      }
+
       return c.json({
         success: true,
         user
       })
     } catch (error) {
-      throw new HTTPException(401, { message: 'User not authenticated' })
+      console.error('Get user profile error:', error)
+      if (error instanceof HTTPException) throw error
+      throw new HTTPException(500, { message: 'Failed to get user profile' })
     }
   }
 
-  // Update user profile
   async updateProfile(c: Context) {
     try {
-      const user = getAuthenticatedUser(c)
-      const { name, phone, address } = await c.req.json()
+      const userId = c.get('userId')
+      const updateData = await c.req.json()
 
-      if (!name || name.trim().length < 2) {
-        throw new HTTPException(400, { message: 'Valid name is required' })
-      }
+      console.log('Updating user profile:', userId)
 
-      if (user.role === 'admin') {
-        await db
-          .update(admins)
-          .set({
-            name: name.trim(),
-            phone: phone?.trim(),
-            updatedAt: new Date()
-          })
-          .where(eq(admins.id, parseInt(user.id)))
-      } else {
-        await db
-          .update(customers)
-          .set({
-            name: name.trim(),
-            phone: phone?.trim(),
-            address: address?.trim(),
-            updatedAt: new Date()
-          })
-          .where(eq(customers.id, parseInt(user.id)))
-      }
+      await this.authService.updateUserProfile(userId, updateData)
 
       return c.json({
         success: true,
         message: 'Profile updated successfully'
       })
-
     } catch (error) {
       console.error('Update profile error:', error)
-      if (error instanceof HTTPException) {
-        throw error
-      }
       throw new HTTPException(500, { message: 'Failed to update profile' })
     }
   }
 
-  // Admin: Create admin user
+  async logout(c: Context) {
+    try {
+      const userId = c.get('userId')
+      
+      console.log('Logging out user:', userId)
+      
+      await this.authService.logout(userId)
+
+      return c.json({
+        success: true,
+        message: 'Logged out successfully'
+      })
+    } catch (error) {
+      console.error('Logout error:', error)
+      throw new HTTPException(500, { message: 'Failed to logout' })
+    }
+  }
+
   async createAdmin(c: Context) {
     try {
-      const currentUser = getAuthenticatedUser(c)
+      const adminData = await c.req.json()
       
-      if (currentUser.role !== 'admin') {
-        throw new HTTPException(403, { message: 'Admin access required' })
-      }
+      console.log('Creating new admin')
 
-      const { clerkUserId, name, email, phone, role = 'admin' } = await c.req.json()
-
-      if (!clerkUserId || !name || !email) {
-        throw new HTTPException(400, { message: 'Clerk User ID, name, and email are required' })
-      }
-
-      const existingAdmin = await db
-        .select({ id: admins.id })
-        .from(admins)
-        .where(eq(admins.clerkUserId, clerkUserId))
-        .limit(1)
-
-      if (existingAdmin.length > 0) {
-        throw new HTTPException(400, { message: 'Admin already exists' })
-      }
-
-      const newAdmin = await db
-        .insert(admins)
-        .values({
-          clerkUserId,
-          name: name.trim(),
-          email: email.toLowerCase().trim(),
-          phone: phone?.trim(),
-          role
-        })
-        .returning({
-          id: admins.id,
-          name: admins.name,
-          email: admins.email,
-          role: admins.role
-        })
-
-      console.log(`Admin created: ${email}`)
+      const admin = await this.authService.createAdmin(adminData)
 
       return c.json({
         success: true,
         message: 'Admin created successfully',
-        admin: newAdmin[0]
-      }, 201)
-
+        admin
+      })
     } catch (error) {
       console.error('Create admin error:', error)
-      if (error instanceof HTTPException) {
-        throw error
-      }
       throw new HTTPException(500, { message: 'Failed to create admin' })
     }
   }
 
-  // Admin: List all users
   async listUsers(c: Context) {
     try {
-      const currentUser = getAuthenticatedUser(c)
-      
-      if (currentUser.role !== 'admin') {
-        throw new HTTPException(403, { message: 'Admin access required' })
-      }
+      const userType = c.req.query('type') // 'admin' | 'customer'
+      const limit = Number(c.req.query('limit')) || 50
+      const offset = Number(c.req.query('offset')) || 0
 
-      const page = parseInt(c.req.query('page') || '1')
-      const limit = parseInt(c.req.query('limit') || '20')
-      const offset = (page - 1) * limit
+      console.log('Listing users:', { userType, limit, offset })
 
-      const customersList = await db
-        .select({
-          id: customers.id,
-          clerkUserId: customers.clerkUserId,
-          name: customers.name,
-          phone: customers.phone,
-          isActive: customers.isActive,
-          createdAt: customers.createdAt
-        })
-        .from(customers)
-        .limit(limit)
-        .offset(offset)
-
-      const adminsList = await db
-        .select({
-          id: admins.id,
-          clerkUserId: admins.clerkUserId,
-          name: admins.name,
-          email: admins.email,
-          phone: admins.phone,
-          role: admins.role,
-          isActive: admins.isActive,
-          createdAt: admins.createdAt
-        })
-        .from(admins)
-        .limit(limit)
-        .offset(offset)
+      const users = await this.authService.listUsers({ userType, limit, offset })
 
       return c.json({
         success: true,
-        data: {
-          customers: customersList,
-          admins: adminsList,
-          pagination: {
-            page,
-            limit,
-            hasMore: customersList.length === limit || adminsList.length === limit
-          }
-        }
+        users,
+        count: users.length
       })
-
     } catch (error) {
       console.error('List users error:', error)
-      if (error instanceof HTTPException) {
-        throw error
-      }
       throw new HTTPException(500, { message: 'Failed to list users' })
     }
   }
 
-  // Admin: Deactivate user
   async deactivateUser(c: Context) {
     try {
-      const currentUser = getAuthenticatedUser(c)
+      const targetUserId = c.req.param('userId')
       
-      if (currentUser.role !== 'admin') {
-        throw new HTTPException(403, { message: 'Admin access required' })
-      }
+      console.log('Deactivating user:', targetUserId)
 
-      const userId = c.req.param('userId')
-      const { userType } = await c.req.json()
-
-      if (!userId || !userType) {
-        throw new HTTPException(400, { message: 'User ID and user type are required' })
-      }
-
-      if (userType === 'admin') {
-        await db
-          .update(admins)
-          .set({ isActive: 'false', updatedAt: new Date() })
-          .where(eq(admins.id, parseInt(userId)))
-      } else {
-        await db
-          .update(customers)
-          .set({ isActive: 'false', updatedAt: new Date() })
-          .where(eq(customers.id, parseInt(userId)))
-      }
+      await this.authService.deactivateUser(targetUserId)
 
       return c.json({
         success: true,
         message: 'User deactivated successfully'
       })
-
     } catch (error) {
       console.error('Deactivate user error:', error)
-      if (error instanceof HTTPException) {
-        throw error
-      }
       throw new HTTPException(500, { message: 'Failed to deactivate user' })
-    }
-  }
-
-  // Simple logout
-  async logout(c: Context) {
-    try {
-      const user = getAuthenticatedUser(c)
-      console.log(`User logged out: ${user.email}`)
-      
-      return c.json({
-        success: true,
-        message: 'Logged out successfully'
-      })
-    } catch (error) {
-      return c.json({
-        success: true,
-        message: 'Logged out successfully'
-      })
     }
   }
 }

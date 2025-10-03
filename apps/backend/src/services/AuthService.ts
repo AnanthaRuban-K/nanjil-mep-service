@@ -1,450 +1,173 @@
-import { clerkClient } from '@clerk/clerk-sdk-node'
-import { db } from '../db'
-import { customers, admins } from '../db/schema'
-import { eq } from 'drizzle-orm'
-
-interface User {
-  id: string
-  clerkUserId: string
-  email: string
-  name: string
-  role: 'admin' | 'customer'
-  phone?: string
-  isActive: boolean
-}
+import { db } from '../db/index'
+import { admins, customers } from '../db/schema'
+import { eq, or } from 'drizzle-orm'
 
 export class AuthService {
   
-  // Get user from Clerk ID and sync with local database
-  async getUserFromClerkId(clerkUserId: string): Promise<User | null> {
+  async getUserProfile(clerkUserId: string) {
     try {
-      // Get user details from Clerk
-      const clerkUser = await clerkClient.users.getUser(clerkUserId)
-      
-      if (!clerkUser) {
-        return null
-      }
-
-      // Check if user exists in admins table first
-      const adminResult = await db
-        .select({
-          id: admins.id,
-          clerkUserId: admins.clerkUserId,
-          name: admins.name,
-          email: admins.email,
-          phone: admins.phone,
-          role: admins.role,
-          isActive: admins.isActive
-        })
+      // Check if user is admin
+      const admin = await db.select()
         .from(admins)
         .where(eq(admins.clerkUserId, clerkUserId))
-        .limit(1)
-
-      if (adminResult.length > 0) {
-        const admin = adminResult[0]
+      
+      if (admin.length > 0) {
         return {
-          id: admin.id.toString(),
-          clerkUserId: admin.clerkUserId!,
-          email: admin.email,
-          name: admin.name,
-          phone: admin.phone || undefined,
-          role: 'admin',
-          isActive: admin.isActive === 'true'
+          ...admin[0],
+          userType: 'admin'
         }
       }
 
-      // Check customers table
-      const customerResult = await db
-        .select({
-          id: customers.id,
-          clerkUserId: customers.clerkUserId,
-          name: customers.name,
-          phone: customers.phone,
-          isActive: customers.isActive
-        })
+      // Check if user is customer
+      const customer = await db.select()
         .from(customers)
         .where(eq(customers.clerkUserId, clerkUserId))
-        .limit(1)
-
-      if (customerResult.length > 0) {
-        const customer = customerResult[0]
+      
+      if (customer.length > 0) {
         return {
-          id: customer.id.toString(),
-          clerkUserId: customer.clerkUserId!,
-          email: clerkUser.emailAddresses[0]?.emailAddress || '',
-          name: customer.name,
-          phone: customer.phone || undefined,
-          role: 'customer',
-          isActive: customer.isActive === 'true'
+          ...customer[0],
+          userType: 'customer'
         }
       }
 
-      // User doesn't exist in local database, create as customer
-      return await this.createCustomerFromClerk(clerkUser)
-
+      return null
     } catch (error) {
-      console.error('Error getting user from Clerk ID:', error)
+      console.error('getUserProfile error:', error)
       return null
     }
   }
 
-  // Create customer record from Clerk user
-  private async createCustomerFromClerk(clerkUser: any): Promise<User> {
+  async updateUserProfile(clerkUserId: string, updateData: any) {
     try {
-      const email = clerkUser.emailAddresses[0]?.emailAddress || ''
-      const phone = clerkUser.phoneNumbers[0]?.phoneNumber || ''
-      const name = clerkUser.firstName || clerkUser.username || email.split('@')[0]
-
-      const customerResult = await db
-        .insert(customers)
-        .values({
-          clerkUserId: clerkUser.id,
-          name,
-          phone,
-          language: 'ta'
-        })
-        .returning({
-          id: customers.id,
-          clerkUserId: customers.clerkUserId,
-          name: customers.name,
-          phone: customers.phone
-        })
-
-      const newCustomer = customerResult[0]
+      // Try to update admin first
+      const admin = await db.select()
+        .from(admins)
+        .where(eq(admins.clerkUserId, clerkUserId))
       
-      console.log(`Created new customer from Clerk: ${email}`)
-
-      return {
-        id: newCustomer.id.toString(),
-        clerkUserId: newCustomer.clerkUserId!,
-        email,
-        name: newCustomer.name,
-        phone: newCustomer.phone || undefined,
-        role: 'customer',
-        isActive: true
+      if (admin.length > 0) {
+        await db.update(admins)
+          .set({ ...updateData, updatedAt: new Date() })
+          .where(eq(admins.clerkUserId, clerkUserId))
+        return true
       }
 
+      // Try to update customer
+      await db.update(customers)
+        .set({ ...updateData, updatedAt: new Date() })
+        .where(eq(customers.clerkUserId, clerkUserId))
+      
+      return true
     } catch (error) {
-      console.error('Error creating customer from Clerk:', error)
-      throw new Error('Failed to create user account')
+      console.error('updateUserProfile error:', error)
+      throw new Error('Failed to update profile')
     }
   }
 
-  // Create admin user (manual process)
-  async createAdmin(data: {
+  async logout(clerkUserId: string) {
+    try {
+      // Clear any cached tokens or sessions if needed
+      // For now, just log the logout
+      console.log('User logged out:', clerkUserId)
+      return true
+    } catch (error) {
+      console.error('logout error:', error)
+      throw new Error('Failed to logout')
+    }
+  }
+
+  async isUserAdmin(clerkUserId: string): Promise<boolean> {
+    try {
+      const result = await db.select()
+        .from(admins)
+        .where(eq(admins.clerkUserId, clerkUserId))
+      
+      return result.length > 0 && result[0].isActive === 'true'
+    } catch (error) {
+      console.error('isUserAdmin error:', error)
+      return false
+    }
+  }
+
+  async createAdmin(adminData: {
     clerkUserId: string
     name: string
     email: string
     phone?: string
     role?: string
-  }): Promise<User> {
+  }) {
     try {
-      // Verify Clerk user exists
-      const clerkUser = await clerkClient.users.getUser(data.clerkUserId)
-      if (!clerkUser) {
-        throw new Error('Clerk user not found')
-      }
-
-      // Check if admin already exists
-      const existingAdmin = await db
-        .select({ id: admins.id })
-        .from(admins)
-        .where(eq(admins.clerkUserId, data.clerkUserId))
-        .limit(1)
-
-      if (existingAdmin.length > 0) {
-        throw new Error('Admin already exists')
-      }
-
-      const adminResult = await db
-        .insert(admins)
+      const newAdmin = await db.insert(admins)
         .values({
-          clerkUserId: data.clerkUserId,
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          role: data.role || 'admin'
+          clerkUserId: adminData.clerkUserId,
+          name: adminData.name,
+          email: adminData.email,
+          phone: adminData.phone || null,
+          role: adminData.role || 'admin',
+          isActive: 'true'
         })
-        .returning({
-          id: admins.id,
-          clerkUserId: admins.clerkUserId,
-          name: admins.name,
-          email: admins.email,
-          phone: admins.phone,
-          role: admins.role
-        })
-
-      const newAdmin = adminResult[0]
+        .returning()
       
-      console.log(`Created new admin: ${data.email}`)
-
-      return {
-        id: newAdmin.id.toString(),
-        clerkUserId: newAdmin.clerkUserId!,
-        email: newAdmin.email,
-        name: newAdmin.name,
-        phone: newAdmin.phone || undefined,
-        role: 'admin',
-        isActive: true
-      }
-
+      return newAdmin[0]
     } catch (error) {
-      console.error('Error creating admin:', error)
-      throw new Error(error instanceof Error ? error.message : 'Failed to create admin')
+      console.error('createAdmin error:', error)
+      throw new Error('Failed to create admin')
     }
   }
 
-  // Update user profile
-  async updateProfile(userId: string, updates: {
-    name?: string
-    phone?: string
-    address?: string
-  }): Promise<boolean> {
+  async listUsers(params: {
+    userType?: string
+    limit: number
+    offset: number
+  }) {
     try {
-      // Determine if user is admin or customer
-      const adminResult = await db
-        .select({ id: admins.id })
-        .from(admins)
-        .where(eq(admins.id, parseInt(userId)))
-        .limit(1)
-
-      if (adminResult.length > 0) {
-        // Update admin
-        await db
-          .update(admins)
-          .set({
-            name: updates.name,
-            phone: updates.phone,
-            updatedAt: new Date()
-          })
-          .where(eq(admins.id, parseInt(userId)))
-      } else {
-        // Update customer
-        await db
-          .update(customers)
-          .set({
-            name: updates.name,
-            phone: updates.phone,
-            address: updates.address,
-            updatedAt: new Date()
-          })
-          .where(eq(customers.id, parseInt(userId)))
+      if (params.userType === 'admin') {
+        return await db.select()
+          .from(admins)
+          .limit(params.limit)
+          .offset(params.offset)
+      } else if (params.userType === 'customer') {
+        return await db.select()
+          .from(customers)
+          .limit(params.limit)
+          .offset(params.offset)
       }
 
-      return true
+      // Return both if no type specified
+      const [adminsList, customersList] = await Promise.all([
+        db.select().from(admins).limit(params.limit).offset(params.offset),
+        db.select().from(customers).limit(params.limit).offset(params.offset)
+      ])
 
+      return [...adminsList, ...customersList]
     } catch (error) {
-      console.error('Error updating profile:', error)
-      return false
+      console.error('listUsers error:', error)
+      return []
     }
   }
 
-  // Deactivate user account
-  async deactivateUser(userId: string): Promise<boolean> {
+  async deactivateUser(clerkUserId: string) {
     try {
-      // Check if user is admin first
-      const adminCheck = await db
-        .select({ id: admins.id })
-        .from(admins)
-        .where(eq(admins.id, parseInt(userId)))
-        .limit(1)
-
-      if (adminCheck.length > 0) {
-        // Update admin
-        await db
-          .update(admins)
-          .set({ isActive: 'false', updatedAt: new Date() })
-          .where(eq(admins.id, parseInt(userId)))
-      } else {
-        // Update customer
-        await db
-          .update(customers)
-          .set({ isActive: 'false', updatedAt: new Date() })
-          .where(eq(customers.id, parseInt(userId)))
-      }
-
-      return true
-
-    } catch (error) {
-      console.error('Error deactivating user:', error)
-      return false
-    }
-  }
-
-  // Get user role for authorization
-  async getUserRole(clerkUserId: string): Promise<'admin' | 'customer' | null> {
-    try {
-      // Check admin first
-      const adminResult = await db
-        .select({ role: admins.role })
+      // Try admin first
+      const admin = await db.select()
         .from(admins)
         .where(eq(admins.clerkUserId, clerkUserId))
-        .limit(1)
-
-      if (adminResult.length > 0) {
-        return 'admin'
-      }
-
-      // Check customer
-      const customerResult = await db
-        .select({ id: customers.id })
-        .from(customers)
-        .where(eq(customers.clerkUserId, clerkUserId))
-        .limit(1)
-
-      if (customerResult.length > 0) {
-        return 'customer'
-      }
-
-      return null
-
-    } catch (error) {
-      console.error('Error getting user role:', error)
-      return null
-    }
-  }
-
-  // Validate user is active
-  async isUserActive(clerkUserId: string): Promise<boolean> {
-    try {
-      // Check admin
-      const adminResult = await db
-        .select({ isActive: admins.isActive })
-        .from(admins)
-        .where(eq(admins.clerkUserId, clerkUserId))
-        .limit(1)
-
-      if (adminResult.length > 0) {
-        return adminResult[0].isActive === 'true'
-      }
-
-      // Check customer
-      const customerResult = await db
-        .select({ isActive: customers.isActive })
-        .from(customers)
-        .where(eq(customers.clerkUserId, clerkUserId))
-        .limit(1)
-
-      if (customerResult.length > 0) {
-        return customerResult[0].isActive === 'true'
-      }
-
-      return false
-
-    } catch (error) {
-      console.error('Error checking user active status:', error)
-      return false
-    }
-  }
-}
-
-// Updated Auth Middleware for Clerk
-import { Context, Next } from 'hono'
-import { HTTPException } from 'hono/http-exception'
-
-export async function clerkAuthMiddleware(c: Context, next: Next) {
-  try {
-    const authHeader = c.req.header('Authorization')
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new HTTPException(401, { message: 'Authorization header required' })
-    }
-    
-    const token = authHeader.substring(7)
-
-    // Development mode - mock tokens
-    if (process.env.NODE_ENV === 'development') {
-      if (token === 'mock-jwt-token') {
-        c.set('user', {
-          id: '1',
-          clerkUserId: 'user_mock123',
-          email: 'customer@test.com',
-          name: 'Test Customer',
-          role: 'customer',
-          isActive: true
-        })
-        await next()
-        return
-      }
       
-      if (token === 'mock-admin-token') {
-        c.set('user', {
-          id: 'admin-1',
-          clerkUserId: 'user_admin123',
-          email: 'admin@nanjilmep.com',
-          name: 'Test Admin',
-          role: 'admin',
-          isActive: true
-        })
-        await next()
-        return
+      if (admin.length > 0) {
+        await db.update(admins)
+          .set({ isActive: 'false', updatedAt: new Date() })
+          .where(eq(admins.clerkUserId, clerkUserId))
+        return true
       }
-    }
 
-    // Production - verify Clerk JWT
-    try {
-      const clerkUser = await clerkClient.verifyToken(token)
+      // Try customer
+      await db.update(customers)
+        .set({ isActive: 'false', updatedAt: new Date() })
+        .where(eq(customers.clerkUserId, clerkUserId))
       
-      if (!clerkUser || !clerkUser.sub) {
-        throw new HTTPException(401, { message: 'Invalid token' })
-      }
-
-      const authService = new AuthService()
-      const user = await authService.getUserFromClerkId(clerkUser.sub)
-
-      if (!user) {
-        throw new HTTPException(401, { message: 'User not found' })
-      }
-
-      if (!user.isActive) {
-        throw new HTTPException(401, { message: 'Account is deactivated' })
-      }
-
-      c.set('user', user)
-      await next()
-
-    } catch (clerkError) {
-      console.error('Clerk token verification failed:', clerkError)
-      throw new HTTPException(401, { message: 'Token verification failed' })
+      return true
+    } catch (error) {
+      console.error('deactivateUser error:', error)
+      throw new Error('Failed to deactivate user')
     }
-    
-  } catch (error) {
-    console.error('Auth middleware error:', error)
-    if (error instanceof HTTPException) {
-      throw error
-    }
-    throw new HTTPException(401, { message: 'Authentication failed' })
   }
-}
-
-// Helper functions for role-based access
-export function requireAdmin(c: Context, next: Next) {
-  const user = c.get('user') as User
-  
-  if (!user || user.role !== 'admin') {
-    throw new HTTPException(403, { message: 'Admin access required' })
-  }
-  
-  return next()
-}
-
-export function requireCustomer(c: Context, next: Next) {
-  const user = c.get('user') as User
-  
-  if (!user || user.role !== 'customer') {
-    throw new HTTPException(403, { message: 'Customer access required' })
-  }
-  
-  return next()
-}
-
-// Get authenticated user helper
-export function getAuthenticatedUser(c: Context): User {
-  const user = c.get('user') as User
-  
-  if (!user) {
-    throw new HTTPException(401, { message: 'User not authenticated' })
-  }
-  
-  return user
 }

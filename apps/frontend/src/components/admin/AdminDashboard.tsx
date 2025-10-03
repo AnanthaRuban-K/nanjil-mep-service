@@ -228,7 +228,8 @@ export function AdminDashboard() {
   const hasError = statsError || bookingsError
 
   // Use stats from API if available, otherwise calculate from bookings
-  const stats = statsData?.stats || calculateStats()
+  // ✅ CORRECT - statsData is already the DashboardStats type
+const stats = statsData || calculateStats()
   const bookings: Booking[] = bookingsResponse?.bookings || []
 
   if (isLoading) {

@@ -1,234 +1,194 @@
-import * as admin from 'firebase-admin'
-import { db } from "../db/index"
-import { adminTokens, notifications } from "../db/schema"
-import { eq } from "drizzle-orm"
-
-export interface NotificationPayload {
-  type: 'new_booking' | 'booking_updated' | 'emergency_booking' | 'customer_message'
-  title: string
-  message: string
-  bookingId?: number
-  bookingNumber?: string
-  customerId?: number
-  priority: 'normal' | 'urgent' | 'emergency'
-  data?: any
-}
+import { messaging } from '../config/firebase'
+import { db } from '../db'
+import { adminTokens } from '../db/schema'
+import { eq, and } from 'drizzle-orm'
 
 export class NotificationService {
-  constructor() {
-    this.initializeFirebase()
-  }
-
-  private initializeFirebase() {
-    // Only initialize if not already initialized
-    if (!admin.apps.length) {
-      try {
-        admin.initializeApp({
-          credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-          }),
-        })
-        console.log('Firebase Admin initialized successfully')
-      } catch (error) {
-        console.error('Failed to initialize Firebase Admin:', error)
-      }
-    }
-  }
-
-  // Add admin FCM token
-  async addAdminToken(token: string) {
+  
+ async registerToken(userId: string, token: string, deviceType: string = 'web') {
     try {
-      // Check if token already exists
+      console.log('Registering token for userId:', userId)
+      
+      // Check if token exists
       const existing = await db.select()
         .from(adminTokens)
         .where(eq(adminTokens.token, token))
-        .limit(1)
-
-      if (existing.length === 0) {
+      
+      if (existing.length > 0) {
+        console.log('Token exists, updating...')
+        await db.update(adminTokens)
+          .set({ 
+            isActive: true, 
+            lastUsed: new Date(),
+            updatedAt: new Date()
+          })
+          .where(eq(adminTokens.token, token))
+      } else {
+        console.log('Inserting new token...')
+        // Don't use adminId if you're storing Clerk user IDs as strings
+        // Either create a separate customer_tokens table or modify schema
         await db.insert(adminTokens).values({
           token,
-          isActive: true,
-          createdAt: new Date(),
+          
+          deviceType,
+          isActive: true
         })
-        console.log('Admin token saved to database')
       }
+      
+      console.log('Token registered successfully')
     } catch (error) {
-      console.error('Error saving token to database:', error)
+      console.error('registerToken error:', error)
+      throw error
     }
   }
 
-  // Send notification to all admin tokens
-  async sendToAllAdmins(notification: NotificationPayload) {
+  // Send notification to specific user
+  async sendToUser(userId: string, notification: {
+    title: string
+    body: string
+    data?: Record<string, string>
+  }) {
     try {
-      const tokens = await this.getActiveAdminTokens()
+      const tokens = await db.select()
+        .from(adminTokens)
+        .where(and(
+          eq(adminTokens.adminId, Number(userId)),
+          eq(adminTokens.isActive, true)
+        ))
       
       if (tokens.length === 0) {
-        console.log('No admin tokens found')
-        // Still save notification to database for history
-        await this.saveNotificationToDatabase(notification)
-        return
+        console.log('No FCM tokens found for user:', userId)
+        return { successCount: 0, failureCount: 0 }
       }
 
-      const message = {
+      // Send to each token individually
+      const messages = tokens.map(t => ({
         notification: {
           title: notification.title,
-          body: notification.message,
+          body: notification.body
         },
-        data: {
-          type: notification.type,
-          priority: notification.priority,
-          bookingId: notification.bookingId?.toString() || '',
-          bookingNumber: notification.bookingNumber || '',
-          customerId: notification.customerId?.toString() || '',
-          click_action: 'FLUTTER_NOTIFICATION_CLICK', // For mobile apps
-        },
-      }
+        data: notification.data || {},
+        token: t.token
+      }))
 
-      // Send to each token individually (Firebase Admin SDK way)
-      const promises = tokens.map(async (token) => {
-        try {
-          const response = await admin.messaging().send({
-            ...message,
-            token: token,
-          })
-          console.log('Notification sent successfully to token:', token.substring(0, 20) + '...')
-          return { success: true, token }
-        } catch (error) {
-          console.error('Failed to send to token:', token.substring(0, 20) + '...', error)
-          // Mark token as inactive if it's invalid
-          await this.markTokenInactive(token)
-          return { success: false, token, error }
-        }
-      })
-
-      const results = await Promise.allSettled(promises)
-      const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length
+      // Use sendEach instead of sendMulticast
+      const response = await messaging.sendEach(messages)
       
-      console.log(`Push notifications: ${successCount}/${tokens.length} successful`)
-
-      // Save notification to database
-      await this.saveNotificationToDatabase(notification)
-
-      return { successCount, totalCount: tokens.length }
+      console.log('Notification sent:', response.successCount, 'success,', response.failureCount, 'failed')
+      
+      // Clean up invalid tokens
+      if (response.failureCount > 0) {
+        await this.cleanupInvalidTokens(response.responses, tokens)
+      }
+      
+      return response
     } catch (error) {
-      console.error('Error sending push notifications:', error)
-      // Don't throw error - still save to database
-      await this.saveNotificationToDatabase(notification)
-      return { successCount: 0, totalCount: 0 }
+      console.error('Error sending notification:', error)
+      throw error
     }
   }
 
-  private async getActiveAdminTokens(): Promise<string[]> {
+  // Send to all admins
+  async sendToAllAdmins(notification: {
+    title: string
+    body: string
+    data?: Record<string, string>
+  }) {
     try {
-      const result = await db.select({ token: adminTokens.token })
+      const tokens = await db.select()
         .from(adminTokens)
         .where(eq(adminTokens.isActive, true))
       
-      return result.map(r => r.token)
+      if (tokens.length === 0) {
+        console.log('No admin tokens found')
+        return { successCount: 0, failureCount: 0 }
+      }
+
+      const messages = tokens.map(t => ({
+        notification: {
+          title: notification.title,
+          body: notification.body
+        },
+        data: notification.data || {},
+        token: t.token
+      }))
+
+      const response = await messaging.sendEach(messages)
+      
+      console.log('Admin notification sent:', response.successCount, 'success,', response.failureCount, 'failed')
+      
+      if (response.failureCount > 0) {
+        await this.cleanupInvalidTokens(response.responses, tokens)
+      }
+      
+      return response
     } catch (error) {
-      console.error('Error getting admin tokens:', error)
-      return []
+      console.error('Error sending admin notification:', error)
+      throw error
     }
   }
 
-  private async markTokenInactive(token: string) {
-    try {
-      await db.update(adminTokens)
-        .set({ isActive: false })
-        .where(eq(adminTokens.token, token))
-    } catch (error) {
-      console.error('Error marking token inactive:', error)
+  // Clean up invalid tokens
+  private async cleanupInvalidTokens(responses: any[], tokens: any[]) {
+    for (let i = 0; i < responses.length; i++) {
+      const response = responses[i]
+      if (!response.success) {
+        const errorCode = response.error?.code
+        
+        // Remove invalid tokens
+        if (errorCode === 'messaging/invalid-registration-token' || 
+            errorCode === 'messaging/registration-token-not-registered') {
+          await db.update(adminTokens)
+            .set({ isActive: false })
+            .where(eq(adminTokens.token, tokens[i].token))
+          
+          console.log('Deactivated invalid token:', tokens[i].token)
+        }
+      }
     }
   }
 
-  private async saveNotificationToDatabase(notification: NotificationPayload) {
-    try {
-      await db.insert(notifications).values({
-        type: notification.type,
-        title: notification.title,
-        message: notification.message,
-        bookingId: notification.bookingId || null,
-        priority: notification.priority,
-        isRead: 'false',
-        createdAt: new Date(),
-      })
-    } catch (error) {
-      console.error('Error saving notification to database:', error)
-    }
-  }
-
-  // Simplified notification methods
-  async notifyNewBooking(booking: any, customer: any) {
-    const urgencyEmoji = this.getUrgencyEmoji(booking.priority)
-    const serviceEmoji = booking.serviceType === 'electrical' ? '⚡' : '🔧'
-    
-    return this.sendToAllAdmins({
-      type: 'new_booking',
-      title: `${urgencyEmoji} New Service Booking`,
-      message: `${serviceEmoji} ${customer.name} booked ${booking.serviceType} service - ${booking.priority.toUpperCase()}`,
-      bookingId: booking.id,
-      bookingNumber: booking.bookingNumber,
-      customerId: customer.id,
-      priority: booking.priority,
+  // Booking notifications
+  async notifyNewBooking(bookingId: number, bookingData: any) {
+    return await this.sendToAllAdmins({
+      title: 'புதிய பதிவு • New Booking',
+      body: `${bookingData.contactInfo.name} - ${bookingData.serviceType}`,
       data: {
-        customerName: customer.name,
-        customerPhone: customer.phone,
-        serviceType: booking.serviceType,
-        address: booking.address,
+        type: 'new_booking',
+        bookingId: bookingId.toString(),
+        priority: bookingData.priority
       }
     })
   }
 
-  async notifyEmergencyBooking(booking: any, customer: any) {
-    return this.sendToAllAdmins({
-      type: 'emergency_booking',
-      title: '🚨 EMERGENCY SERVICE REQUEST',
-      message: `⚡ URGENT: ${customer.name} needs immediate ${booking.serviceType} service!`,
-      bookingId: booking.id,
-      bookingNumber: booking.bookingNumber,
-      customerId: customer.id,
-      priority: 'emergency',
+  async notifyBookingStatusUpdate(customerId: string, bookingNumber: string, status: string) {
+    const statusMessages: Record<string, string> = {
+      confirmed: 'உங்கள் பதிவு உறுதிப்படுத்தப்பட்டது • Booking confirmed',
+      in_progress: 'பணியாளர் வழியில் உள்ளார் • Technician on the way',
+      completed: 'சேவை முடிவடைந்தது • Service completed',
+      cancelled: 'பதிவு ரத்து செய்யப்பட்டது • Booking cancelled'
+    }
+
+    return await this.sendToUser(customerId, {
+      title: `பதிவு ${bookingNumber}`,
+      body: statusMessages[status] || 'Status updated',
       data: {
-        customerName: customer.name,
-        customerPhone: customer.phone,
-        serviceType: booking.serviceType,
-        address: booking.address,
-        problem: booking.problemDescription,
+        type: 'booking_update',
+        bookingNumber,
+        status
       }
     })
   }
 
-  private getUrgencyEmoji(priority: string): string {
-    switch (priority) {
-      case 'emergency': return '🚨'
-      case 'urgent': return '⚠️'
-      default: return '📋'
-    }
-  }
-
-  // Test notification method
-  async testNotification() {
-    return this.sendToAllAdmins({
-      type: 'new_booking',
-      title: '🧪 Test Notification',
-      message: 'This is a test notification for admin dashboard',
-      priority: 'normal'
+  async notifyEmergencyBooking(bookingId: number, bookingData: any) {
+    return await this.sendToAllAdmins({
+      title: 'அவசர பதிவு • EMERGENCY BOOKING',
+      body: `${bookingData.contactInfo.name} - ${bookingData.description.substring(0, 50)}`,
+      data: {
+        type: 'emergency_booking',
+        bookingId: bookingId.toString(),
+        priority: 'emergency'
+      }
     })
   }
 }
-
-// Simple usage example:
-/*
-const notificationService = new NotificationService()
-
-// Register admin token
-await notificationService.addAdminToken('your-fcm-token-here')
-
-// Send notification
-await notificationService.notifyNewBooking(booking, customer)
-
-// Test notification
-await notificationService.testNotification()
-*/
