@@ -2,14 +2,17 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy root package files
+# Copy all package files
 COPY package*.json ./
-
-# Copy backend package files
 COPY apps/backend/package*.json ./apps/backend/
+COPY apps/frontend/package*.json ./apps/frontend/
 
-# Install all dependencies (including devDependencies for build)
+# Install root dependencies
 RUN npm install
+
+# Install workspace dependencies
+RUN cd apps/backend && npm install
+RUN cd apps/frontend && npm install
 
 # Copy all source code
 COPY . .
