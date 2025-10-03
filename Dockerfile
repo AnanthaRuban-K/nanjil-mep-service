@@ -21,7 +21,7 @@ COPY . .
 RUN cd apps/backend && npm run build
 
 # Expose port
-EXPOSE 3000
+EXPOSE 3100
 
 # Start the backend
 CMD ["node", "apps/backend/dist/main.js"]
