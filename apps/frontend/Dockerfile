@@ -26,7 +26,7 @@ COPY apps/frontend/.env.production ./apps/frontend/.env.production
 ENV NODE_ENV=production
 RUN nx build frontend
 
-# Production image, copy all the files and run next
+# Production image
 FROM base AS runner
 WORKDIR /app
 
@@ -39,7 +39,7 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/dist/apps/frontend/standalone ./
 COPY --from=builder /app/dist/apps/frontend/static ./apps/frontend/.next/static
 
-# Copy env file (so runtime can access too)
+# Copy env file
 COPY apps/frontend/.env.production ./.env.production
 
 USER nextjs
@@ -49,5 +49,4 @@ EXPOSE 3100
 ENV PORT=3100
 ENV HOSTNAME="0.0.0.0"
 
-# Start the application
 CMD ["node", "apps/frontend/server.js"]
