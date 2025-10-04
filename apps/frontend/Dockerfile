@@ -5,28 +5,31 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files
+# Copy root package files and workspace configuration
 COPY package.json package-lock.json* ./
-COPY apps/frontend/package.json ./apps/frontend/
+COPY nx.json ./
+
+# Install ALL dependencies (we need them for the build)
 RUN npm ci
 
-# Rebuild the source code only when needed
+# Build stage
 FROM base AS builder
 WORKDIR /app
+
+# Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
+
+# Copy the entire monorepo (needed for Nx)
 COPY . .
 
-# Install Nx CLI
+# Install Nx CLI globally
 RUN npm install -g nx
 
-# Copy env file for production build
-COPY apps/frontend/.env.production ./apps/frontend/.env.production
-
-# Build the frontend with production env
+# Build the frontend using Nx
 ENV NODE_ENV=production
-RUN nx build frontend
+RUN nx build frontend --prod
 
-# Production image
+# Production stage
 FROM base AS runner
 WORKDIR /app
 
@@ -35,12 +38,9 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy built application
-COPY --from=builder /app/dist/apps/frontend/standalone ./
-COPY --from=builder /app/dist/apps/frontend/static ./apps/frontend/.next/static
-
-# Copy env file
-COPY apps/frontend/.env.production ./.env.production
+# Copy built application from the Nx output directory
+COPY --from=builder --chown=nextjs:nodejs /app/dist/apps/frontend/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/dist/apps/frontend/static ./apps/frontend/.next/static
 
 USER nextjs
 
@@ -49,4 +49,5 @@ EXPOSE 3100
 ENV PORT=3100
 ENV HOSTNAME="0.0.0.0"
 
+# Start the application
 CMD ["node", "apps/frontend/server.js"]
