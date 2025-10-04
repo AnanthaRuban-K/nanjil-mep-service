@@ -6,10 +6,10 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Copy root package files
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 
 # Install all dependencies
-RUN npm ci
+RUN npm install
 
 # Build stage
 FROM base AS builder
@@ -22,7 +22,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build the backend using Nx
-ENV NODE_ENV=production
 RUN npx nx build backend
 
 # Production stage
