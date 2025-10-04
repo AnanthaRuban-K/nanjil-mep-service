@@ -1,27 +1,24 @@
 FROM node:20-alpine AS base
 
-# Install dependencies
+# Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy backend's package files from the correct path
-COPY apps/backend/package.json apps/backend/package-lock.json* ./
-
-# Install dependencies
-RUN npm install
+# Install backend dependencies
+COPY apps/backend/package*.json ./
+RUN npm ci --only=production
 
 # Build stage
 FROM base AS builder
 WORKDIR /app
 
-# Copy node_modules
-COPY --from=deps /app/node_modules ./node_modules
-
-# Copy backend files
+# Copy source code
 COPY apps/backend ./
+COPY package*.json ./
+RUN npm ci
 
-# Build
+# Build the backend
 RUN npm run build
 
 # Production stage
@@ -30,12 +27,13 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Create app user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 hono
 
-# Copy built files
+# Copy built application
 COPY --from=builder --chown=hono:nodejs /app/dist ./dist
-COPY --from=builder --chown=hono:nodejs /app/node_modules ./node_modules
+COPY --from=deps --chown=hono:nodejs /app/node_modules ./node_modules
 
 USER hono
 
