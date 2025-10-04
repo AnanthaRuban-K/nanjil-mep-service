@@ -5,11 +5,10 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy root package files and workspace configuration
+# Copy root package files
 COPY package.json package-lock.json* ./
-COPY nx.json ./
 
-# Install ALL dependencies (we need them for the build)
+# Install all dependencies (needed for build)
 RUN npm ci
 
 # Build stage
@@ -19,15 +18,12 @@ WORKDIR /app
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy the entire monorepo (needed for Nx)
+# Copy the entire monorepo (needed for Nx builds)
 COPY . .
-
-# Install Nx CLI globally
-RUN npm install -g nx
 
 # Build the frontend using Nx
 ENV NODE_ENV=production
-RUN nx build frontend --prod
+RUN npx nx build frontend --prod
 
 # Production stage
 FROM base AS runner

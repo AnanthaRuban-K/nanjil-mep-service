@@ -7,7 +7,6 @@ WORKDIR /app
 
 # Copy root package files
 COPY package.json package-lock.json* ./
-COPY nx.json ./
 
 # Install all dependencies
 RUN npm ci
@@ -22,12 +21,9 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy entire monorepo
 COPY . .
 
-# Install Nx CLI
-RUN npm install -g nx
-
-# Build the backend
+# Build the backend using Nx
 ENV NODE_ENV=production
-RUN nx build backend
+RUN npx nx build backend
 
 # Production stage
 FROM base AS runner
