@@ -64,7 +64,7 @@ app.use('*', clerkMiddleware({
 }))
 
 // Rate Limiting
-app.use('/api/*', rateLimiter)
+//app.use('/api/*', rateLimiter)
 
 // Health Check Endpoint
 app.get('/health', (c) => {
