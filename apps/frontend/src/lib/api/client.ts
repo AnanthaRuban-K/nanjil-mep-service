@@ -95,10 +95,10 @@ api.interceptors.response.use(
       // If still no token and on admin page, redirect to login
       if (typeof window !== 'undefined') {
         const path = window.location.pathname
-        if (path.startsWith('/admin') && path !== '/admin/login') {
-          console.error('Unauthorized - redirecting to login')
-          window.location.href = '/admin/login'
-        }
+       // if (path.startsWith('/admin') && path !== '/admin/login') {
+         // console.error('Unauthorized - redirecting to login')
+         // window.location.href = '/admin/login'
+       // }
       }
     }
 
