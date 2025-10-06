@@ -16,16 +16,30 @@ export const api = axios.create({
   withCredentials: false, // Changed - CORS doesn't need credentials for JWT
 })
 
-// Get Clerk session token - CORRECTED VERSION
 const getAuthToken = async (): Promise<string | null> => {
   if (typeof window === 'undefined') return null
   
   try {
-    // Correct way to access Clerk
-    const clerk = (window as any).Clerk
-    if (!clerk?.session) return null
+    // Wait for Clerk to be ready
+    const waitForClerk = () => new Promise<any>((resolve) => {
+      const checkClerk = () => {
+        const clerk = (window as any).Clerk
+        if (clerk?.loaded) {
+          resolve(clerk)
+        } else {
+          setTimeout(checkClerk, 100)
+        }
+      }
+      checkClerk()
+    })
 
-    // Get token directly from current session
+    const clerk = await waitForClerk()
+    
+    if (!clerk?.session) {
+      console.warn('No active Clerk session')
+      return null
+    }
+
     const token = await clerk.session.getToken()
     return token
   } catch (error) {
