@@ -1,7 +1,7 @@
 // File: app/admin/layout.tsx - Production Admin Layout
 'use client'
 import React from 'react'
-
+import { RoleGuard } from '@/components/RoleGuard'
 import AdminHeader from '@/components/AdminHeader'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
@@ -28,7 +28,10 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-   
+    <RoleGuard 
+      allowedRoles={['admin']}
+      fallback={<AdminAccessDenied />}
+    >
       <QueryClientProvider client={adminQueryClient}>
         <div className="min-h-screen bg-gray-50">
           <AdminHeader />
@@ -48,7 +51,7 @@ export default function AdminLayout({
           />
         </div>
       </QueryClientProvider>
-  
+    </RoleGuard>
   )
 }
 
