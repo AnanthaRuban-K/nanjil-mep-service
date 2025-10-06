@@ -5,68 +5,91 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
     ? 'https://api.nanjilmepservice.com'
     : 'http://localhost:3101')
 
-console.log('API Base URL:', API_BASE_URL)
+console.log('🔧 API Base URL:', API_BASE_URL)
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000,
-  withCredentials: false,
+  timeout: 10000,
+  withCredentials: true, // Important for cookies
 })
 
-const getAuthToken = (): string | null => {
+// Get Clerk session token
+const getAuthToken = async (): Promise<string | null> => {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem('adminToken') || localStorage.getItem('token')
+  
+  try {
+    // Get Clerk's window object
+    const clerk = (window as any).Clerk
+    if (!clerk) return null
+
+    // Get session token from Clerk
+    const session = await clerk.session
+    if (!session) return null
+
+    const token = await session.getToken()
+    return token
+  } catch (error) {
+    console.error('Failed to get auth token:', error)
+    return null
+  }
 }
 
+// Request interceptor
 api.interceptors.request.use(
-  (config) => {
-    const token = getAuthToken()
+  async (config) => {
+    const token = await getAuthToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log('Token attached to request')
-    } else {
-      console.warn('No token available')
     }
     return config
   },
   (error) => Promise.reject(error)
 )
 
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const originalRequest = error.config
+
+    // Handle timeout
     if (error.code === 'ECONNABORTED') {
-      console.error('Request timeout')
-      return Promise.reject(new Error('Server not responding. Please try again.'))
+      console.error('⏱️ Request timeout')
+      throw new Error('Server not responding. Please try again.')
     }
     
+    // Handle network errors
     if (!error.response) {
-      console.error('Network error')
-      return Promise.reject(new Error('Cannot connect to server.'))
+      console.error('🌐 Network error')
+      throw new Error('Cannot connect to server.')
     }
 
-    if (error.response?.status === 401) {
-      console.error('401 Unauthorized - Token invalid or expired')
+    // Handle 401 - try to refresh token once
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
       
-      // Clear tokens
-      localStorage.removeItem('adminToken')
-      localStorage.removeItem('token')
+      const newToken = await getAuthToken()
+      if (newToken) {
+        originalRequest.headers.Authorization = `Bearer ${newToken}`
+        return api(originalRequest)
+      }
       
-      // Redirect to login
-      if (typeof window !== 'undefined') {
+      // Redirect to login if still unauthorized
+      if (typeof window !== 'undefined' && window.location.pathname.includes('/admin')) {
         window.location.href = '/admin/login'
       }
     }
 
+    // Handle 429 - rate limit
     if (error.response?.status === 429) {
-      console.error('Rate limit exceeded')
-      return Promise.reject(new Error('Too many requests. Please wait.'))
+      console.error('⚠️ Rate limit exceeded')
+      throw new Error('Too many requests. Please wait a moment.')
     }
     
-    return Promise.reject(error)
+    throw error
   }
 )
 
