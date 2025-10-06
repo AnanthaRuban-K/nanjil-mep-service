@@ -16,45 +16,19 @@ export const api = axios.create({
   withCredentials: false,
 })
 
-const getAuthToken = async (): Promise<string | null> => {
+const getAuthToken = (): string | null => {
   if (typeof window === 'undefined') return null
-  
-  try {
-    const waitForClerk = () => new Promise<any>((resolve) => {
-      const checkClerk = () => {
-        const clerk = (window as any).Clerk
-        if (clerk?.loaded) {
-          resolve(clerk)
-        } else {
-          setTimeout(checkClerk, 100)
-        }
-      }
-      checkClerk()
-    })
-
-    const clerk = await waitForClerk()
-    
-    if (!clerk?.session) {
-      console.warn('No active Clerk session')
-      return null
-    }
-
-    const token = await clerk.session.getToken()
-    return token
-  } catch (error) {
-    console.error('Failed to get auth token:', error)
-    return null
-  }
+  return localStorage.getItem('adminToken') || localStorage.getItem('token')
 }
 
 api.interceptors.request.use(
-  async (config) => {
-    const token = await getAuthToken()
+  (config) => {
+    const token = getAuthToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log('✅ Token attached to request')
+      console.log('Token attached to request')
     } else {
-      console.warn('⚠️ No token available')
+      console.warn('No token available')
     }
     return config
   },
@@ -64,8 +38,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config
-
     if (error.code === 'ECONNABORTED') {
       console.error('Request timeout')
       return Promise.reject(new Error('Server not responding. Please try again.'))
@@ -76,17 +48,17 @@ api.interceptors.response.use(
       return Promise.reject(new Error('Cannot connect to server.'))
     }
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
+    if (error.response?.status === 401) {
+      console.error('401 Unauthorized - Token invalid or expired')
       
-      const newToken = await getAuthToken()
-      if (newToken) {
-        originalRequest.headers.Authorization = `Bearer ${newToken}`
-        return api(originalRequest)
+      // Clear tokens
+      localStorage.removeItem('adminToken')
+      localStorage.removeItem('token')
+      
+      // Redirect to login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/admin/login'
       }
-      
-      // REDIRECT DISABLED - JUST LOG THE ERROR
-      console.error('❌ 401 Unauthorized - No valid token')
     }
 
     if (error.response?.status === 429) {
