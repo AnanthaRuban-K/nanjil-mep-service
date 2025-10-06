@@ -5,31 +5,28 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
     ? 'https://api.nanjilmepservice.com'
     : 'http://localhost:3101')
 
-console.log('🔧 API Base URL:', API_BASE_URL)
+console.log('API Base URL:', API_BASE_URL)
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
-  withCredentials: true, // Important for cookies
+  timeout: 30000, // Increased from 10s to 30s
+  withCredentials: false, // Changed - CORS doesn't need credentials for JWT
 })
 
-// Get Clerk session token
+// Get Clerk session token - CORRECTED VERSION
 const getAuthToken = async (): Promise<string | null> => {
   if (typeof window === 'undefined') return null
   
   try {
-    // Get Clerk's window object
+    // Correct way to access Clerk
     const clerk = (window as any).Clerk
-    if (!clerk) return null
+    if (!clerk?.session) return null
 
-    // Get session token from Clerk
-    const session = await clerk.session
-    if (!session) return null
-
-    const token = await session.getToken()
+    // Get token directly from current session
+    const token = await clerk.session.getToken()
     return token
   } catch (error) {
     console.error('Failed to get auth token:', error)
@@ -43,6 +40,9 @@ api.interceptors.request.use(
     const token = await getAuthToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+      console.log('Token attached to request') // Debug log
+    } else {
+      console.warn('No token available') // Debug log
     }
     return config
   },
@@ -57,39 +57,44 @@ api.interceptors.response.use(
 
     // Handle timeout
     if (error.code === 'ECONNABORTED') {
-      console.error('⏱️ Request timeout')
+      console.error('Request timeout')
       throw new Error('Server not responding. Please try again.')
     }
     
     // Handle network errors
     if (!error.response) {
-      console.error('🌐 Network error')
-      throw new Error('Cannot connect to server.')
+      console.error('Network error - cannot reach server')
+      throw new Error('Cannot connect to server. Check your internet connection.')
     }
 
     // Handle 401 - try to refresh token once
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       
+      // Try getting token again
       const newToken = await getAuthToken()
       if (newToken) {
         originalRequest.headers.Authorization = `Bearer ${newToken}`
         return api(originalRequest)
       }
       
-      // Redirect to login if still unauthorized
-      if (typeof window !== 'undefined' && window.location.pathname.includes('/admin')) {
-        window.location.href = '/admin/login'
+      // If still no token and on admin page, redirect to login
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname
+        if (path.startsWith('/admin') && path !== '/admin/login') {
+          console.error('Unauthorized - redirecting to login')
+          window.location.href = '/admin/login'
+        }
       }
     }
 
     // Handle 429 - rate limit
     if (error.response?.status === 429) {
-      console.error('⚠️ Rate limit exceeded')
+      console.error('Rate limit exceeded')
       throw new Error('Too many requests. Please wait a moment.')
     }
     
-    throw error
+    return Promise.reject(error)
   }
 )
 
