@@ -22,6 +22,7 @@ import { rateLimiter } from './middleware/RateLimiter'
 // Utils
 import { validateEnv } from './utils/env.js'
 import { notificationRoutes } from './routes/NotificationRoutes'
+import { adminOnly } from './middleware/adminOnly'
 const app = new Hono()
 
 // Validate environment variables
@@ -86,6 +87,7 @@ app.route('/api/notifications', notificationRoutes)
 // API Routes
 
 app.route('/api/bookings', bookingRoutes)
+app.use('/api/admin/*', adminOnly)  // Protect all admin routes
 app.route('/api/admin', adminRoutes)
 app.route('/api/services', serviceRoutes)
 app.route('/api/customers', customerRoutes)

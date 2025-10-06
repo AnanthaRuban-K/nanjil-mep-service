@@ -1,11 +1,12 @@
 import { Hono } from 'hono'
 import { AdminController } from '../controllers/AdminController'
-
+import { adminOnly } from '../middleware/adminOnly'  // Import it
 
 const adminRoutes = new Hono()
 const adminController = new AdminController()
 
-
+// Apply middleware to ALL admin routes
+adminRoutes.use('*', adminOnly)  // ← ADD THIS LINE
 
 // Dashboard & Analytics
 adminRoutes.get('/dashboard', (c) => adminController.getDashboardMetrics(c))
