@@ -76,17 +76,30 @@ export class AuthService {
   }
 
   async isUserAdmin(clerkUserId: string): Promise<boolean> {
-    try {
-      const result = await db.select()
-        .from(admins)
-        .where(eq(admins.clerkUserId, clerkUserId))
-      
-      return result.length > 0 && result[0].isActive === 'true'
-    } catch (error) {
-      console.error('isUserAdmin error:', error)
-      return false
+  try {
+    console.log('Checking admin for userId:', clerkUserId)
+    
+    const result = await db.select()
+      .from(admins)
+      .where(eq(admins.clerkUserId, clerkUserId))  // Make sure this matches your schema
+    
+    console.log('Admin query result:', result)
+    console.log('Records found:', result.length)
+    
+    if (result.length > 0) {
+      console.log('Admin record:', {
+        id: result[0].id,
+        clerkUserId: result[0].clerkUserId,
+        isActive: result[0].isActive
+      })
     }
+    
+    return result.length > 0 && result[0].isActive === 'true'
+  } catch (error) {
+    console.error('isUserAdmin error:', error)
+    return false
   }
+}
 
   async createAdmin(adminData: {
     clerkUserId: string
