@@ -18,19 +18,23 @@ export function BookingList() {
   const cancelBookingMutation = useCancelBooking()
   const submitFeedbackMutation = useSubmitBookingFeedback()
 
-  const handleCancelBooking = async (bookingId: string) => {
+  const handleCancelBooking = async (booking: Booking) => {
     if (!confirm('இந்த பதிவை இரத்து செய்ய வேண்டுமா? / Do you want to cancel this booking?')) {
       return
     }
 
     try {
+      // Convert booking.id to string for the API call
       await cancelBookingMutation.mutateAsync({ 
-        bookingId, 
+        bookingId: String(booking.id), 
         reason: 'Customer requested cancellation' 
       })
-      alert('பதிவு இரத்து செய்யப்பட்டது / Booking cancelled')
-    } catch (error) {
-      alert('பிழை ஏற்பட்டது / Error occurred')
+      alert('பதிவு இரத்து செய்யப்பட்டது / Booking cancelled successfully')
+      refetch() // Refresh the bookings list
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.message || 'Failed to cancel booking'
+      alert(`பிழை ஏற்பட்டது / Error: ${errorMsg}`)
+      console.error('Cancel booking error:', error)
     }
   }
 
@@ -38,8 +42,9 @@ export function BookingList() {
     if (!selectedBooking || rating === 0) return
 
     try {
+      // Use booking.id for the API call
       await submitFeedbackMutation.mutateAsync({
-        bookingId: selectedBooking.bookingNumber,
+        bookingId: String(selectedBooking.id),
         rating,
         review
       })
@@ -47,9 +52,12 @@ export function BookingList() {
       setSelectedBooking(null)
       setRating(0)
       setReview('')
-      alert('மதிப்பீடு சமர்ப்பிக்கப்பட்டது / Rating submitted')
-    } catch (error) {
-      alert('பிழை ஏற்பட்டது / Error occurred')
+      alert('மதிப்பீடு சமர்ப்பிக்கப்பட்டது / Rating submitted successfully')
+      refetch() // Refresh the bookings list
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.message || 'Failed to submit rating'
+      alert(`பிழை ஏற்பட்டது / Error: ${errorMsg}`)
+      console.error('Submit rating error:', error)
     }
   }
 
@@ -72,6 +80,14 @@ export function BookingList() {
       case 'completed': return 'முடிந்தது (Completed)'
       case 'cancelled': return 'இரத்து செய்யப்பட்டது (Cancelled)'
       default: return status
+    }
+  }
+
+  const getServiceTypeText = (serviceType: string) => {
+    switch (serviceType) {
+      case 'electrical': return 'மின்சாரம் (Electrical)'
+      case 'plumbing': return 'குழாய் (Plumbing)'
+      default: return serviceType
     }
   }
 
@@ -143,7 +159,10 @@ export function BookingList() {
                     <div className="flex items-center space-x-3 mb-2">
                       <span className={`w-3 h-3 rounded-full ${
                         booking.status === 'completed' ? 'bg-green-500' :
-                        booking.status === 'cancelled' ? 'bg-red-500' : 'bg-yellow-500'
+                        booking.status === 'cancelled' ? 'bg-red-500' : 
+                        booking.status === 'in_progress' ? 'bg-purple-500' :
+                        booking.status === 'confirmed' ? 'bg-blue-500' :
+                        'bg-yellow-500'
                       }`}></span>
                       <span className="font-bold text-lg">#{booking.bookingNumber}</span>
                       <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(booking.status)}`}>
@@ -155,13 +174,16 @@ export function BookingList() {
                       <div>
                         <p className="text-sm text-gray-600">Service:</p>
                         <p className="font-medium">
-                          {booking.serviceType === 'electrical' ? 'மின்சாரம் (Electrical)' : 'குழாய் (Plumbing)'}
+                          {getServiceTypeText(booking.serviceType)}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Scheduled:</p>
                         <p className="font-medium">
-                          {new Date(booking.scheduledTime).toLocaleDateString('en-IN')}
+                          {new Date(booking.scheduledTime).toLocaleString('en-IN', {
+                            dateStyle: 'medium',
+                            timeStyle: 'short'
+                          })}
                         </p>
                       </div>
                     </div>
@@ -198,7 +220,7 @@ export function BookingList() {
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
                     <Clock className="w-4 h-4" />
                     <span>
-                      Booked: {new Date(booking.createdAt || '').toLocaleDateString('en-IN')}
+                      Booked: {new Date(booking.createdAt || booking.scheduledTime).toLocaleDateString('en-IN')}
                     </span>
                   </div>
                   
@@ -207,12 +229,13 @@ export function BookingList() {
                       onClick={() => window.location.href = 'tel:1800-NANJIL'}
                       className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
                     >
+                      <Phone className="w-4 h-4 inline mr-1" />
                       Call Us
                     </button>
                     
-                    {booking.status === 'pending' && (
+                    {(booking.status === 'pending' || booking.status === 'confirmed') && (
                       <button
-                        onClick={() => handleCancelBooking(booking.bookingNumber)}
+                        onClick={() => handleCancelBooking(booking)}
                         disabled={cancelBookingMutation.isPending}
                         className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
                       >
@@ -228,6 +251,7 @@ export function BookingList() {
                         }}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
                       >
+                        <Star className="w-4 h-4 inline mr-1" />
                         Rate Service
                       </button>
                     )}
@@ -262,7 +286,7 @@ export function BookingList() {
                 </h3>
                 <button
                   onClick={() => setShowRatingModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
                 >
                   ×
                 </button>
@@ -271,7 +295,10 @@ export function BookingList() {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-600 mb-2">
-                    Booking: {selectedBooking.bookingNumber}
+                    Booking: #{selectedBooking.bookingNumber}
+                  </p>
+                  <p className="text-sm font-medium text-gray-700 mb-1">
+                    {getServiceTypeText(selectedBooking.serviceType)}
                   </p>
                   <p className="text-sm text-gray-600">
                     How was our service?
@@ -283,7 +310,7 @@ export function BookingList() {
                     <button
                       key={star}
                       onClick={() => setRating(star)}
-                      className={`text-2xl ${
+                      className={`text-3xl ${
                         star <= rating ? 'text-yellow-400' : 'text-gray-300'
                       } hover:text-yellow-400 transition-colors`}
                     >
@@ -295,7 +322,7 @@ export function BookingList() {
                 <textarea
                   value={review}
                   onChange={(e) => setReview(e.target.value)}
-                  placeholder="Optional review..."
+                  placeholder="Optional review... (மதிப்புரை எழுதவும்)"
                   rows={3}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
@@ -303,7 +330,11 @@ export function BookingList() {
               
               <div className="mt-6 flex justify-end space-x-3">
                 <button
-                  onClick={() => setShowRatingModal(false)}
+                  onClick={() => {
+                    setShowRatingModal(false)
+                    setRating(0)
+                    setReview('')
+                  }}
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
                 >
                   Cancel
